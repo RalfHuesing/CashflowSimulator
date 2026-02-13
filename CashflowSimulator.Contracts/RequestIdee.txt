@@ -1,0 +1,239 @@
+vorläufige idee wie SimulationProjectDto aufgebaut sein könnte
+
+{
+  "meta": {
+    "scenarioName": "Balanced 60/40 - Strategie mit Cash-Tent",
+    "version": "2.2",
+    "createdAt": "2026-02-10T16:15:00Z",
+
+    // --- SIMULATIONS-STEUERUNG ---
+    // Modus: "Stochastic" (Monte Carlo) oder "Historical" (Backtesting)
+    "simulationMode": "Stochastic",
+    "monteCarloOptions": {
+      "iterations": 5000,   // Höhere Anzahl glättet statistische Ausreißer (Konvergenz)
+      "randomSeed": 42      // Fixer Seed garantiert, dass bei erneutem Run exakt dieselben Kurven rauskommen
+    },
+    "applyInflation": true, // Aktiviert Kaufkraftverlust-Berechnung
+    "applyTaxation": true   // Aktiviert Steuerlogik (KapESt, Vorabpauschale etc.)
+  },
+
+  "parameters": {
+    "startYear": 2024,
+    "endYear": 2085,        // Zeithorizont bis zum 100. Lebensjahr (Langlebigkeitsrisiko abdecken)
+    "birthYear": 1985,      // Dient der Berechnung des biologischen Alters im Chart
+    "retirementYear": 2050, // Trigger für den Phasenwechsel (Ansparen -> Entnehmen)
+    "initialLiquidCash": 25000.00, // Startkapital auf dem Giro/Tagesgeld (außerhalb des Depots)
+    "currencyCode": "EUR"
+  },
+
+  // --- STEUERLICHES UMFELD (DEUTSCHLAND 2024+) ---
+  "taxEnvironment": {
+    "capitalGainsTaxRate": 0.26375,  // 25% Abgeltungsteuer + 5,5% Soli
+    "taxFreeAllowance": 1000.00,     // Sparer-Pauschbetrag (jährlich erneuerbar)
+    "initialLossCarryforward": 2500.00, // Altverluste: Werden vor neuen Steuern verrechnet
+    
+    // Parameter für die Rentenbesteuerung (nachgelagert)
+    "incomeTaxFreeAmount": 11604.00, // Grundfreibetrag ESt
+    "socialSecurityRateRetiree": 0.11 // Pauschale für KVdR (ca. 8%) + PV (ca. 3-4%)
+  },
+
+  "economics": {
+    // --- BASISZINS (VORABPAUSCHALE) ---
+    // Bestimmt die steuerliche fiktive Mindestrendite.
+    // Kann als Zeitreihe definiert werden, um Zinsänderungen zu simulieren.
+    "baseInterestRate": {
+        "default": 0.02,    // Langfristige Annahme (2%)
+        "2023": 0.00,       // Historisch: Keine Vorabpauschale
+        "2024": 0.0229,     // Aktuell: Bundesbank Basiszins Jan 2024
+        "2025": 0.0250      // Prognose
+    },
+
+    // --- INFLATIONSSZENARIEN ---
+    "inflationDefinitions": [
+      { 
+        "id": "inf-base", 
+        "name": "VPI (Basisinflation)", 
+        // Zeitreihe: Inflation ist kurzfristig hoch, pendelt sich langfristig ein
+        "annualRate": {
+            "default": 0.02, // EZB Ziel
+            "2024": 0.038,
+            "2025": 0.030
+        }
+      },
+      { 
+        "id": "inf-housing", 
+        "name": "Wohnkosten & Energie", 
+        // Annahme: Wohnen verteuert sich schneller als der Warenkorb
+        "annualRate": {
+            "default": 0.03,
+            "2024": 0.048,
+            "2025": 0.040
+        }
+      }
+    ]
+  },
+
+  "cashflowStreams": [
+    // 1. HAUPTEINNAHME (Gehalt)
+    {
+      "id": "inc-salary",
+      "name": "Angestelltenverhältnis Netto",
+      "type": "Income",
+      "recurrence": "Monthly",
+      "amount": 3800.00,
+      "timeline": {
+        "start": "2024-01-01",
+        "end": "2050-12-31" // Endet exakt mit dem retirementYear
+      },
+      "adjustments": {
+        "inflationReferenceId": "inf-base",
+        // Reallohnsteigerung: Gehalt steigt 1% stärker als die Basisinflation
+        "realGrowthRate": 0.01 
+      }
+    },
+    // 2. BASIS-AUSGABEN
+    {
+      "id": "exp-living",
+      "name": "Lebenshaltung (Konsum)",
+      "type": "Expense",
+      "recurrence": "Monthly",
+      "amount": 1200.00,
+      "timeline": { "start": "2024-01-01", "end": null }, // "null" = Lebenslang
+      "adjustments": { "inflationReferenceId": "inf-base" }
+    },
+    // 3. WOHNKOSTEN (Spezielle Inflationsrate)
+    {
+      "id": "exp-housing",
+      "name": "Warmmiete / Hausgeld",
+      "type": "Expense",
+      "recurrence": "Monthly",
+      "amount": 1400.00,
+      "timeline": { "start": "2024-01-01", "end": null },
+      "adjustments": { "inflationReferenceId": "inf-housing" }
+    }
+  ],
+
+  "portfolio": {
+    "strategy": {
+      // --- A) REBALANCING ---
+      "rebalancing": {
+        "mode": "Threshold", // Spart Gebühren: Nur handeln, wenn Bänder verletzt werden
+        "checkInterval": "Monthly",
+        "absoluteDeviationThreshold": 0.05, // Toleranzband: +/- 5% (z.B. 45-55% bei 50% Ziel)
+        "minimumTransactionAmount": 500.00  // Unterdrückt Kleinst-Transaktionen
+      },
+
+      // --- B) LIQUIDITÄTSMANAGEMENT (GLIDE PATH) ---
+      "liquidity": {
+        // PHASE 1: ANSPAREN (bis 2050)
+        "accumulation": {
+          "lookaheadMonths": 6, // Eiserne Reserve für Notfälle
+          "priority": "FillCashFirst" // Erst Puffer voll machen, Rest investieren
+        },
+        
+        // PHASE 2: ENTSPAREN (ab 2050)
+        "decumulation": {
+          "lookaheadMonths": 36, // "Cash Tent": 3 Jahre Puffer gegen Sequence-of-Returns Risiko
+          
+          // "PROPHYLACTIC REFILL" (Markt-Timing Light)
+          // Strategie: In Boom-Phasen (nahe All-Time-High) Gewinne sichern
+          "prophylacticRefill": {
+            "enabled": true,
+            "trigger": "MarketCloseToAth", 
+            "athThreshold": 0.05,   // Wenn Markt < 5% vom ATH entfernt
+            "refillTargetMonths": 60 // ... erhöhe Puffer auf 5 Jahre
+          }
+        }
+      }
+    },
+
+    // --- PORTFOLIO STRUKTUR (Summe TargetWeight = 1.0) ---
+    "allocationBuckets": [
+      
+      // BUCKET 1: INDUSTRIELÄNDER (50%)
+      {
+        "id": "bucket-dev-markets",
+        "name": "Equity Developed Markets",
+        "targetWeight": 0.50, 
+        "holdings": [
+          {
+            "id": "asset-msci-world",
+            "isin": "IE00B4L5Y983",
+            "name": "iShares Core MSCI World",
+            "currentPricePerUnit": 92.50, // Aktueller Kurs für t=0
+            "isPrimaryStrategyInstrument": true, // Aktives Sparplan-Instrument
+            "attributes": {
+              "expectedReturn": 0.075, // Nominalrendite
+              "volatility": 0.16,      // Risiko
+              "correlationToMarket": 0.95, // Hohes Beta
+              "partialExemptionRate": 0.30 // 30% Steuerfrei (Aktienfonds)
+              "allowFractionalShares": true
+"transactionFeeFixed": 4.90, // Fixe Kosten pro Order
+  "transactionFeePercent": 0.0025, // Prozentuale Kosten (z.B. 0,25%)
+            },
+            "transactionHistory": [
+                { "date": "2022-01-15", "type": "Buy", "quantity": 100.0, "price": 85.00 }
+            ]
+          }
+        ]
+      },
+
+      // BUCKET 2: SCHWELLENLÄNDER (10%)
+      {
+        "id": "bucket-em-markets",
+        "name": "Equity Emerging Markets",
+        "targetWeight": 0.10,
+        "holdings": [
+          {
+            "id": "asset-msci-em",
+            "isin": "IE00BKM4GZ66",
+            "name": "iShares Core MSCI EM IMI",
+            "currentPricePerUnit": 28.40,
+            "isPrimaryStrategyInstrument": true,
+            "attributes": {
+              "expectedReturn": 0.085, // Höhere Chance...
+              "volatility": 0.22,      // ...bei höherem Risiko
+              "correlationToMarket": 0.75, // Diversifiziert das Portfolio
+              "partialExemptionRate": 0.30,
+              "allowFractionalShares": true
+"transactionFeeFixed": 4.90, // Fixe Kosten pro Order
+  "transactionFeePercent": 0.0025, // Prozentuale Kosten (z.B. 0,25%)
+            },
+            "transactionHistory": [
+                // Beispiel: Vorabpauschale wurde bereits gezahlt
+                { "date": "2024-01-02", "type": "TaxPrepayment", "amount": 12.50, "note": "Vorabpauschale 2023" }
+            ]
+          }
+        ]
+      },
+
+      // BUCKET 3: SICHERHEITSBAUSTEIN (40%)
+      {
+        "id": "bucket-bonds",
+        "name": "High Grade Bonds (EUR)",
+        "targetWeight": 0.40,
+        "holdings": [
+          {
+            "id": "asset-gov-bonds",
+            "isin": "LU0290355717",
+            "name": "Xtrackers Eurozone Gov Bond",
+            "currentPricePerUnit": 142.10,
+            "isPrimaryStrategyInstrument": true,
+            "attributes": {
+              "expectedReturn": 0.025, // Zinsrendite
+              "volatility": 0.04,      // Sehr schwankungsarm
+              "correlationToMarket": 0.10, // Kaum Korrelation zu Aktien (Stabilisator)
+              "partialExemptionRate": 0.00 // Keine Teilfreistellung
+              "allowFractionalShares": false
+"transactionFeeFixed": 4.90, // Fixe Kosten pro Order
+  "transactionFeePercent": 0.0025, // Prozentuale Kosten (z.B. 0,25%)
+            },
+            "transactionHistory": [
+                { "date": "2023-06-01", "type": "Buy", "quantity": 50.0, "price": 138.00 }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
