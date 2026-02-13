@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta"
+             xmlns:components="clr-namespace:CashflowSimulator.Desktop.Common.Components"
+             x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
+             x:DataType="meta:MetaEditViewModel">
+  <components:FeaturePageView Title="Stammdaten"
+                              Description="Szenario-Name und Metadaten bearbeiten.">
+    <StackPanel Spacing="{StaticResource SpacingMediumValue}">
+      <TextBlock Text="Szenario-Name" Foreground="{StaticResource SecondaryTextBrush}"/>
+      <TextBox Text="{Binding ScenarioName}" Watermark="Name des Szenarios"/>
+      <TextBlock Text="{Binding CreatedAt, StringFormat=Erstellt am: {0:dd.MM.yyyy HH:mm}}"
+                 Foreground="{StaticResource SecondaryTextBrush}"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingMediumValue}" Margin="{StaticResource SpacingLarge}">
+        <Button Content="Übernehmen" Command="{Binding ApplyCommand}" Classes.primary="True"/>
+      </StackPanel>
+    </StackPanel>
+  </components:FeaturePageView>
+</UserControl>

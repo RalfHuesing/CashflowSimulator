@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
              xmlns:nav="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
+             xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
              x:DataType="main:MainShellViewModel">
   <Grid RowDefinitions="Auto,*">
@@ -52,10 +53,13 @@
         </DockPanel>
       </Border>
       <Border Grid.Column="1" Padding="{StaticResource SpacingLarge}" Background="{StaticResource ContentBackgroundBrush}">
-        <TextBlock Text="Bereich für Inhalte (Stammdaten, Cashflows, …)"
-                   Foreground="{StaticResource SecondaryTextBrush}"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>
+        <ContentControl Content="{Binding CurrentContent}">
+          <ContentControl.DataTemplates>
+            <DataTemplate DataType="meta:MetaEditViewModel">
+              <meta:MetaEditView/>
+            </DataTemplate>
+          </ContentControl.DataTemplates>
+        </ContentControl>
       </Border>
     </Grid>
   </Grid>

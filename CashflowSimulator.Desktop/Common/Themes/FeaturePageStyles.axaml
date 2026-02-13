@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="TextBlock.feature-page-title">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSection}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+  </Style>
+  <Style Selector="TextBlock.feature-page-description">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
+    <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+    <Setter Property="Margin" Value="0,0,0,8"/>
+  </Style>
+</Styles>

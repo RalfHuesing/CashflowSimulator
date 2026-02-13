@@ -1,6 +1,7 @@
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
+using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,30 +17,30 @@ public partial class MainShellViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    [NotifyCanExecuteChangedFor(nameof(OpenStammdatenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShowStammdatenCommand))]
     [NotifyPropertyChangedFor(nameof(CurrentProjectTitle))]
     private SimulationProjectDto _currentProject;
 
     [ObservableProperty]
     private string? _currentFilePath;
 
+    [ObservableProperty]
+    private object? _currentContent;
+
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
-    private readonly IMetaEditDialogService _metaEditDialogService;
     private readonly IDefaultProjectProvider _defaultProjectProvider;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
-        IMetaEditDialogService metaEditDialogService,
         IDefaultProjectProvider defaultProjectProvider,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
         _fileDialogService = fileDialogService;
         _storageService = storageService;
-        _metaEditDialogService = metaEditDialogService;
         _defaultProjectProvider = defaultProjectProvider;
         _logger = logger;
         Navigation = navigationViewModel;
@@ -47,9 +48,10 @@ public partial class MainShellViewModel : ObservableObject
         CurrentProject = _defaultProjectProvider.CreateDefault();
         CurrentFilePath = null;
 
-        var stammdatenItem = new NavItemViewModel { DisplayName = "Stammdaten", Command = OpenStammdatenCommand };
+        var stammdatenItem = new NavItemViewModel { DisplayName = "Stammdaten", Command = ShowStammdatenCommand };
         navigationViewModel.Items.Add(stammdatenItem);
-        stammdatenItem.IsActive = true;
+
+        ShowStammdaten();
     }
 
     /// <summary>
@@ -107,13 +109,16 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanSave() => CurrentProject is not null;
 
-    [RelayCommand(CanExecute = nameof(CanOpenStammdaten))]
-    private async Task OpenStammdatenAsync()
+    [RelayCommand(CanExecute = nameof(CanShowStammdaten))]
+    private void ShowStammdaten()
     {
-        var updated = await _metaEditDialogService.ShowEditAsync(CurrentProject.Meta).ConfigureAwait(true);
-        if (updated is null) return;
-        CurrentProject = CurrentProject with { Meta = updated };
+        CurrentContent = new MetaEditViewModel(CurrentProject.Meta, meta =>
+        {
+            CurrentProject = CurrentProject with { Meta = meta };
+        });
+        foreach (var item in Navigation.Items)
+            item.IsActive = item.DisplayName == "Stammdaten";
     }
 
-    private bool CanOpenStammdaten() => CurrentProject is not null;
+    private bool CanShowStammdaten() => CurrentProject is not null;
 }

@@ -5,7 +5,6 @@ using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
-using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Infrastructure.Storage;
@@ -44,8 +43,6 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
                 services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
-                services.AddSingleton<MetaEditDialogService>();
-                services.AddSingleton<IMetaEditDialogService>(sp => sp.GetRequiredService<MetaEditDialogService>());
 
                 // Shell / Main-Feature
                 services.AddTransient<NavigationViewModel>();

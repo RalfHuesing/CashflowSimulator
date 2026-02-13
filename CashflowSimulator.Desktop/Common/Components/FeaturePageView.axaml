@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:CashflowSimulator.Desktop.Common.Components"
+             x:Class="CashflowSimulator.Desktop.Common.Components.FeaturePageView">
+  <StackPanel Spacing="{StaticResource SpacingMediumValue}" Margin="{StaticResource SpacingLarge}">
+    <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=components:FeaturePageView}}"
+               Classes="feature-page-title"/>
+    <TextBlock Text="{Binding Description, RelativeSource={RelativeSource AncestorType=components:FeaturePageView}}"
+               Classes="feature-page-description"/>
+    <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource AncestorType=components:FeaturePageView}}"/>
+  </StackPanel>
+</UserControl>

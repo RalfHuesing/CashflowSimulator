@@ -7,6 +7,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="/Common/Themes/Default.axaml"/>
+        <StyleInclude Source="/Common/Themes/FeaturePageStyles.axaml"/>
         <StyleInclude Source="/Features/Main/Themes/MainShellStyles.axaml"/>
     </Application.Styles>
 </Application>
