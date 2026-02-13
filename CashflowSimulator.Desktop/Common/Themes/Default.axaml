@@ -1,0 +1,21 @@
+<Styles xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- Zentrale Farben/Brushes – keine Hardcodes in Views verwenden -->
+      <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4"/>
+      <SolidColorBrush x:Key="TextBrush" Color="#212121"/>
+      <SolidColorBrush x:Key="SecondaryTextBrush" Color="#616161"/>
+      <!-- Gemeinsame Abstände -->
+      <Thickness x:Key="SpacingSmall">4</Thickness>
+      <Thickness x:Key="SpacingMedium">8</Thickness>
+      <Thickness x:Key="SpacingLarge">16</Thickness>
+      <!-- App-Titel für Fenster -->
+      <x:String x:Key="ApplicationTitle">Cashflow Simulator</x:String>
+    </ResourceDictionary>
+  </Styles.Resources>
+  <!-- Optionale Basis-Styles für Controls; erweiterbar -->
+  <Style Selector="Button">
+    <Setter Property="Padding" Value="{StaticResource SpacingMedium}"/>
+  </Style>
+</Styles>

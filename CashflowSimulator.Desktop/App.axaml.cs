@@ -1,6 +1,8 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CashflowSimulator.Desktop
 {
@@ -15,7 +17,7 @@ namespace CashflowSimulator.Desktop
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow();
+                desktop.MainWindow = CompositionRoot.Services.GetRequiredService<MainWindow>();
             }
 
             base.OnFrameworkInitializationCompleted();

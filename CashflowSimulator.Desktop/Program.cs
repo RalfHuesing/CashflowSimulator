@@ -1,18 +1,31 @@
-﻿using Avalonia;
 using System;
+using Avalonia;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace CashflowSimulator.Desktop
 {
     internal class Program
     {
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
         [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        public static void Main(string[] args)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug()
+                .CreateLogger();
 
-        // Avalonia configuration, don't remove; also used by visual designer.
+            var services = new ServiceCollection();
+            services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
+            services.AddTransient<MainWindow>();
+            var serviceProvider = services.BuildServiceProvider();
+            CompositionRoot.Services = serviceProvider;
+
+            BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(args);
+        }
+
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
