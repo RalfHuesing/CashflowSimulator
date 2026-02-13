@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
+             x:Class="CashflowSimulator.Desktop.Features.Main.BottomBarView"
+             x:DataType="main:MainShellViewModel"
+             Padding="{StaticResource SpacingMedium}"
+             Background="{StaticResource NavBackgroundBrush}">
+  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+    <Button Content="Laden" Command="{Binding LoadCommand}"/>
+    <Button Content="Speichern" Command="{Binding SaveCommand}"/>
+  </StackPanel>
+</UserControl>

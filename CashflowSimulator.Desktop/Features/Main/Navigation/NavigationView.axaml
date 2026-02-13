@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
+             x:Class="CashflowSimulator.Desktop.Features.Main.Navigation.NavigationView"
+             x:DataType="vm:NavigationViewModel"
+             Background="{StaticResource NavBackgroundBrush}"
+             Padding="{StaticResource SpacingMedium}">
+  <ItemsControl ItemsSource="{Binding Items}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate DataType="vm:NavItemViewModel">
+        <Button Content="{Binding DisplayName}"
+                Command="{Binding Command}"
+                Margin="{StaticResource SpacingSmall}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"/>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

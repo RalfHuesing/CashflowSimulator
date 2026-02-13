@@ -7,24 +7,32 @@ Avalonia-Desktop-Client (.NET 9) des **Cashflow Simulators**. Einstiegspunkt und
 - **Abhängigkeiten:** Dieses Projekt referenziert **CashflowSimulator.Contracts** (DTOs, Result, Interfaces). Optional später: Engine, Infrastructure.
 - **Keine umgekehrten Abhängigkeiten:** Core/Infrastructure kennen die Desktop-App nicht. Siehe Solution-README bzw. `.cursor/rules/main.md` für die Gesamtarchitektur.
 
-## Ordner- und Namespacestruktur (vereinbart)
+## Ordner- und Namespacestruktur (Feature-basiert)
+
+Die App ist nach **Domänen-Features** organisiert (Vertical Slices). Details siehe **FEATURES.md**.
 
 ```
 CashflowSimulator.Desktop/
-├── App.axaml, App.axaml.cs, Program.cs, MainWindow.*   # Root – Einstieg, Hauptfenster
+├── App.axaml, App.axaml.cs, Program.cs, MainWindow.*   # Root – Einstieg, Hauptfenster (hostet Shell)
 ├── CompositionRoot.cs                                  # Zugriff auf ServiceProvider (gesetzt in Program.Main)
 ├── Common/
-│   ├── Themes/                                         # Zentrale Styles – keine hardcodierten Farben/Margins in Views
-│   │   └── Default.axaml                               # Brushes, Thickness, ApplicationTitle, Basis-Styles
-│   └── Controls/                                       # Wiederverwendbare UserControls (Namespace: CashflowSimulator.Desktop.Common.Controls)
-├── Views/                                              # (geplant) Fenster, Dialoge, große Screens
-├── ViewModels/                                          # (geplant) ViewModels
-└── Services/                                            # (geplant) UI-Dienste (z. B. Dialoge öffnen)
+│   ├── Themes/Default.axaml                            # Brushes, Thickness, ApplicationTitle – keine Hardcodes in Views
+│   └── Controls/                                       # Wiederverwendbare UserControls
+├── Services/                                            # App-weite UI-Dienste (plattformunabhängig)
+│   ├── IFileDialogService.cs                           # Öffnen/Speichern (Avalonia StorageProvider)
+│   └── AvaloniaFileDialogService.cs
+└── Features/
+    ├── Main/                                            # Shell: Banner, Navigation links, Content, Laden/Speichern unten
+    │   ├── MainShellView*, MainShellViewModel
+    │   ├── Navigation/NavigationView*, NavigationViewModel
+    │   └── BottomBarView*
+    ├── Meta/                                            # Stammdaten: MetaEditDialog
+    └── Cashflow/                                        # (später) Liste, Dialoge
 ```
 
 - **Root-Namespace:** `CashflowSimulator.Desktop` für App, Program, MainWindow, CompositionRoot.
-- **Common/Themes:** Reine XAML-Ressourcen (ResourceDictionary in Styles); in `App.axaml` per `StyleInclude Source="/Common/Themes/Default.axaml"` eingebunden.
-- **Common/Controls:** UserControls mit Namespace `CashflowSimulator.Desktop.Common.Controls`.
+- **Services:** `CashflowSimulator.Desktop.Services` – z. B. Dateidialog (Windows-unabhängig über Avalonia).
+- **Features:** `CashflowSimulator.Desktop.Features.Main`, `.Features.Meta`, `.Features.Main.Navigation` usw.
 
 ## Technische Grundlagen
 

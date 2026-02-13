@@ -2,7 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="CashflowSimulator.Desktop.MainWindow"
-        Title="{StaticResource ApplicationTitle}">
+        Title="{StaticResource ApplicationTitle}"
+        Width="900" Height="600">
+  <main:MainShellView/>
 </Window>

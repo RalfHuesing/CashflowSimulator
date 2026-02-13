@@ -6,6 +6,10 @@
       <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4"/>
       <SolidColorBrush x:Key="TextBrush" Color="#212121"/>
       <SolidColorBrush x:Key="SecondaryTextBrush" Color="#616161"/>
+      <SolidColorBrush x:Key="BannerBrush" Color="#0078D4"/>
+      <SolidColorBrush x:Key="BannerTextBrush" Color="#FFFFFF"/>
+      <SolidColorBrush x:Key="NavBackgroundBrush" Color="#F5F5F5"/>
+      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FAFAFA"/>
       <!-- Gemeinsame Abstände -->
       <Thickness x:Key="SpacingSmall">4</Thickness>
       <Thickness x:Key="SpacingMedium">8</Thickness>

@@ -3,12 +3,14 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CashflowSimulator.Contracts\CashflowSimulator.Contracts.csproj" />
+    <ProjectReference Include="..\CashflowSimulator.Infrastructure\CashflowSimulator.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

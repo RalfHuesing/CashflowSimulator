@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
+             xmlns:nav="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
+             x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
+             x:DataType="main:MainShellViewModel">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <!-- Banner oben: Logo/Titel -->
+    <Border Grid.Row="0" Background="{StaticResource BannerBrush}" Padding="{StaticResource SpacingMedium}">
+      <TextBlock Text="{Binding CurrentProjectTitle}"
+                 Foreground="{StaticResource BannerTextBrush}"
+                 FontSize="18"
+                 VerticalAlignment="Center"/>
+    </Border>
+
+    <!-- Mitte: Navigation links, Content rechts -->
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+      <nav:NavigationView Grid.Column="0"
+                          Width="220"
+                          DataContext="{Binding Navigation}"/>
+      <Border Grid.Column="1" Padding="{StaticResource SpacingLarge}" Background="{StaticResource ContentBackgroundBrush}">
+        <TextBlock Text="Bereich für Inhalte (Stammdaten, Cashflows, …)"
+                   Foreground="{StaticResource SecondaryTextBrush}"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"/>
+      </Border>
+    </Grid>
+
+    <!-- Unten: Laden, Speichern (DataContext = MainShellViewModel) -->
+    <main:BottomBarView Grid.Row="2" DataContext="{Binding}"/>
+  </Grid>
+</UserControl>
