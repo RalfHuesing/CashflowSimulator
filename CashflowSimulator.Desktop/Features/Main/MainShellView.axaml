@@ -5,6 +5,7 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Main"
              xmlns:nav="using:CashflowSimulator.Desktop.Features.Main.Navigation"
+             xmlns:meta="using:CashflowSimulator.Desktop.Features.Meta"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
              x:DataType="vm:MainShellViewModel">
@@ -84,17 +85,27 @@
                 </Grid>
 
                 <Border Grid.Row="1" Classes="card">
-                    <StackPanel Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fi:SymbolIcon Symbol="ArrowTrendingLines" FontSize="64" Foreground="#E5E7EB"/>
-                        <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
-                        
-                        <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid>
+                        <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
+                                    Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <fi:SymbolIcon Symbol="ArrowTrendingLines" FontSize="64" Foreground="#E5E7EB"/>
+                            <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        <ContentControl Content="{Binding CurrentContentViewModel}"
+                                         IsVisible="{Binding !IsContentPlaceholderVisible}">
+                            <ContentControl.DataTemplates>
+                                <DataTemplate DataType="meta:MetaEditViewModel">
+                                    <meta:MetaEditView/>
+                                </DataTemplate>
+                            </ContentControl.DataTemplates>
+                        </ContentControl>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>

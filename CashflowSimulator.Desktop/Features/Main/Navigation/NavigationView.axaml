@@ -14,7 +14,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:NavItemViewModel">
                     <Button Classes="ghost" 
-                            Command="{Binding $parent[main:MainShellView].((main:MainShellViewModel)DataContext).OpenStammdatenCommand}"
+                            Command="{Binding $parent[main:MainShellView].((main:MainShellViewModel)DataContext).OpenSzenarioCommand}"
                             HorizontalAlignment="Stretch"
                             Margin="0,2">
                         <Grid ColumnDefinitions="Auto, 16, *">

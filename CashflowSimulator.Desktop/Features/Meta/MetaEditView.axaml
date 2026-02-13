@@ -4,7 +4,7 @@
              xmlns:components="clr-namespace:CashflowSimulator.Desktop.Common.Components"
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
              x:DataType="meta:MetaEditViewModel">
-  <components:FeaturePageView Title="Stammdaten"
+  <components:FeaturePageView Title="Szenario"
                               Description="Szenario-Name und Metadaten bearbeiten.">
     <StackPanel Spacing="{StaticResource SpacingMediumValue}">
       <TextBlock Text="Szenario-Name" Foreground="{StaticResource SecondaryTextBrush}"/>

@@ -1,6 +1,7 @@
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
+using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,12 +18,16 @@ public partial class MainShellViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    [NotifyCanExecuteChangedFor(nameof(OpenStammdatenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenSzenarioCommand))]
     [NotifyPropertyChangedFor(nameof(CurrentProjectTitle))]
     private SimulationProjectDto _currentProject;
 
     [ObservableProperty]
     private string? _currentFilePath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsContentPlaceholderVisible))]
+    private object? _currentContentViewModel;
 
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
@@ -58,20 +63,25 @@ public partial class MainShellViewModel : ObservableObject
         ? "Unbenanntes Szenario"
         : CurrentProject.Meta.ScenarioName;
 
+    /// <summary>
+    /// True, wenn der Platzhalter im Content-Bereich angezeigt werden soll (kein Bereich ausgewählt).
+    /// </summary>
+    public bool IsContentPlaceholderVisible => CurrentContentViewModel is null;
+
     private void InitializeNavigation()
     {
         // Initialbefüllung der Navigation.
         // Später könnte dies basierend auf dem geladenen Projekt dynamisch erweitert werden.
 
-        var stammdatenItem = new NavItemViewModel
+        var szenarioItem = new NavItemViewModel
         {
-            DisplayName = "Stammdaten",
-            Icon = Symbol.Database, // FluentIcon: Database passt gut zu Meta-Daten
-            Command = OpenStammdatenCommand,
-            IsActive = true
+            DisplayName = "Szenario",
+            Icon = Symbol.Database,
+            Command = OpenSzenarioCommand,
+            IsActive = false
         };
 
-        Navigation.Items.Add(stammdatenItem);
+        Navigation.Items.Add(szenarioItem);
     }
 
     [RelayCommand]
@@ -139,26 +149,23 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanSave() => CurrentProject is not null;
 
-    [RelayCommand(CanExecute = nameof(CanOpenStammdaten))]
-    private async Task OpenStammdatenAsync()
+    [RelayCommand(CanExecute = nameof(CanOpenSzenario))]
+    private void OpenSzenario()
     {
-        _logger.LogDebug("Stammdaten geöffnet (Command ausgeführt).");
-        try
+        _logger.LogDebug("Szenario-Bereich geöffnet.");
+        var onApply = new Action<MetaDto>(updated =>
         {
-#if false
-            var updated = await _metaEditDialogService.ShowEditAsync(CurrentProject.Meta).ConfigureAwait(true);
-            if (updated is null) return; // Abbrechen
-
-            // Immutable Update: Wir erstellen eine Kopie des Projects mit neuen Meta-Daten
             CurrentProject = CurrentProject with { Meta = updated };
-            _logger.LogDebug("Stammdaten aktualisiert: {Name}", updated.ScenarioName);
-#endif
-        }
-        catch (Exception ex)
+            _logger.LogDebug("Szenario-Metadaten übernommen: {Name}", updated.ScenarioName);
+        });
+        CurrentContentViewModel = new MetaEditViewModel(CurrentProject.Meta, onApply);
+        if (Navigation.Items.Count > 0)
         {
-            _logger.LogError(ex, "Fehler im Stammdaten-Dialog.");
+            foreach (var item in Navigation.Items)
+                item.IsActive = false;
+            Navigation.Items[0].IsActive = true;
         }
     }
 
-    private bool CanOpenStammdaten() => CurrentProject is not null;
+    private bool CanOpenSzenario() => CurrentProject is not null;
 }
