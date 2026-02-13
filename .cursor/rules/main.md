@@ -1,40 +1,89 @@
-# San.Development.Tools AI Rules
+# Cashflow Simulator – AI Rules
 
-Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Architektur. Du arbeitest an einer modularen WPF-Solution (.NET 8).
+Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Architektur. Du arbeitest an einer portablen **Avalonia Desktop-App** (.NET 9). Die Kernlogik (Simulation, Steuern, Wachstumsmodelle) liegt in separaten DLLs.
 
-## 🌐 Projekt & Domain-Kontext
-- **Domain:** Entwickler-UI für Entwickler, die mit webbasierten KIS (Browser) arbeiten. Ermöglicht manuelles Extrahieren von spezifischem Kontext: SQL-Datenbankschema, Sage-100-Metadaten, Programm-Quellcode. Enthält Hilfs-Tools (z. B. Sage-Dienst neustarten, Prompt-Library).
-- **Solution & Einstiegspunkt:** Die **primäre Anwendung** ist **San.Development.Tools.App**; sie lädt und hostet die Features. Die Features sind bewusst als eigene Projekte (`San.Development.Tools.Features.*`) ausgelagert zur Entkopplung. Die **Standalone-Apps** (`*Feature*.App`, z. B. für ein einzelnes Feature) dienen ausschließlich dem **manuellen Testen** und werden produktiv nicht eingesetzt.
+## Projekt- und Domain-Überblick
 
-## 🏗 Architektur & Schichtenmodell
-- **Modular Monolith:** Halte die Trennung zwischen `Core` (Infrastruktur), `Database` (Domain) und `Features.*` (UI) strikt ein.
-- **Composition Root:** Registriere neue Services immer über Extension Methods (z.B. `Add[Feature]Feature`) in der jeweiligen Library.
-- **Thin Clients:** Die `.App` Projekte sind reine Bootstrapper. Keine Business-Logik oder komplexe XAML-Layouts dort.
+- **Produkt:** Cashflow Simulator – finanzielle Lebenssimulation für deutsche Nutzer über Dekaden (Anspar- und Rentenphase).
+- **Kernkonzepte:** Szenarien, SimulationProjectDto, Lebensabschnitte, Cashflows (Einnahmen/Ausgaben), Portfolio/Assets, Monte-Carlo-Simulation, Steuerlogik (FIFO, Vorabpauschale), externe Kursdaten (über Interfaces).
+- **Zielsprache:** Deutsch (keine Lokalisierung).
 
-## 🛠 Coding Standards (.NET 8 / C# 12)
-- **C# 12 Features:** Nutze konsequent Primary Constructors, Collection Expressions (`[]`) und Pattern Matching.
-- **Asynchronität:** - Nutze `await Task.Run` für CPU-intensive Arbeit.
-    - Verwende `ConfigureAwait(false)` in allen Domain- und Core-Libraries.
-    - Nutze `FireAndForgetSafeAsync()` für Hintergrund-Tasks aus ViewModels (verfügbar in `TaskExtensions`).
-- **Result Pattern:** Vermeide Exceptions für den Programmfluss. Nutze die `Result` oder `Result<T>` Klasse aus dem Core-Namespace.
-- **Boilerplate vermeiden:** Nutze zentrale Extension Methods (z.B. in `TaskExtensions` oder `SqlSchemaExtensions`), statt Logik zu duplizieren.
+## Solution-Struktur und Namenskonvention
 
-## 🖼 WPF & MVVM
-- **Strict MVVM:** Jegliche Logik gehört ins ViewModel. Das Code-Behind (`.xaml.cs`) darf nur den Konstruktor (`InitializeComponent`) und ggf. UI-spezifische Events enthalten, die nicht via Binding lösbar sind.
-- **BaseViewModel:** Alle ViewModels müssen von `BaseViewModel` erben. Nutze `RunSafeAsync` für Operationen mit Error-Handling und Busy-State.
-- **XAML Styling:** Keine Hardcoded-Colors oder Margins. Nutze die zentralen Ressourcen aus `San.Development.Tools.Core` (`San.Brushes.*`, `San.Styles.*`).
-- **Commands:** Nutze ausschließlich `[RelayCommand]` aus dem CommunityToolkit.Mvvm.
+- **Präfix:** `CashflowSimulator.*` für alle Projekte und Namespaces.
 
-## 📝 Kommentierung & Dokumentation
-- **Warum, nicht Wie:** Kommentiere nur komplexe fachliche Entscheidungen oder Domain-Wissen (z.B. Sage 100 Spezifika).
-- **Kein Rauschen:** Dokumentiere keine offensichtlichen Properties oder Standard-Konstruktoren.
-- **XML Docs:** Nur für öffentliche API-Schnittstellen in `Core` oder `Domain` Libraries, um IntelliSense-Support zu bieten.
+| Projekt | Verantwortung |
+| --- | --- |
+| **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. IPriceProvider). |
+| **CashflowSimulator.Core** | Stateless Mathematik – SimulationEngine, Wachstumsmodelle, Steuerlogik; keine UI, keine I/O. |
+| **CashflowSimulator.Infrastructure** | Außenwelt – Persistenz (Laden/Speichern Szenarien), Kursdaten (z. B. StockPriceEngine/Cache), Implementierungen für Contracts-Interfaces. |
+| **CashflowSimulator.Desktop** | Avalonia-UI; Einstiegspunkt, Composition Root; ViewModels wrappen DTOs aus Contracts; keine Business-Logik in Core/Engine nachbauen. |
 
-## ✅ Testing (xUnit)
-- **Framework:** Nutze xUnit mit `[Fact]` für Einzeltests und `[Theory]` für datengetriebene Tests.
-- **Mocking:** Nutze handgeschriebene Mocks (z. B. `MockFileService` für `IFileService`) oder bei Bedarf NSubstitute/Moq.
+Keine separaten „Feature“-Projekte; klare Schichtentrennung reicht.
+
+```mermaid
+flowchart TB
+    Contracts[CashflowSimulator.Contracts]
+    Core[CashflowSimulator.Core]
+    Infra[CashflowSimulator.Infrastructure]
+    Desktop[CashflowSimulator.Desktop]
+    Core --> Contracts
+    Infra --> Contracts
+    Desktop --> Core
+    Desktop --> Infra
+    Desktop --> Contracts
+```
+
+## Architektur und Datenfluss
+
+- **Contracts** sind das Bindeglied: Core und Infrastructure hängen nur von Contracts ab; Desktop hängt von allen Schichten ab.
+- **Datenfluss:** JSON → SimulationProjectDto → UI (ViewModels mit Backing Fields auf DTOs) → Simulation (DTO an Engine) → SimulationResultDto; Speichern = DTO 1:1 als JSON.
+- **Externe APIs:** Über Interfaces (z. B. in Contracts), Implementierungen in Infrastructure; austauschbar und testbar.
+
+## Coding Standards (.NET 9 / C#)
+
+- **C#:** Moderne Features nutzen – Primary Constructors, Collection Expressions, Pattern Matching.
+- **Async durchgängig:** CPU-intensive Arbeit (z. B. Simulation) in Libraries mit `Task.Run`/Parallelisierung; öffentliche Engine-API async (z. B. `RunSimulationAsync`); in allen Non-UI-Libraries `ConfigureAwait(false)`.
+- **SimulationEngine:** Alle Kerne nutzen (z. B. `Parallel.ForEach` über Monte-Carlo-Iterationen), API trotzdem async, damit die UI nicht blockiert.
+- **Result-Pattern:** Für erwartbare Fehler (Validierung, Laden/Speichern, fehlgeschlagene Services) `Result`/`Result<T>` verwenden; Exceptions für unerwartete Programmfehler. Implementierung in Core oder kleine Hilfsklasse.
+- Boilerplate vermeiden: zentrale Extension Methods, keine Duplikate.
+
+## Dependency Injection
+
+- **Container:** Microsoft.Extensions.DependencyInjection.
+- **Composition Root:** Im Desktop-Projekt (bei App-Start); Registrierung der Services aus Core und Infrastructure.
+- Constructor Injection; keine Service-Locator oder nicht über DI verwaltete Singletons.
+
+## Logging
+
+- **Serilog** als Standard; strukturiertes Logging.
+- In Libraries über abstrakte Schnittstelle injizieren (z. B. `ILogger`/`ILogger<T>`); Konfiguration im Desktop/Host.
+
+## Avalonia und MVVM
+
+- **Strict MVVM:** Logik im ViewModel; Code-Behind nur für `InitializeComponent` und UI-Events, die nicht per Binding abbildbar sind.
+- ViewModels: DTOs aus Contracts als Backing Fields; wo sinnvoll CommunityToolkit.Mvvm (RelayCommand etc.) oder etabliertes Avalonia-MVVM-Pattern nutzen.
+- **Fehlerbehandlung in der UI:** State of the Art – z. B. Toasts oder zentrale Fehleranzeige; Fehler aus Result/Exceptions dem Nutzer klar und verständlich (Deutsch) anzeigen.
+
+## XAML und Styling
+
+- **Keine Hardcoded-Colors/Margins** im XAML; zentrale Ressourcen (Styles, Brushes, Themes) von Anfang an anlegen und nutzen.
+- **Trennung Code vs. XAML:** Layout und Struktur im XAML; wiederkehrende Muster als **UserControls** kapseln, sobald sich Wiederholung abzeichnet.
+- Keine Business-Logik im Code-Behind.
+
+## Kommentierung und Dokumentation
+
+- Kommentieren: „Warum“, nicht „Wie“; nur bei komplexen fachlichen Entscheidungen oder Domain-Wissen (z. B. Steuer-FIFO, Lookahead).
+- **XML-Docs:** Für öffentliche APIs in Contracts und Core (IntelliSense).
+
+## Testing (xUnit)
+
+- **Framework:** xUnit; `[Fact]` für Einzeltests, `[Theory]` für datengetriebene Tests.
 - **Naming:** Testnamen folgen dem Muster `MethodName_StateUnderTest_ExpectedBehavior`.
+- **Mocking:** Interfaces aus Contracts mocken (z. B. IPriceProvider, IStorage); handgeschriebene Mocks oder NSubstitute/Moq.
+- Unit-Tests für Core (SimulationEngine, Steuerlogik) und sinnvolle Infrastruktur-Szenarien; UI-Tests optional später.
 
-## 🧹 Clean Code & SOLID
-- **Pragmatismus:** Enterprise Grade bedeutet Robustheit, nicht Over-Engineering. Wähle den simpelsten Weg, der testbar und wartbar bleibt.
-- **Dependency Injection:** Nutze Constructor Injection. Vermeide statische Service-Locator oder Singletons, die nicht über DI verwaltet werden.
+## Clean Code und SOLID
+
+- Pragmatisch: robust und wartbar, kein Over-Engineering.
+- SOLID und getrennte Verantwortlichkeiten: Contracts = Daten/Verträge; Core = reine Rechenlogik; Infrastructure = I/O und externe Dienste; Desktop = Präsentation und Orchestrierung.
