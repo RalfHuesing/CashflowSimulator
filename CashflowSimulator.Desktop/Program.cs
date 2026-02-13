@@ -5,6 +5,7 @@ using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
+using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Infrastructure.Storage;
@@ -43,14 +44,21 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
                 services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
+                services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
 
                 // Shell / Main-Feature
                 services.AddTransient<NavigationViewModel>();
                 services.AddTransient<MainShellViewModel>();
+                services.AddTransient<MetaEditViewModel>();
                 services.AddTransient<MainWindow>();
 
                 var serviceProvider = services.BuildServiceProvider();
                 CompositionRoot.Services = serviceProvider;
+
+                // Default-Projekt einmalig setzen
+                var projectService = serviceProvider.GetRequiredService<ICurrentProjectService>();
+                var defaultProvider = serviceProvider.GetRequiredService<IDefaultProjectProvider>();
+                projectService.SetCurrent(defaultProvider.CreateDefault());
 
                 BuildAvaloniaApp()
                     .StartWithClassicDesktopLifetime(args);

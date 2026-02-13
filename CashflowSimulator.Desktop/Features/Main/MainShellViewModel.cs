@@ -12,67 +12,79 @@ namespace CashflowSimulator.Desktop.Features.Main;
 
 /// <summary>
 /// ViewModel für die Hauptshell.
-/// Verwaltet den globalen Status (Projekt, Dateipfad) und orchestriert die Top-Level-Aktionen.
+/// Verwaltet die Anzeige und orchestriert Top-Level-Aktionen; der Projekt-State liegt in <see cref="ICurrentProjectService"/>.
 /// </summary>
 public partial class MainShellViewModel : ObservableObject
 {
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    [NotifyCanExecuteChangedFor(nameof(OpenSzenarioCommand))]
-    [NotifyPropertyChangedFor(nameof(CurrentProjectTitle))]
-    private SimulationProjectDto _currentProject;
-
-    [ObservableProperty]
-    private string? _currentFilePath;
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsContentPlaceholderVisible))]
     private object? _currentContentViewModel;
 
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
-    private readonly IDefaultProjectProvider _defaultProjectProvider;
+    private readonly ICurrentProjectService _currentProjectService;
+    private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
-        IDefaultProjectProvider defaultProjectProvider,
+        ICurrentProjectService currentProjectService,
+        Func<MetaEditViewModel> createMetaEditViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
         _fileDialogService = fileDialogService;
         _storageService = storageService;
-        _defaultProjectProvider = defaultProjectProvider;
+        _currentProjectService = currentProjectService;
+        _createMetaEditViewModel = createMetaEditViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
 
-        // Startzustand: Default-Projekt (InMemory)
-        CurrentProject = _defaultProjectProvider.CreateDefault();
-        CurrentFilePath = null;
-
+        _currentProjectService.ProjectChanged += OnProjectChanged;
         InitializeNavigation();
+        // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
+        SaveCommand.NotifyCanExecuteChanged();
+        OpenSzenarioCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
 
     /// <summary>
-    /// Dynamischer Titel für den Header-Bereich.
+    /// Dynamischer Titel für den Header-Bereich (aus <see cref="ICurrentProjectService"/>).
     /// </summary>
-    public string CurrentProjectTitle => string.IsNullOrWhiteSpace(CurrentProject.Meta.ScenarioName)
-        ? "Unbenanntes Szenario"
-        : CurrentProject.Meta.ScenarioName;
+    public string CurrentProjectTitle => GetCurrentProjectTitle();
+
+    /// <summary>
+    /// Aktueller Dateipfad (aus <see cref="ICurrentProjectService"/>).
+    /// </summary>
+    public string? CurrentFilePath => _currentProjectService.CurrentFilePath;
 
     /// <summary>
     /// True, wenn der Platzhalter im Content-Bereich angezeigt werden soll (kein Bereich ausgewählt).
     /// </summary>
     public bool IsContentPlaceholderVisible => CurrentContentViewModel is null;
 
+    private void OnProjectChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(CurrentProjectTitle));
+        OnPropertyChanged(nameof(CurrentFilePath));
+        SaveCommand.NotifyCanExecuteChanged();
+        OpenSzenarioCommand.NotifyCanExecuteChanged();
+    }
+
+    private string GetCurrentProjectTitle()
+    {
+        var current = _currentProjectService.Current;
+        if (current is null)
+            return "Unbenanntes Szenario";
+        return string.IsNullOrWhiteSpace(current.Meta.ScenarioName)
+            ? "Unbenanntes Szenario"
+            : current.Meta.ScenarioName;
+    }
+
     private void InitializeNavigation()
     {
-        // Initialbefüllung der Navigation.
-        // Später könnte dies basierend auf dem geladenen Projekt dynamisch erweitert werden.
-
         var szenarioItem = new NavItemViewModel
         {
             DisplayName = "Szenario",
@@ -98,12 +110,10 @@ public partial class MainShellViewModel : ObservableObject
             if (!result.IsSuccess)
             {
                 _logger.LogError("Fehler beim Laden der Datei '{Path}': {Error}", path, result.Error);
-                // Hier könnte man noch einen User-Dialog (MessageBox) triggern
                 return;
             }
 
-            CurrentProject = result.Value!;
-            CurrentFilePath = path;
+            _currentProjectService.SetCurrent(result.Value!, path);
             _logger.LogInformation("Projekt erfolgreich geladen aus {Path}", path);
         }
         catch (Exception ex)
@@ -117,28 +127,30 @@ public partial class MainShellViewModel : ObservableObject
     {
         try
         {
-            var path = CurrentFilePath;
+            var current = _currentProjectService.Current;
+            if (current is null) return;
 
-            // "Speichern unter" Logik, falls noch kein Pfad existiert
+            var path = _currentProjectService.CurrentFilePath;
+
             if (string.IsNullOrEmpty(path))
             {
                 path = await _fileDialogService.SaveAsync(new SaveFileDialogOptions(
                     "Szenario speichern",
                     "Szenario-Dateien",
                     "json",
-                    SuggestedFileName: $"{CurrentProject.Meta.ScenarioName}.json")).ConfigureAwait(true);
+                    SuggestedFileName: $"{current.Meta.ScenarioName}.json")).ConfigureAwait(true);
 
                 if (string.IsNullOrEmpty(path)) return;
             }
 
-            var result = await _storageService.SaveAsync(path, CurrentProject).ConfigureAwait(true);
+            var result = await _storageService.SaveAsync(path, current).ConfigureAwait(true);
             if (!result.IsSuccess)
             {
                 _logger.LogError("Fehler beim Speichern nach '{Path}': {Error}", path, result.Error);
                 return;
             }
 
-            CurrentFilePath = path;
+            _currentProjectService.SetCurrent(current, path);
             _logger.LogInformation("Projekt gespeichert unter {Path}", path);
         }
         catch (Exception ex)
@@ -147,18 +159,13 @@ public partial class MainShellViewModel : ObservableObject
         }
     }
 
-    private bool CanSave() => CurrentProject is not null;
+    private bool CanSave() => _currentProjectService.Current is not null;
 
     [RelayCommand(CanExecute = nameof(CanOpenSzenario))]
     private void OpenSzenario()
     {
         _logger.LogDebug("Szenario-Bereich geöffnet.");
-        var onApply = new Action<MetaDto>(updated =>
-        {
-            CurrentProject = CurrentProject with { Meta = updated };
-            _logger.LogDebug("Szenario-Metadaten übernommen: {Name}", updated.ScenarioName);
-        });
-        CurrentContentViewModel = new MetaEditViewModel(CurrentProject.Meta, onApply);
+        CurrentContentViewModel = _createMetaEditViewModel();
         if (Navigation.Items.Count > 0)
         {
             foreach (var item in Navigation.Items)
@@ -167,5 +174,5 @@ public partial class MainShellViewModel : ObservableObject
         }
     }
 
-    private bool CanOpenSzenario() => CurrentProject is not null;
+    private bool CanOpenSzenario() => _currentProjectService.Current is not null;
 }
