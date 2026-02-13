@@ -20,7 +20,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
         {
             Meta = new MetaDto
             {
-                ScenarioName = "",
+                ScenarioName = "Standard-Szenario",
                 CreatedAt = now
             },
             Parameters = new SimulationParametersDto

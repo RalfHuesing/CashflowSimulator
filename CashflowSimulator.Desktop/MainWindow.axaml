@@ -5,7 +5,7 @@
         xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="CashflowSimulator.Desktop.MainWindow"
-        Title="{StaticResource ApplicationTitle}"
+        Title="CashflowSimulator"
         Width="900" Height="600">
   <main:MainShellView/>
 </Window>
