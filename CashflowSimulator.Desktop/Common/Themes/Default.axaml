@@ -1,52 +1,61 @@
 <Styles xmlns="https://github.com/avaloniaui"
-       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       xmlns:sys="clr-namespace:System;assembly=System.Runtime">
-  <Styles.Resources>
-    <ResourceDictionary>
-      <!-- Corporate Identity (Blazor-Layout) -->
-      <SolidColorBrush x:Key="PrimaryBrush" Color="#052767"/>
-      <SolidColorBrush x:Key="SecondaryBrush" Color="#3a0647"/>
-      <SolidColorBrush x:Key="TextBrush" Color="#212121"/>
-      <SolidColorBrush x:Key="SecondaryTextBrush" Color="#616161"/>
-      <SolidColorBrush x:Key="BannerBrush" Color="#052767"/>
-      <SolidColorBrush x:Key="BannerTextBrush" Color="#FFFFFF"/>
-      <!-- Drawer: Verlauf und Text -->
-      <LinearGradientBrush x:Key="DrawerGradientBrush" StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Color="#052767" Offset="0"/>
-        <GradientStop Color="#3a0647" Offset="1"/>
-      </LinearGradientBrush>
-      <SolidColorBrush x:Key="DrawerTextBrush" Color="#E6FFFFFF"/>
-      <SolidColorBrush x:Key="DrawerTextActiveBrush" Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="DrawerFooterBgBrush" Color="#26000000"/>
-      <SolidColorBrush x:Key="DrawerActionCardBrush" Color="#0DFFFFFF"/>
-      <SolidColorBrush x:Key="DrawerActionCardBorderBrush" Color="#1AFFFFFF"/>
-      <SolidColorBrush x:Key="NavBackgroundBrush" Color="#F0F2F5"/>
-      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#f4f7f9"/>
-      <SolidColorBrush x:Key="DividerBrush" Color="#E0E0E0"/>
-      <!-- Primary-Button (Speichern, OK) -->
-      <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#052767"/>
-      <SolidColorBrush x:Key="PrimaryButtonForeground" Color="#FFFFFF"/>
-      <!-- Navigation: aktiver Eintrag (helle Sidebar) -->
-      <SolidColorBrush x:Key="NavItemActiveBackground" Color="#E3F2FD"/>
-      <SolidColorBrush x:Key="NavItemActiveBorder" Color="#106EBE"/>
-      <!-- Navigation im Drawer: aktiver Eintrag (dunkle Sidebar) -->
-      <SolidColorBrush x:Key="DrawerNavActiveBackground" Color="#26FFFFFF"/>
-      <SolidColorBrush x:Key="DrawerNavActiveBorder" Color="#FFFFFF"/>
-      <!-- Abstände -->
-      <Thickness x:Key="SpacingSmall">4</Thickness>
-      <Thickness x:Key="SpacingMedium">8</Thickness>
-      <Thickness x:Key="SpacingLarge">16</Thickness>
-      <sys:Double x:Key="SpacingSmallValue">4</sys:Double>
-      <sys:Double x:Key="SpacingMediumValue">8</sys:Double>
-      <sys:Double x:Key="SpacingLargeValue">16</sys:Double>
-      <!-- Layout/Typo -->
-      <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
-      <sys:Double x:Key="FontSizeBody">14</sys:Double>
-      <sys:Double x:Key="FontSizeSection">16</sys:Double>
-      <sys:Double x:Key="FontSizeTitle">18</sys:Double>
-      <x:String x:Key="ApplicationTitle">Cashflow Simulator</x:String>
-    </ResourceDictionary>
-  </Styles.Resources>
-  <StyleInclude Source="/Common/Themes/Layout.axaml"/>
-  <StyleInclude Source="/Common/Themes/ButtonStyles.axaml"/>
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <Color x:Key="SidebarBackgroundColor">#0F172A</Color> <Color x:Key="ContentBackgroundColor">#F3F4F6</Color> <Color x:Key="SurfaceColor">#FFFFFF</Color>
+        
+        <Color x:Key="PrimaryActionColor">#10B981</Color>     <Color x:Key="PrimaryActionHoverColor">#059669</Color> <Color x:Key="TextPrimaryColor">#111827</Color>       <Color x:Key="TextSecondaryColor">#6B7280</Color>     <Color x:Key="TextOnDarkColor">#F9FAFB</Color>        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
+        <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="PrimaryActionBrush" Color="{StaticResource PrimaryActionColor}" />
+        <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="{StaticResource PrimaryActionHoverColor}" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+        <SolidColorBrush x:Key="TextOnDarkBrush" Color="{StaticResource TextOnDarkColor}" />
+
+        <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
+        <Thickness x:Key="PagePadding">24</Thickness>
+    </Styles.Resources>
+
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{StaticResource PrimaryActionBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PrimaryActionHoverBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+
+    <Style Selector="Button.ghost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33FFFFFF" /> <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+    
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="BoxShadow" Value="0 4 6 0 #1A000000" /> <Setter Property="Padding" Value="24" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
 </Styles>

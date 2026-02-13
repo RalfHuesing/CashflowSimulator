@@ -1,22 +1,33 @@
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FluentIcons.Common;
 
 namespace CashflowSimulator.Desktop.Features.Main.Navigation;
 
 /// <summary>
-/// Ein Eintrag in der linken Navigation (Icon + Text, Command beim Klick).
+/// Ein einzelner Eintrag in der Navigationsleiste.
+/// Unterstützt nun native Vektor-Icons via FluentIcons.
 /// </summary>
 public partial class NavItemViewModel : ObservableObject
 {
-    public string DisplayName { get; init; } = string.Empty;
     /// <summary>
-    /// Optional: Ressourcen-Schlüssel oder Symbol-Name für ein Icon (z. B. FluentIcons).
+    /// Der Anzeigetext (z.B. "Dashboard", "Stammdaten").
     /// </summary>
-    public string? IconKey { get; init; }
-    public ICommand Command { get; init; } = null!;
+    public required string DisplayName { get; init; }
 
     /// <summary>
-    /// Ob dieser Eintrag aktuell ausgewählt/aktiv ist (für Hervorhebung in der Nav).
+    /// Das Icon-Symbol aus dem Fluent-System.
+    /// Default ist ein Platzhalter, sollte bei Initialisierung gesetzt werden.
+    /// </summary>
+    public Symbol Icon { get; init; } = Symbol.Document;
+
+    /// <summary>
+    /// Der Command, der ausgeführt wird (Navigation oder Aktion).
+    /// </summary>
+    public required ICommand Command { get; init; }
+
+    /// <summary>
+    /// Steuert den visuellen "Active State" (z.B. farbiger Balken links).
     /// </summary>
     [ObservableProperty]
     private bool _isActive;

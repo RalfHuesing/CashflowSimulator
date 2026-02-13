@@ -1,31 +1,28 @@
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
-using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentIcons.Common;
 using Microsoft.Extensions.Logging;
 
 namespace CashflowSimulator.Desktop.Features.Main;
 
 /// <summary>
-/// ViewModel für die Hauptshell: Banner, Navigation, Content, Laden/Speichern.
-/// Hält das aktuelle Projekt und den aktuellen Dateipfad; orchestriert Dateidialog und Storage.
+/// ViewModel für die Hauptshell.
+/// Verwaltet den globalen Status (Projekt, Dateipfad) und orchestriert die Top-Level-Aktionen.
 /// </summary>
 public partial class MainShellViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ShowStammdatenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenStammdatenCommand))]
     [NotifyPropertyChangedFor(nameof(CurrentProjectTitle))]
     private SimulationProjectDto _currentProject;
 
     [ObservableProperty]
     private string? _currentFilePath;
-
-    [ObservableProperty]
-    private object? _currentContent;
 
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
@@ -45,80 +42,122 @@ public partial class MainShellViewModel : ObservableObject
         _logger = logger;
         Navigation = navigationViewModel;
 
+        // Startzustand: Default-Projekt (InMemory)
         CurrentProject = _defaultProjectProvider.CreateDefault();
         CurrentFilePath = null;
 
-        var stammdatenItem = new NavItemViewModel { DisplayName = "Stammdaten", Command = ShowStammdatenCommand };
-        navigationViewModel.Items.Add(stammdatenItem);
-
-        ShowStammdaten();
+        InitializeNavigation();
     }
 
+    public NavigationViewModel Navigation { get; }
+
     /// <summary>
-    /// Anzeige für Titel/Banner: Projektname oder "Neues Szenario".
+    /// Dynamischer Titel für den Header-Bereich.
     /// </summary>
-    public string CurrentProjectTitle => string.IsNullOrEmpty(CurrentProject.Meta.ScenarioName)
-        ? "Neues Szenario"
+    public string CurrentProjectTitle => string.IsNullOrWhiteSpace(CurrentProject.Meta.ScenarioName)
+        ? "Unbenanntes Szenario"
         : CurrentProject.Meta.ScenarioName;
 
-    public NavigationViewModel Navigation { get; }
+    private void InitializeNavigation()
+    {
+        // Initialbefüllung der Navigation.
+        // Später könnte dies basierend auf dem geladenen Projekt dynamisch erweitert werden.
+
+        var stammdatenItem = new NavItemViewModel
+        {
+            DisplayName = "Stammdaten",
+            Icon = Symbol.Database, // FluentIcon: Database passt gut zu Meta-Daten
+            Command = OpenStammdatenCommand,
+            IsActive = true
+        };
+
+        Navigation.Items.Add(stammdatenItem);
+    }
 
     [RelayCommand]
     private async Task LoadAsync()
     {
-        var path = await _fileDialogService.OpenAsync(
-            new FileDialogOptions("Szenario öffnen", "Szenario-Dateien", ".json")).ConfigureAwait(true);
-        if (string.IsNullOrEmpty(path)) return;
-
-        var result = await _storageService.LoadAsync(path).ConfigureAwait(true);
-        if (!result.IsSuccess)
+        try
         {
-            _logger.LogWarning("Laden fehlgeschlagen: {Error}", result.Error);
-            return;
-        }
+            var path = await _fileDialogService.OpenAsync(
+                new FileDialogOptions("Szenario öffnen", "Szenario-Dateien", ".json")).ConfigureAwait(true);
 
-        CurrentProject = result.Value!;
-        CurrentFilePath = path;
-        _logger.LogInformation("Projekt geladen: {Path}", path);
+            if (string.IsNullOrEmpty(path)) return;
+
+            var result = await _storageService.LoadAsync(path).ConfigureAwait(true);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError("Fehler beim Laden der Datei '{Path}': {Error}", path, result.Error);
+                // Hier könnte man noch einen User-Dialog (MessageBox) triggern
+                return;
+            }
+
+            CurrentProject = result.Value!;
+            CurrentFilePath = path;
+            _logger.LogInformation("Projekt erfolgreich geladen aus {Path}", path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Unerwarteter Fehler beim LoadAsync.");
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task SaveAsync()
     {
-        var path = CurrentFilePath;
-        if (string.IsNullOrEmpty(path))
+        try
         {
-            path = await _fileDialogService.SaveAsync(new SaveFileDialogOptions(
-                "Szenario speichern",
-                "Szenario-Dateien",
-                "json",
-                SuggestedFileName: "Szenario.json")).ConfigureAwait(true);
-            if (string.IsNullOrEmpty(path)) return;
-        }
+            var path = CurrentFilePath;
 
-        var result = await _storageService.SaveAsync(path, CurrentProject).ConfigureAwait(true);
-        if (!result.IsSuccess)
+            // "Speichern unter" Logik, falls noch kein Pfad existiert
+            if (string.IsNullOrEmpty(path))
+            {
+                path = await _fileDialogService.SaveAsync(new SaveFileDialogOptions(
+                    "Szenario speichern",
+                    "Szenario-Dateien",
+                    "json",
+                    SuggestedFileName: $"{CurrentProject.Meta.ScenarioName}.json")).ConfigureAwait(true);
+
+                if (string.IsNullOrEmpty(path)) return;
+            }
+
+            var result = await _storageService.SaveAsync(path, CurrentProject).ConfigureAwait(true);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError("Fehler beim Speichern nach '{Path}': {Error}", path, result.Error);
+                return;
+            }
+
+            CurrentFilePath = path;
+            _logger.LogInformation("Projekt gespeichert unter {Path}", path);
+        }
+        catch (Exception ex)
         {
-            _logger.LogWarning("Speichern fehlgeschlagen: {Error}", result.Error);
-            return;
+            _logger.LogCritical(ex, "Unerwarteter Fehler beim SaveAsync.");
         }
-
-        CurrentFilePath = path;
-        _logger.LogInformation("Projekt gespeichert: {Path}", path);
     }
 
     private bool CanSave() => CurrentProject is not null;
 
-    [RelayCommand(CanExecute = nameof(CanShowStammdaten))]
-    private void ShowStammdaten()
+    [RelayCommand(CanExecute = nameof(CanOpenStammdaten))]
+    private async Task OpenStammdatenAsync()
     {
-        CurrentContent = new MetaEditViewModel(CurrentProject.Meta, meta =>
+        try
         {
-            CurrentProject = CurrentProject with { Meta = meta };
-        });
-        foreach (var item in Navigation.Items)
-            item.IsActive = item.DisplayName == "Stammdaten";
+#if false
+            var updated = await _metaEditDialogService.ShowEditAsync(CurrentProject.Meta).ConfigureAwait(true);
+            if (updated is null) return; // Abbrechen
+
+            // Immutable Update: Wir erstellen eine Kopie des Projects mit neuen Meta-Daten
+            CurrentProject = CurrentProject with { Meta = updated };
+            _logger.LogDebug("Stammdaten aktualisiert: {Name}", updated.ScenarioName);
+#endif
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Fehler im Stammdaten-Dialog.");
+        }
     }
 
-    private bool CanShowStammdaten() => CurrentProject is not null;
+    private bool CanOpenStammdaten() => CurrentProject is not null;
 }

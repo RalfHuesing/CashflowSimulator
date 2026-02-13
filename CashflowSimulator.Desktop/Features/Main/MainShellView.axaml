@@ -1,66 +1,102 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
-             xmlns:nav="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
-             xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Main"
+             xmlns:nav="using:CashflowSimulator.Desktop.Features.Main.Navigation"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
-             x:DataType="main:MainShellViewModel">
-  <Grid RowDefinitions="Auto,*">
-    <!-- AppBar: Corporate Header -->
-    <Border Grid.Row="0" Classes="appbar banner" Background="{StaticResource BannerBrush}">
-      <Grid ColumnDefinitions="Auto,*">
-        <TextBlock Grid.Column="0" Classes="banner-title" VerticalAlignment="Center" Foreground="{StaticResource BannerTextBrush}">
-          <Run Text="Cashflow" FontWeight="Light"/>
-          <Run Text=" - " Foreground="{StaticResource BannerTextBrush}"/>
-          <Run Text="Simulator" FontWeight="Bold" Foreground="{StaticResource BannerTextBrush}"/>
-        </TextBlock>
-        <TextBlock Grid.Column="1"
-                   Text="{Binding CurrentProjectTitle}"
-                   Foreground="{StaticResource BannerTextBrush}"
-                   Opacity="0.85"
-                   FontSize="14"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>
-      </Grid>
-    </Border>
+             x:DataType="vm:MainShellViewModel">
 
-    <!-- Drawer links (Gradient) + Content rechts -->
-    <Grid Grid.Row="1" ColumnDefinitions="260,*">
-      <Border Grid.Column="0" Classes="drawer" Background="{StaticResource DrawerGradientBrush}" Width="260">
-        <DockPanel>
-          <!-- Drawer-Footer: Szenario-Verwaltung (zuerst, damit es unten sitzt) -->
-          <Border DockPanel.Dock="Bottom" Classes="drawer-footer">
-            <Border Classes="action-card">
-              <StackPanel Spacing="8">
-                <TextBlock Text="Szenario Verwaltung" Classes="action-card-header" HorizontalAlignment="Center"/>
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                  <Button Content="Laden"
-                          Classes="drawer-action-btn"
-                          Command="{Binding LoadCommand}"
-                          HorizontalAlignment="Stretch"/>
-                  <Button Grid.Column="1"
-                          Content="Speichern"
-                          Classes="drawer-action-btn primary"
-                          Command="{Binding SaveCommand}"
-                          HorizontalAlignment="Stretch"/>
+    <Grid ColumnDefinitions="260, *">
+        
+        <Border Grid.Column="0" 
+                Background="{DynamicResource SidebarBackgroundBrush}"
+                Padding="{DynamicResource PagePadding}">
+            <Grid RowDefinitions="Auto, *, Auto">
+                
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,40">
+                    <fi:SymbolIcon Symbol="ArrowTrendingLines" 
+                                   FontSize="28" 
+                                   Foreground="{DynamicResource PrimaryActionBrush}"/>
+                    <TextBlock Text="CS.Desktop" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <nav:NavigationView Grid.Row="1" DataContext="{Binding Navigation}"/>
+
+                <StackPanel Grid.Row="2" Spacing="8">
+                    <TextBlock Text="SZENARIO" 
+                               FontSize="10" 
+                               FontWeight="Bold" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="4,0,0,4"/>
+                    
+                    <Button Classes="ghost" Command="{Binding LoadCommand}" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <fi:SymbolIcon Symbol="FolderOpen" />
+                            <TextBlock Text="Laden..." />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="ghost" Command="{Binding SaveCommand}" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <fi:SymbolIcon Symbol="Save" />
+                            <TextBlock Text="Speichern" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1" 
+                Background="{DynamicResource ContentBackgroundBrush}"
+                Padding="{DynamicResource PagePadding}">
+            
+            <Grid RowDefinitions="Auto, *">
+                
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,24">
+                    <Border Grid.Column="0" 
+                            Width="48" Height="48" 
+                            CornerRadius="12"
+                            Background="White"
+                            BoxShadow="0 2 4 0 #10000000"
+                            Margin="0,0,16,0">
+                        <fi:SymbolIcon Symbol="Briefcase" 
+                                       FontSize="24" 
+                                       Foreground="{DynamicResource PrimaryActionBrush}"
+                                       VerticalAlignment="Center" 
+                                       HorizontalAlignment="Center"/>
+                    </Border>
+                    
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Aktuelles Szenario" 
+                                   FontSize="12" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding CurrentProjectTitle}" 
+                                   Classes="h1"
+                                   Margin="0"/>
+                    </StackPanel>
                 </Grid>
-              </StackPanel>
-            </Border>
-          </Border>
-          <nav:NavigationView DataContext="{Binding Navigation}"
-                              Background="Transparent"
-                              Padding="{StaticResource SpacingMedium}"/>
-        </DockPanel>
-      </Border>
-      <Border Grid.Column="1" Padding="{StaticResource SpacingLarge}" Background="{StaticResource ContentBackgroundBrush}">
-        <ContentControl Content="{Binding CurrentContent}">
-          <ContentControl.DataTemplates>
-            <DataTemplate DataType="meta:MetaEditViewModel">
-              <meta:MetaEditView/>
-            </DataTemplate>
-          </ContentControl.DataTemplates>
-        </ContentControl>
-      </Border>
+
+                <Border Grid.Row="1" Classes="card">
+                    <StackPanel Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <fi:SymbolIcon Symbol="ArrowTrendingLines" FontSize="64" Foreground="#E5E7EB"/>
+                        <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"/>
+                        
+                        <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
-  </Grid>
 </UserControl>
