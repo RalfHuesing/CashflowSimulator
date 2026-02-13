@@ -46,10 +46,11 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
 
-                // Shell / Main-Feature
+                // Shell / Main-Feature (Func<T> wird von MS.DI nicht automatisch bereitgestellt)
                 services.AddTransient<NavigationViewModel>();
-                services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MetaEditViewModel>();
+                services.AddSingleton<Func<MetaEditViewModel>>(sp => () => sp.GetRequiredService<MetaEditViewModel>());
+                services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MainWindow>();
 
                 var serviceProvider = services.BuildServiceProvider();
