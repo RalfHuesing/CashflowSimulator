@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Projektmappenelemente/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="CashflowSimulator.Contracts/CashflowSimulator.Contracts.csproj" />
+  <Project Path="CashflowSimulator.Desktop/CashflowSimulator.Desktop.csproj" />
+  <Project Path="CashflowSimulator.Engine/CashflowSimulator.Engine.csproj" />
+  <Project Path="CashflowSimulator.Infrastructure/CashflowSimulator.Infrastructure.csproj" />
+  <Project Path="CashflowSimulator.Shared/CashflowSimulator.Shared.csproj" />
+</Solution>
