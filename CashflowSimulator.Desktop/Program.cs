@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Avalonia;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
@@ -18,31 +19,52 @@ namespace CashflowSimulator.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            var logDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
+            var logPath = Path.Combine(logDirectory, "cashflow-.log");
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.File(
+                    logPath,
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.Debug(outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
 
-            var services = new ServiceCollection();
-            services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
+            try
+            {
+                Log.Information("Application starting");
+                var services = new ServiceCollection();
+                services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
-            // App-weite Services (plattformunabhängig)
-            services.AddSingleton<AvaloniaFileDialogService>();
-            services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
-            services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
-            services.AddSingleton<MetaEditDialogService>();
-            services.AddSingleton<IMetaEditDialogService>(sp => sp.GetRequiredService<MetaEditDialogService>());
+                // App-weite Services (plattformunabhängig)
+                services.AddSingleton<AvaloniaFileDialogService>();
+                services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
+                services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
+                services.AddSingleton<MetaEditDialogService>();
+                services.AddSingleton<IMetaEditDialogService>(sp => sp.GetRequiredService<MetaEditDialogService>());
 
-            // Shell / Main-Feature
-            services.AddTransient<NavigationViewModel>();
-            services.AddTransient<MainShellViewModel>();
-            services.AddTransient<MainWindow>();
+                // Shell / Main-Feature
+                services.AddTransient<NavigationViewModel>();
+                services.AddTransient<MainShellViewModel>();
+                services.AddTransient<MainWindow>();
 
-            var serviceProvider = services.BuildServiceProvider();
-            CompositionRoot.Services = serviceProvider;
+                var serviceProvider = services.BuildServiceProvider();
+                CompositionRoot.Services = serviceProvider;
 
-            BuildAvaloniaApp()
-                .StartWithClassicDesktopLifetime(args);
+                BuildAvaloniaApp()
+                    .StartWithClassicDesktopLifetime(args);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application startup failed");
+                throw;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static AppBuilder BuildAvaloniaApp()
