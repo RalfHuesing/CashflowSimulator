@@ -56,8 +56,14 @@ flowchart TB
 
 ## Logging
 
-- **Serilog** als Standard; strukturiertes Logging.
-- In Libraries über abstrakte Schnittstelle injizieren (z. B. `ILogger`/`ILogger<T>`); Konfiguration im Desktop/Host.
+- **Serilog** als Standard; Konfiguration im Desktop-Host (`Program.Main`).
+- In Libraries und ViewModels: **ILogger** / **ILogger&lt;T&gt;** per Constructor Injection; Konfiguration nur im Host.
+- **Strukturiertes Logging:** Stets Platzhalter verwenden, keine String-Interpolation:
+  - Richtig: `_logger.LogError("Fehler beim Laden der Datei '{Path}': {Error}", path, result.Error);`
+  - Falsch: `_logger.LogError($"Fehler: {path}");` (nicht strukturiert, schlecht durchsuchbar).
+- **Log-Datei:** Unter dem App-Basisverzeichnis in `Logs/cashflow-{Date}.log` (Rolling pro Tag); Format: `{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}`. Level z. B. INF, DBG, ERR, FTL.
+- **Level-Nutzung:** `LogDebug` für detaillierte Ablauf-Infos, `LogInformation` für normale Meilensteine (z. B. „Projekt geladen“), `LogError` für erwartbare Fehler (z. B. Laden fehlgeschlagen), `LogCritical`/`Log.Fatal` für unerwartete Startup- oder App-Abstürze.
+- **App-Start:** Beim Start `Log.Information("Application starting")`; bei Fehler im Startup `Log.Fatal(ex, "Application startup failed")` und Exception durchreichen. Spätere Erweiterungen (neue Features, Services) sollen dieses Muster beibehalten: strukturierte Platzhalter, passendes Level, ILogger injizieren.
 
 ## Avalonia und MVVM
 
