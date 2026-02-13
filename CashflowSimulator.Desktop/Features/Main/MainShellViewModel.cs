@@ -26,22 +26,25 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly IMetaEditDialogService _metaEditDialogService;
+    private readonly IDefaultProjectProvider _defaultProjectProvider;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
         IMetaEditDialogService metaEditDialogService,
+        IDefaultProjectProvider defaultProjectProvider,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
         _fileDialogService = fileDialogService;
         _storageService = storageService;
         _metaEditDialogService = metaEditDialogService;
+        _defaultProjectProvider = defaultProjectProvider;
         _logger = logger;
         Navigation = navigationViewModel;
 
-        CurrentProject = NewEmptyProject();
+        CurrentProject = _defaultProjectProvider.CreateDefault();
         CurrentFilePath = null;
 
         var stammdatenItem = new NavItemViewModel { DisplayName = "Stammdaten", Command = OpenStammdatenCommand };
@@ -113,10 +116,4 @@ public partial class MainShellViewModel : ObservableObject
     }
 
     private bool CanOpenStammdaten() => CurrentProject is not null;
-
-    private static SimulationProjectDto NewEmptyProject() => new()
-    {
-        Meta = new MetaDto { ScenarioName = "", CreatedAt = DateTimeOffset.UtcNow },
-        Parameters = new SimulationParametersDto()
-    };
 }

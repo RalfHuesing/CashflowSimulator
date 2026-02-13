@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CashflowSimulator.Contracts\CashflowSimulator.Contracts.csproj" />
+    <ProjectReference Include="..\CashflowSimulator.Engine\CashflowSimulator.Engine.csproj" />
     <ProjectReference Include="..\CashflowSimulator.Infrastructure\CashflowSimulator.Infrastructure.csproj" />
   </ItemGroup>
 
