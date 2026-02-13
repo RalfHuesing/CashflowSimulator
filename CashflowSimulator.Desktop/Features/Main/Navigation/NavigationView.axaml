@@ -3,7 +3,7 @@
              xmlns:vm="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
              x:Class="CashflowSimulator.Desktop.Features.Main.Navigation.NavigationView"
              x:DataType="vm:NavigationViewModel"
-             Background="{StaticResource NavBackgroundBrush}"
+             Background="Transparent"
              Padding="{StaticResource SpacingMedium}">
   <ItemsControl ItemsSource="{Binding Items}">
     <ItemsControl.ItemTemplate>

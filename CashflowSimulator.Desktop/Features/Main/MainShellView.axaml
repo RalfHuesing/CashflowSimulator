@@ -4,20 +4,53 @@
              xmlns:nav="clr-namespace:CashflowSimulator.Desktop.Features.Main.Navigation"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
              x:DataType="main:MainShellViewModel">
-  <Grid RowDefinitions="Auto,*,Auto">
-    <!-- Banner oben: Logo/Titel -->
-    <Border Grid.Row="0" Classes="banner" Background="{StaticResource BannerBrush}" Padding="{StaticResource SpacingMedium}">
-      <TextBlock Text="{Binding CurrentProjectTitle}"
-                 Classes="banner-title"
-                 Foreground="{StaticResource BannerTextBrush}"
-                 VerticalAlignment="Center"/>
+  <Grid RowDefinitions="Auto,*">
+    <!-- AppBar: Corporate Header -->
+    <Border Grid.Row="0" Classes="appbar banner" Background="{StaticResource BannerBrush}">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Column="0" Classes="banner-title" VerticalAlignment="Center" Foreground="{StaticResource BannerTextBrush}">
+          <Run Text="Cashflow" FontWeight="Light"/>
+          <Run Text=" - " Foreground="{StaticResource BannerTextBrush}"/>
+          <Run Text="Simulator" FontWeight="Bold" Foreground="{StaticResource BannerTextBrush}"/>
+        </TextBlock>
+        <TextBlock Grid.Column="1"
+                   Text="{Binding CurrentProjectTitle}"
+                   Foreground="{StaticResource BannerTextBrush}"
+                   Opacity="0.85"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"/>
+      </Grid>
     </Border>
 
-    <!-- Mitte: Navigation links, Content rechts -->
-    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-      <nav:NavigationView Grid.Column="0"
-                          Width="220"
-                          DataContext="{Binding Navigation}"/>
+    <!-- Drawer links (Gradient) + Content rechts -->
+    <Grid Grid.Row="1" ColumnDefinitions="260,*">
+      <Border Grid.Column="0" Classes="drawer" Background="{StaticResource DrawerGradientBrush}" Width="260">
+        <DockPanel>
+          <!-- Drawer-Footer: Szenario-Verwaltung (zuerst, damit es unten sitzt) -->
+          <Border DockPanel.Dock="Bottom" Classes="drawer-footer">
+            <Border Classes="action-card">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Szenario Verwaltung" Classes="action-card-header" HorizontalAlignment="Center"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                  <Button Content="Laden"
+                          Classes="drawer-action-btn"
+                          Command="{Binding LoadCommand}"
+                          HorizontalAlignment="Stretch"/>
+                  <Button Grid.Column="1"
+                          Content="Speichern"
+                          Classes="drawer-action-btn primary"
+                          Command="{Binding SaveCommand}"
+                          HorizontalAlignment="Stretch"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </Border>
+          <nav:NavigationView DataContext="{Binding Navigation}"
+                              Background="Transparent"
+                              Padding="{StaticResource SpacingMedium}"/>
+        </DockPanel>
+      </Border>
       <Border Grid.Column="1" Padding="{StaticResource SpacingLarge}" Background="{StaticResource ContentBackgroundBrush}">
         <TextBlock Text="Bereich für Inhalte (Stammdaten, Cashflows, …)"
                    Foreground="{StaticResource SecondaryTextBrush}"
@@ -25,8 +58,5 @@
                    HorizontalAlignment="Center"/>
       </Border>
     </Grid>
-
-    <!-- Unten: Laden, Speichern (DataContext = MainShellViewModel) -->
-    <main:BottomBarView Grid.Row="2" DataContext="{Binding}"/>
   </Grid>
 </UserControl>

@@ -3,21 +3,35 @@
        xmlns:sys="clr-namespace:System;assembly=System.Runtime">
   <Styles.Resources>
     <ResourceDictionary>
-      <!-- Zentrale Farben/Brushes – keine Hardcodes in Views verwenden -->
-      <SolidColorBrush x:Key="PrimaryBrush" Color="#106EBE"/>
+      <!-- Corporate Identity (Blazor-Layout) -->
+      <SolidColorBrush x:Key="PrimaryBrush" Color="#052767"/>
+      <SolidColorBrush x:Key="SecondaryBrush" Color="#3a0647"/>
       <SolidColorBrush x:Key="TextBrush" Color="#212121"/>
       <SolidColorBrush x:Key="SecondaryTextBrush" Color="#616161"/>
-      <SolidColorBrush x:Key="BannerBrush" Color="#106EBE"/>
+      <SolidColorBrush x:Key="BannerBrush" Color="#052767"/>
       <SolidColorBrush x:Key="BannerTextBrush" Color="#FFFFFF"/>
+      <!-- Drawer: Verlauf und Text -->
+      <LinearGradientBrush x:Key="DrawerGradientBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#052767" Offset="0"/>
+        <GradientStop Color="#3a0647" Offset="1"/>
+      </LinearGradientBrush>
+      <SolidColorBrush x:Key="DrawerTextBrush" Color="#E6FFFFFF"/>
+      <SolidColorBrush x:Key="DrawerTextActiveBrush" Color="#FFFFFF"/>
+      <SolidColorBrush x:Key="DrawerFooterBgBrush" Color="#26000000"/>
+      <SolidColorBrush x:Key="DrawerActionCardBrush" Color="#0DFFFFFF"/>
+      <SolidColorBrush x:Key="DrawerActionCardBorderBrush" Color="#1AFFFFFF"/>
       <SolidColorBrush x:Key="NavBackgroundBrush" Color="#F0F2F5"/>
-      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#F8F9FA"/>
+      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#f4f7f9"/>
       <SolidColorBrush x:Key="DividerBrush" Color="#E0E0E0"/>
       <!-- Primary-Button (Speichern, OK) -->
-      <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#106EBE"/>
+      <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#052767"/>
       <SolidColorBrush x:Key="PrimaryButtonForeground" Color="#FFFFFF"/>
-      <!-- Navigation: aktiver Eintrag -->
+      <!-- Navigation: aktiver Eintrag (helle Sidebar) -->
       <SolidColorBrush x:Key="NavItemActiveBackground" Color="#E3F2FD"/>
       <SolidColorBrush x:Key="NavItemActiveBorder" Color="#106EBE"/>
+      <!-- Navigation im Drawer: aktiver Eintrag (dunkle Sidebar) -->
+      <SolidColorBrush x:Key="DrawerNavActiveBackground" Color="#26FFFFFF"/>
+      <SolidColorBrush x:Key="DrawerNavActiveBorder" Color="#FFFFFF"/>
       <!-- Abstände -->
       <Thickness x:Key="SpacingSmall">4</Thickness>
       <Thickness x:Key="SpacingMedium">8</Thickness>
