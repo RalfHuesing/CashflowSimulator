@@ -1,19 +1,32 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta"
-             xmlns:components="clr-namespace:CashflowSimulator.Desktop.Common.Components"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Meta"
+             xmlns:comp="using:CashflowSimulator.Desktop.Common.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
-             x:DataType="meta:MetaEditViewModel">
-  <components:FeaturePageView Title="Szenario"
-                              Description="Szenario-Name und Metadaten bearbeiten.">
-    <StackPanel Spacing="{StaticResource SpacingMediumValue}">
-      <TextBlock Text="Szenario-Name" Foreground="{StaticResource SecondaryTextBrush}"/>
-      <TextBox Text="{Binding ScenarioName}" Watermark="Name des Szenarios"/>
-      <TextBlock Text="{Binding CreatedAt, StringFormat=Erstellt am: {0:dd.MM.yyyy HH:mm}}"
-                 Foreground="{StaticResource SecondaryTextBrush}"/>
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingMediumValue}" Margin="{StaticResource SpacingLarge}">
-        <Button Content="Übernehmen" Command="{Binding ApplyCommand}" Classes.primary="True"/>
-      </StackPanel>
-    </StackPanel>
-  </components:FeaturePageView>
+             x:DataType="vm:MetaEditViewModel">
+
+    <comp:FeaturePageView Title="Szenario-Einstellungen"
+                          Description="Hier können Metadaten des aktuellen Szenarios bearbeitet werden.">
+        
+        <StackPanel Spacing="20" MaxWidth="600" HorizontalAlignment="Left">
+            <StackPanel Spacing="5">
+                <TextBlock Text="Szenario Name" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding ScenarioName}" Watermark="Name eingeben..." />
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Erstellt am" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                           Opacity="0.6"/>
+            </StackPanel>
+
+            <Button Command="{Binding ApplyCommand}" 
+                    Content="Übernehmen" 
+                    Classes="accent" />
+        </StackPanel>
+        
+    </comp:FeaturePageView>
 </UserControl>
