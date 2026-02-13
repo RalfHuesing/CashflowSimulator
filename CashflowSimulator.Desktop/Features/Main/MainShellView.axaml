@@ -5,7 +5,7 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Main"
              xmlns:nav="using:CashflowSimulator.Desktop.Features.Main.Navigation"
-             xmlns:meta="using:CashflowSimulator.Desktop.Features.Meta"
+             xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta;assembly=CashflowSimulator.Desktop"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
              x:DataType="vm:MainShellViewModel">
@@ -98,10 +98,14 @@
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
                         <ContentControl Content="{Binding CurrentContentViewModel}"
-                                         IsVisible="{Binding !IsContentPlaceholderVisible}">
+                                         IsVisible="{Binding !IsContentPlaceholderVisible}"
+                                         HorizontalContentAlignment="Stretch"
+                                         VerticalContentAlignment="Stretch">
                             <ContentControl.DataTemplates>
                                 <DataTemplate DataType="meta:MetaEditViewModel">
-                                    <meta:MetaEditView/>
+                                    <meta:MetaEditView DataContext="{Binding}"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Stretch"/>
                                 </DataTemplate>
                             </ContentControl.DataTemplates>
                         </ContentControl>
