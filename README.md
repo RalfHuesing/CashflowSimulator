@@ -1,95 +1,61 @@
 # Cashflow Simulator
 
-## Big Picture
+## Überblick
 
-Der Cashflow Simulator ist mehr als ein einfacher Rendite rechner.
-Er soll die komplette finanzielle Lebenssituation eines Deutschen über Dekaden und verschiedene Lebensphasen hinweg abbilden können.
+Der Cashflow Simulator ist mehr als ein einfacher Renditerechner. Er bildet die finanzielle Lebenssituation eines Nutzers über Dekaden und verschiedene Lebensphasen hinweg ab. **Zielgruppe:** Deutsche mit langfristiger Finanzplanung (Anspar- und Rentenphase).
 
+## Wozu? ? Kernfragen
 
-Es sollen Fragestellungen wie die folgenden beantwortet werden können:
-- Kann ich mir das 3. Auto in 25 Jahren leisten
-- Wieviel Cash brauche ich zu einem gegebenen Lebensabschnitt (Ansparphase / Entsparphase) um die nächsten N-Jahre auch mit Börsencrashs zu überstehen
-- Wieviel muss KANN ich heute langfristig investieren damit mein definiertes Cash Bucket nicht gefährdet ist
-- Wenn investiert wird - in welche Assets ("Rebalance per Sparplan")
-- Es sollen verschiedene Korrelationen untereinander simuliert werden und die beste Strategie für die lebensphasen ermittelt werden. verkäufe und steuer effekte müssen natürlich auch beachtet werden
+Die Anwendung soll unter anderem beantworten:
 
-Daraus ergeben sich folgende Implikationen hinsichtlich Wert-Änderungen:
-- In die Zukunft gerichtete Wertschwankungen können nur mit einer Montecarlo und perzentiler Auswertung abgeschätzt werden.
-- Auch die Inflation ist eine Montecarlo-Simulation mit einer erwarteten negativ Rendite (-0.02) und einer Volatilität die auch 0 sein kann.
-- Das bezieht sich auch auf das Gehalt und alle sonstigen Cashflows und insbesondere natürlich Wertepapiere.
-- Diese Schwankungsbereiche (Simulationen) werden zentral definiert und können dem jeweiligen Asset oder Cashflow zugewiesen werden.
-- Es gibt Feste Cashflow events und Cashflow events mit einer gewissen toleranz. Das auto in 10 jahren muss evtl. nicht genau in 10 jahren sein. 12 jahre würde auch gehen .. aber dann ist das darauf folgende auto erst mit einem gewissen abstand dran (+10 jahre). Es macht kein sinn jedes jahr ein neues auto zu kaufen.
+- Kann ich mir das 3. Auto in 25 Jahren leisten?
+- Wieviel Cash brauche ich in einem gegebenen Lebensabschnitt (Anspar- oder Entsparphase), um die nächsten N Jahre auch bei Börsencrashs abgesichert zu sein?
+- Wieviel kann ich heute langfristig investieren, ohne mein definiertes Cash-Bucket zu gefährden?
+- In welche Assets soll investiert werden ? inkl. Rebalancing-Strategie?
+- Verschiedene Korrelationen und Strategien über die Lebensphasen simulieren; Verkäufe und Steuereffekte sind dabei zu berücksichtigen.
 
-Zielgruppe:
-Deutsche
+## Konzepte
 
-Notwendige Daten und Features
-- Stammdaten: Geburtsdatum
-- Steuern: Die Steuern insbesondere bei einem Dekaden später erfolgendem Verkauf müssen berücksichtigt werden
-- Lebensabschnitte: Es können lebensabschnitte definiert werden. aus UI Sicht hinterlegt der benutzer hier das beginn und Ende Alter. Zusätzlich wird hier der Lookahead Zeitraum hinterlegt, in diesem zeitraum muss versucht werden alle notwendigen und geplanten ausgaben als cash vorhanden sein. Im Regelfall definiert man hier zwei Abschnitte: Ansparphase und Rentenphase
-- Cashflows: Es gibt laufende Einnahmen, Laufende Ausgaben, geplante einmalige Einnahmen und geplante einmalige Ausgaben. Jedem Cashflow hinterlegt man zu welchem Lebensabschnitt er gehört. Zusätzlich kann man ein Von-Bis Alter hinterlegen - dieses ist im bereich des jeweiligen lebensabschnittes (also nicht über "67" wenn es die ansparphase ist).
-Hier werden allerdings bestimmte flows dupliziert - wie beispielsweise die Miete. Aber richtigerweise ändert man sein verhalten in der Entsparphase und die Werte ändern sich auch
-- Portfolio: Ein Portfolio setzt sich aus Assetallokations zusammen. Beispielsweise MSCI World (60) und Anleihen (40).
-Jede allokation hat eine erwartete Rendite sowie Volatilität (Montecarlo). Pro Asset kann es beliebig viele Wertpapiere geben. Beispielsweise hat man im Laufe der Jahre verschiedene MSCI World ETFs bespart. Nur ein ETF kann "aktiv" sein - dieser wird verwendet wenn Gekauft wird. Beim VERKAUF wird sinnvoll entschieden was verkauft wird um steuern zu optimieren. Zusätzlich liegt hinter jedem Assets eine langjährige Transaktionshistorie mit Kauf, Verkauf, Dividenden und Steuern (Vorabpauschale). Wird verkauft wird dieses im FIFO durchgeführt und die steuer entsprechend berechnet.
-Getätigte Verkäufe müssen bei der Akkumulation beachtet werden.
+### Lebensabschnitte
 
-## Szenarios
+Es können Lebensabschnitte definiert werden (z.B. Ansparphase und Rentenphase). Pro Abschnitt: Beginn- und Endalter sowie ein **Lookahead-Zeitraum**. In diesem Zeitraum soll versucht werden, alle geplanten Ausgaben als Cash vorzuhalten. Typisch sind zwei Abschnitte: Ansparphase und Rentenphase.
 
-Es gibt beliebig viele Szenarios.
-Ein Szenario ist die vollständige Ansammlung aller notwendiger Informationen.
+### Cashflows
 
-## Die neue Projekt-Architektur
+- **Laufend:** Einnahmen und Ausgaben.
+- **Einmalig:** Geplante Einnahmen und Ausgaben (z.B. Auto in X Jahren).
 
-Wir nutzen eine klare Trennung nach Verantwortlichkeiten, wobei die **Contracts** das Bindeglied für alles sind.
+Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter innerhalb dieses Abschnitts. In der Entsparphase können sich Werte und Verhalten ändern (z.B. andere Miete/Kosten) ? dafür können entsprechende Flows gepflegt werden.
 
-| Projekt | Verantwortung | Details |
-| --- | --- | --- |
-| **`.Contracts`** | **Die "Single Source of Truth"** | Enthält das `SimulationProjectDto`, alle Enums und Interfaces (z.B. `IPriceProvider`). |
-| **`.Core`** | **Die Mathematik (Stateless)** | Beinhaltet die `SimulationEngine`, Wachstumsmodelle und Steuerlogik. Sie "rechnet" nur. |
-| **`.Infrastructure`** | **Die Außenwelt** | Hier liegt die `StockPriceEngine` mit ihrem Datei-Cache und die Logik zum Laden/Speichern der Szenarien von der Festplatte. |
-| **`.Desktop`** | **Die Benutzeroberfläche** | Avalonia UI Projekt. Die ViewModels "wrappen" die DTOs aus den Contracts und machen sie für den User editierbar. |
+**Unsicherheit:** Einige Events haben eine Toleranz (z.B. ?Auto in 10?12 Jahren?); das darauf folgende Event verschiebt sich entsprechend (z.B. +10 Jahre Abstand).
 
----
+### Portfolio
 
-## Das SimulationProjectDto (Mentaler Blueprint)
+- Ein Portfolio besteht aus **Assetallokationen** (z.B. MSCI World 60 %, Anleihen 40 %).
+- Jede Allokation hat erwartete Rendite und Volatilität (für die Monte-Carlo-Simulation).
+- Pro Asset können mehrere Wertpapiere existieren (z.B. verschiedene MSCI-World-ETFs über die Jahre). Nur ein Wertpapier pro Asset ist ?aktiv? und wird beim **Kauf** (Sparplan) verwendet.
+- Beim **Verkauf** wird steueroptimiert entschieden (FIFO, Transaktionshistorie mit Kauf, Verkauf, Dividenden, Vorabpauschale). Getätigte Verkäufe fließen in die Akkumulation ein.
 
-Dieses Objekt ist deine "Projektdatei". Alles, was du zum Arbeiten brauchst, steckt hier drin. Wenn du dieses Objekt als JSON speicherst, hast du den kompletten Zustand konserviert.
+**Rebalancing:**
 
-### Grobe Struktur des Objekts:
+- **Per Sparplan:** Neues Geld wird in untergewichtete Assets gelenkt.
+- **Aktiv:** Wenn die Ist-Allokation um mehr als **X %** von der Zielallokation abweicht, wird durch Verkauf/Kauf rebalanciert. Die Schwelle **X %** ist konfigurierbar.
 
-* **`SimulationProjectDto` (Root)**
-* `Id` & `ProjectName`: Metadaten zur Identifikation.
-* **`ScenarioData`**: Die fachliche Welt (Was besitzt/plant der User?).
-* `Person`: Geburtsjahr, Rentenalter.
-* `Assets`: Liste aller Vermögenswerte (Name, ISIN, Vola, Erwartete Rendite).
-* `Cashflows`: Einnahmen, Fixkosten und einmalige Events.
-* `Strategy`: Rebalancing-Regeln und Steuer-Einstellungen.
+### Unsicherheit und Simulation
 
+- Zukünftige Wertschwankungen werden per **Monte-Carlo-Simulation** und Perzentil-Auswertung abgeschätzt.
+- **Inflation** wird ebenfalls als Monte-Carlo modelliert (z.B. erwartete negative reale Rendite, Volatilität konfigurierbar, ggf. 0).
+- Gleiches gilt für Gehalt und andere Cashflows sowie Wertpapiere. Die Schwankungsbereiche werden zentral definiert und den jeweiligen Assets bzw. Cashflows zugeordnet.
 
-* **`ExecutionOptions`**: Die "Regler" für die Engine.
-* Anzahl Monte-Carlo-Iterationen, Simulationsdauer (Jahre), Inflation (An/Aus).
+### Stammdaten und Steuern
 
+- **Stammdaten:** u.a. Geburtsdatum (und Rentenalter).
+- **Steuern:** Verkäufe über Dekaden (FIFO, Vorabpauschale etc.) werden in der Simulation berücksichtigt.
 
-* **`UiState`**: Rein für die Desktop-App.
-* Zuletzt gewählter Tab, Sortierung der Tabellen, Chart-Präferenzen, Fenstergröße.
+## Szenarien
 
-
-
-
+Ein **Szenario** ist die vollständige Sammlung aller Eingaben für eine Planungsvariante (Person, Cashflows, Portfolio, Strategie, Optionen). Es können beliebig viele Szenarien angelegt werden; jedes wird typischerweise als eine Projektdatei (z.B. `Szenario.json`) gespeichert.
 
 ---
 
-## Der Datenfluss (Ohne Mapping-Hölle)
-
-1. **Festplatte**: `Szenario.json` wird geladen  wird zu `SimulationProjectDto`.
-2. **UI (Avalonia)**: Ein `MainViewModel` hält dieses DTO. Sub-ViewModels (z.B. `AssetViewModel`) greifen per **Backing Field** direkt auf die Properties des DTOs zu.
-3. **Simulation**: Du klickst auf "Start"  Das **komplette** DTO wird an die `SimulationEngine` übergeben. Diese nimmt sich nur, was sie zum Rechnen braucht (`ScenarioData` & `ExecutionOptions`) und gibt ein `SimulationResultDto` zurück.
-4. **Speichern**: Du änderst etwas im UI  Die Werte landen im DTO  Das DTO wird 1:1 als JSON auf die Platte geschrieben.
-
-### Warum das für dich (und mich) gut ist:
-
-* **Keine Redundanz**: Wir müssen nicht drei verschiedene Klassen für ein "Asset" pflegen.
-* **Transparenz**: Wenn die Simulation komische Werte liefert, schauen wir in das eine DTO und sehen sofort, ob es an den User-Daten (`ScenarioData`) oder den Rechen-Parametern (`ExecutionOptions`) liegt.
-* **Sprechende Namen**: Da wir neu anfangen, können wir die Properties sofort so nennen, dass sie selbsterklärend sind (z.B. `YearlyReturnExpectation` statt nur `Return`).
-
-**Passt das so für dein mentales Modell? Wenn ja, soll ich dir als ersten Baustein die neue, saubere `SimulationProjectDto`-Struktur in C# zusammenschreiben?**
+Technische Architektur, Datenmodell (`SimulationProjectDto`) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.
