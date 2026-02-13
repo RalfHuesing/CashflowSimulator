@@ -142,6 +142,7 @@ public partial class MainShellViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanOpenStammdaten))]
     private async Task OpenStammdatenAsync()
     {
+        _logger.LogDebug("Stammdaten geöffnet (Command ausgeführt).");
         try
         {
 #if false

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:main="using:CashflowSimulator.Desktop.Features.Main"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Main.Navigation"
              mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="400"
              x:Class="CashflowSimulator.Desktop.Features.Main.Navigation.NavigationView"
@@ -13,7 +14,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:NavItemViewModel">
                     <Button Classes="ghost" 
-                            Command="{Binding Command}"
+                            Command="{Binding $parent[main:MainShellView].((main:MainShellViewModel)DataContext).OpenStammdatenCommand}"
                             HorizontalAlignment="Stretch"
                             Margin="0,2">
                         <Grid ColumnDefinitions="Auto, 16, *">
