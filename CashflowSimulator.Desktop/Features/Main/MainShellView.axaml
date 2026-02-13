@@ -6,10 +6,10 @@
              x:DataType="main:MainShellViewModel">
   <Grid RowDefinitions="Auto,*,Auto">
     <!-- Banner oben: Logo/Titel -->
-    <Border Grid.Row="0" Background="{StaticResource BannerBrush}" Padding="{StaticResource SpacingMedium}">
+    <Border Grid.Row="0" Classes="banner" Background="{StaticResource BannerBrush}" Padding="{StaticResource SpacingMedium}">
       <TextBlock Text="{Binding CurrentProjectTitle}"
+                 Classes="banner-title"
                  Foreground="{StaticResource BannerTextBrush}"
-                 FontSize="18"
                  VerticalAlignment="Center"/>
     </Border>
 

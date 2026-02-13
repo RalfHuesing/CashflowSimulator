@@ -9,6 +9,8 @@
     <ItemsControl.ItemTemplate>
       <DataTemplate DataType="vm:NavItemViewModel">
         <Button Content="{Binding DisplayName}"
+                Classes.nav-item="True"
+                Classes.active="{Binding IsActive}"
                 Command="{Binding Command}"
                 Margin="{StaticResource SpacingSmall}"
                 HorizontalAlignment="Stretch"

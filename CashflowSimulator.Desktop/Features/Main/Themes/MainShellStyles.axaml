@@ -1,0 +1,9 @@
+<Styles xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Feature Main: Hervorhebung des aktiven Nav-Eintrags. Nutzt zentrale Ressourcen. -->
+  <Style Selector="Button.nav-item.active">
+    <Setter Property="Background" Value="{StaticResource NavItemActiveBackground}"/>
+    <Setter Property="BorderThickness" Value="3,0,0,0"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NavItemActiveBorder}"/>
+  </Style>
+</Styles>

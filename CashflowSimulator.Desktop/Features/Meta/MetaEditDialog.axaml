@@ -13,7 +13,7 @@
                Foreground="{StaticResource SecondaryTextBrush}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource SpacingLarge}">
       <Button Content="Abbrechen" Command="{Binding CancelCommand}"/>
-      <Button Content="OK" Command="{Binding OkCommand}" IsDefault="True"/>
+      <Button Content="OK" Command="{Binding OkCommand}" IsDefault="True" Classes.primary="True"/>
     </StackPanel>
   </StackPanel>
 </Window>

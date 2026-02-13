@@ -44,7 +44,9 @@ public partial class MainShellViewModel : ObservableObject
         CurrentProject = NewEmptyProject();
         CurrentFilePath = null;
 
-        navigationViewModel.Items.Add(new NavItemViewModel { DisplayName = "Stammdaten", Command = OpenStammdatenCommand });
+        var stammdatenItem = new NavItemViewModel { DisplayName = "Stammdaten", Command = OpenStammdatenCommand };
+        navigationViewModel.Items.Add(stammdatenItem);
+        stammdatenItem.IsActive = true;
     }
 
     /// <summary>

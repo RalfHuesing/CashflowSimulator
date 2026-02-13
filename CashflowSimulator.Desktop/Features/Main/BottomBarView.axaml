@@ -3,10 +3,11 @@
              xmlns:main="clr-namespace:CashflowSimulator.Desktop.Features.Main"
              x:Class="CashflowSimulator.Desktop.Features.Main.BottomBarView"
              x:DataType="main:MainShellViewModel"
-             Padding="{StaticResource SpacingMedium}"
              Background="{StaticResource NavBackgroundBrush}">
-  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMediumValue}">
-    <Button Content="Laden" Command="{Binding LoadCommand}"/>
-    <Button Content="Speichern" Command="{Binding SaveCommand}"/>
-  </StackPanel>
+  <Border Classes="bottombar-divider" Padding="{StaticResource SpacingMedium}" Background="{StaticResource NavBackgroundBrush}">
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingMediumValue}">
+      <Button Content="Laden" Command="{Binding LoadCommand}"/>
+      <Button Content="Speichern" Command="{Binding SaveCommand}" Classes.primary="True"/>
+    </StackPanel>
+  </Border>
 </UserControl>

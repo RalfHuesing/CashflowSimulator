@@ -4,26 +4,35 @@
   <Styles.Resources>
     <ResourceDictionary>
       <!-- Zentrale Farben/Brushes – keine Hardcodes in Views verwenden -->
-      <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4"/>
+      <SolidColorBrush x:Key="PrimaryBrush" Color="#106EBE"/>
       <SolidColorBrush x:Key="TextBrush" Color="#212121"/>
       <SolidColorBrush x:Key="SecondaryTextBrush" Color="#616161"/>
-      <SolidColorBrush x:Key="BannerBrush" Color="#0078D4"/>
+      <SolidColorBrush x:Key="BannerBrush" Color="#106EBE"/>
       <SolidColorBrush x:Key="BannerTextBrush" Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="NavBackgroundBrush" Color="#F5F5F5"/>
-      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FAFAFA"/>
-      <!-- Gemeinsame Abstände: Thickness für Padding/Margin, Double für Spacing (StackPanel etc.) -->
+      <SolidColorBrush x:Key="NavBackgroundBrush" Color="#F0F2F5"/>
+      <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#F8F9FA"/>
+      <SolidColorBrush x:Key="DividerBrush" Color="#E0E0E0"/>
+      <!-- Primary-Button (Speichern, OK) -->
+      <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#106EBE"/>
+      <SolidColorBrush x:Key="PrimaryButtonForeground" Color="#FFFFFF"/>
+      <!-- Navigation: aktiver Eintrag -->
+      <SolidColorBrush x:Key="NavItemActiveBackground" Color="#E3F2FD"/>
+      <SolidColorBrush x:Key="NavItemActiveBorder" Color="#106EBE"/>
+      <!-- Abstände -->
       <Thickness x:Key="SpacingSmall">4</Thickness>
       <Thickness x:Key="SpacingMedium">8</Thickness>
       <Thickness x:Key="SpacingLarge">16</Thickness>
       <sys:Double x:Key="SpacingSmallValue">4</sys:Double>
       <sys:Double x:Key="SpacingMediumValue">8</sys:Double>
       <sys:Double x:Key="SpacingLargeValue">16</sys:Double>
-      <!-- App-Titel für Fenster -->
+      <!-- Layout/Typo -->
+      <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
+      <sys:Double x:Key="FontSizeBody">14</sys:Double>
+      <sys:Double x:Key="FontSizeSection">16</sys:Double>
+      <sys:Double x:Key="FontSizeTitle">18</sys:Double>
       <x:String x:Key="ApplicationTitle">Cashflow Simulator</x:String>
     </ResourceDictionary>
   </Styles.Resources>
-  <!-- Optionale Basis-Styles für Controls; erweiterbar -->
-  <Style Selector="Button">
-    <Setter Property="Padding" Value="{StaticResource SpacingMedium}"/>
-  </Style>
+  <StyleInclude Source="/Common/Themes/Layout.axaml"/>
+  <StyleInclude Source="/Common/Themes/ButtonStyles.axaml"/>
 </Styles>

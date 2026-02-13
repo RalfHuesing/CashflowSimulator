@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Layout-Styles: Banner-Schatten, Trennlinien, Banner-Titel. Ressourcen aus Default.axaml. -->
+  <Style Selector="Border.banner">
+    <Setter Property="BoxShadow" Value="0 2 6 0 #1A000000"/>
+  </Style>
+  <Style Selector="TextBlock.banner-title">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+  <Style Selector="Border.bottombar-divider">
+    <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}"/>
+  </Style>
+</Styles>

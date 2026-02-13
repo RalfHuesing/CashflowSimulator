@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Basis-Button: Padding, CornerRadius aus zentralen Ressourcen -->
+  <Style Selector="Button">
+    <Setter Property="Padding" Value="{StaticResource SpacingMedium}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}"/>
+  </Style>
+  <!-- Primary-Button für Hauptaktionen (Speichern, OK) – Classes.primary="True" -->
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource PrimaryButtonBackground}"/>
+    <Setter Property="Foreground" Value="{StaticResource PrimaryButtonForeground}"/>
+  </Style>
+</Styles>
