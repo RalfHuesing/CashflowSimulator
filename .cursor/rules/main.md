@@ -62,7 +62,7 @@ flowchart TB
 ## Avalonia und MVVM
 
 - **Strict MVVM:** Logik im ViewModel; Code-Behind nur für `InitializeComponent` und UI-Events, die nicht per Binding abbildbar sind.
-- ViewModels: DTOs aus Contracts als Backing Fields; wo sinnvoll CommunityToolkit.Mvvm (RelayCommand etc.) oder etabliertes Avalonia-MVVM-Pattern nutzen.
+- **ViewModels:** CommunityToolkit.Mvvm verwenden – `[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`; keine handgeschriebenen ICommand- oder INotifyPropertyChanged-Implementierungen. ViewModels als `partial class` für Source Generators.
 - **Fehlerbehandlung in der UI:** State of the Art – z. B. Toasts oder zentrale Fehleranzeige; Fehler aus Result/Exceptions dem Nutzer klar und verständlich (Deutsch) anzeigen.
 
 ## XAML und Styling

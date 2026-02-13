@@ -1,10 +1,9 @@
-using System.ComponentModel;
-using System.Windows.Input;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
-using CashflowSimulator.Desktop.Common;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 
 namespace CashflowSimulator.Desktop.Features.Main;
@@ -13,8 +12,17 @@ namespace CashflowSimulator.Desktop.Features.Main;
 /// ViewModel für die Hauptshell: Banner, Navigation, Content, Laden/Speichern.
 /// Hält das aktuelle Projekt und den aktuellen Dateipfad; orchestriert Dateidialog und Storage.
 /// </summary>
-public class MainShellViewModel : INotifyPropertyChanged
+public partial class MainShellViewModel : ObservableObject
 {
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenStammdatenCommand))]
+    [NotifyPropertyChangedFor(nameof(CurrentProjectTitle))]
+    private SimulationProjectDto _currentProject;
+
+    [ObservableProperty]
+    private string? _currentFilePath;
+
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly IMetaEditDialogService _metaEditDialogService;
@@ -33,52 +41,11 @@ public class MainShellViewModel : INotifyPropertyChanged
         _logger = logger;
         Navigation = navigationViewModel;
 
-        LoadCommand = new RelayCommand(LoadAsync, () => true);
-        SaveCommand = new RelayCommand(SaveAsync, () => CurrentProject is not null);
-        OpenStammdatenCommand = new RelayCommand(OpenStammdatenAsync, () => CurrentProject is not null);
+        CurrentProject = NewEmptyProject();
+        CurrentFilePath = null;
 
-        // Leeres Projekt als Startzustand
-        _currentProject = NewEmptyProject();
-        _currentFilePath = null;
-
-        // Navigationseinträge (IconKeys optional, später z. B. FluentIcons)
         navigationViewModel.Items.Add(new NavItemViewModel { DisplayName = "Stammdaten", Command = OpenStammdatenCommand });
     }
-
-    /// <summary>
-    /// Aktuell geladenes Projekt (niemals null; bei Start ein leeres Projekt).
-    /// </summary>
-    public SimulationProjectDto CurrentProject
-    {
-        get => _currentProject;
-        private set
-        {
-            if (_currentProject == value) return;
-            _currentProject = value;
-            OnPropertyChanged();
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
-            ((RelayCommand)OpenStammdatenCommand).RaiseCanExecuteChanged();
-        }
-    }
-
-    private SimulationProjectDto _currentProject;
-
-    /// <summary>
-    /// Pfad der aktuell geladenen Datei; null wenn noch nicht gespeichert / neu.
-    /// </summary>
-    public string? CurrentFilePath
-    {
-        get => _currentFilePath;
-        private set
-        {
-            if (_currentFilePath == value) return;
-            _currentFilePath = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(CurrentProjectTitle));
-        }
-    }
-
-    private string? _currentFilePath;
 
     /// <summary>
     /// Anzeige für Titel/Banner: Projektname oder "Neues Szenario".
@@ -89,11 +56,8 @@ public class MainShellViewModel : INotifyPropertyChanged
 
     public NavigationViewModel Navigation { get; }
 
-    public ICommand LoadCommand { get; }
-    public ICommand SaveCommand { get; }
-    public ICommand OpenStammdatenCommand { get; }
-
-    private async void LoadAsync()
+    [RelayCommand]
+    private async Task LoadAsync()
     {
         var path = await _fileDialogService.OpenAsync(
             new FileDialogOptions("Szenario öffnen", "Szenario-Dateien", ".json")).ConfigureAwait(true);
@@ -103,7 +67,6 @@ public class MainShellViewModel : INotifyPropertyChanged
         if (!result.IsSuccess)
         {
             _logger.LogWarning("Laden fehlgeschlagen: {Error}", result.Error);
-            // TODO: Fehler an Nutzer (Toast/Message)
             return;
         }
 
@@ -112,7 +75,8 @@ public class MainShellViewModel : INotifyPropertyChanged
         _logger.LogInformation("Projekt geladen: {Path}", path);
     }
 
-    private async void SaveAsync()
+    [RelayCommand(CanExecute = nameof(CanSave))]
+    private async Task SaveAsync()
     {
         var path = CurrentFilePath;
         if (string.IsNullOrEmpty(path))
@@ -136,20 +100,21 @@ public class MainShellViewModel : INotifyPropertyChanged
         _logger.LogInformation("Projekt gespeichert: {Path}", path);
     }
 
-    private async void OpenStammdatenAsync()
+    private bool CanSave() => CurrentProject is not null;
+
+    [RelayCommand(CanExecute = nameof(CanOpenStammdaten))]
+    private async Task OpenStammdatenAsync()
     {
         var updated = await _metaEditDialogService.ShowEditAsync(CurrentProject.Meta).ConfigureAwait(true);
         if (updated is null) return;
         CurrentProject = CurrentProject with { Meta = updated };
     }
 
+    private bool CanOpenStammdaten() => CurrentProject is not null;
+
     private static SimulationProjectDto NewEmptyProject() => new()
     {
         Meta = new MetaDto { ScenarioName = "", CreatedAt = DateTimeOffset.UtcNow },
         Parameters = new SimulationParametersDto()
     };
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

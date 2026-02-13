@@ -1,24 +1,21 @@
-using System.ComponentModel;
-using System.Windows.Input;
 using CashflowSimulator.Contracts.Dtos;
-using CashflowSimulator.Desktop.Common;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CashflowSimulator.Desktop.Features.Meta;
 
 /// <summary>
 /// ViewModel für den Stammdaten-Dialog (MetaDto: Szenario-Name, Erstellungsdatum).
 /// </summary>
-public class MetaEditDialogViewModel : INotifyPropertyChanged
+public partial class MetaEditDialogViewModel : ObservableObject
 {
+    [ObservableProperty]
     private string _scenarioName = string.Empty;
 
     public MetaEditDialogViewModel(MetaDto current)
     {
-        _scenarioName = current.ScenarioName;
+        ScenarioName = current.ScenarioName;
         CreatedAt = current.CreatedAt;
-
-        OkCommand = new RelayCommand(OnOk, () => true);
-        CancelCommand = new RelayCommand(OnCancel, () => true);
     }
 
     /// <summary>
@@ -26,23 +23,10 @@ public class MetaEditDialogViewModel : INotifyPropertyChanged
     /// </summary>
     public Action<MetaDto?>? CloseWithResult { get; set; }
 
-    public string ScenarioName
-    {
-        get => _scenarioName;
-        set
-        {
-            if (_scenarioName == value) return;
-            _scenarioName = value ?? string.Empty;
-            OnPropertyChanged();
-        }
-    }
-
     public DateTimeOffset CreatedAt { get; }
 
-    public ICommand OkCommand { get; }
-    public ICommand CancelCommand { get; }
-
-    private void OnOk()
+    [RelayCommand]
+    private void Ok()
     {
         CloseWithResult?.Invoke(new MetaDto
         {
@@ -51,9 +35,6 @@ public class MetaEditDialogViewModel : INotifyPropertyChanged
         });
     }
 
-    private void OnCancel() => CloseWithResult?.Invoke(null);
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    [RelayCommand]
+    private void Cancel() => CloseWithResult?.Invoke(null);
 }

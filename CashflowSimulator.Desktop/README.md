@@ -44,6 +44,13 @@ CashflowSimulator.Desktop/
 
 Keine hardcodierten Farben oder Margins in View-XAML. Alle Werte kommen aus **Common/Themes/Default.axaml** (Brushes, Thickness, Strings). Views und Controls referenzieren nur Ressourcen (`{StaticResource Key}`).
 
+## Avalonia – Hinweise (nicht WPF)
+
+- **XAML:** Root-Namespace `https://github.com/avaloniaui`; Controls aus Avalonia, keine `System.Windows.*`.
+- **Lifetime:** Hauptfenster per `desktop.MainWindow = ...` setzen; Dialog-Owner ist `TopLevel`/`Visual` (z. B. MainWindow), nicht WPF-Window-Owner.
+- **Ressourcen:** Über `StyleInclude` in App.axaml einbinden; StaticResource nur auf Ressourcen aus erreichbaren Styles zugreifen.
+- **MVVM:** CommunityToolkit.Mvvm (`[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`); Details in `.cursor/rules/main.md` und `.cursor/rules/avalonia.md`.
+
 ## Für AI / spätere Kontexteinordnung
 
 - Dieses Projekt ist der **einzige Host** der Anwendung: hier laufen DI, Logging und Avalonia-Lifetime.
