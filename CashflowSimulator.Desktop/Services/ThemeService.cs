@@ -1,5 +1,6 @@
 using System.Reflection;
 using Avalonia;
+using Avalonia.Threading;
 using Avalonia.Themes.Fluent;
 using Avalonia.Themes.Simple;
 using Avalonia.Markup.Xaml.Styling;
@@ -50,6 +51,16 @@ public sealed class ThemeService : IThemeService
             return;
 
         var id = string.IsNullOrWhiteSpace(themeId) ? GetDefaultThemeId() : themeId.Trim();
+
+        // Theme-Wechsel verzögern, damit offene Popups (z. B. ComboBox-Dropdown) zuerst
+        // geschlossen werden. Sonst: InvalidOperationException "already has a visual parent".
+        Dispatcher.UIThread.Post(() => ApplyThemeCore(app, id), DispatcherPriority.Loaded);
+    }
+
+    private void ApplyThemeCore(Application app, string id)
+    {
+        if (Application.Current is null)
+            return;
 
         app.Styles.Clear();
 
