@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
@@ -24,6 +25,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
+    private readonly IThemeService _themeService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
     private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
@@ -32,6 +34,7 @@ public partial class MainShellViewModel : ObservableObject
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
+        IThemeService themeService,
         Func<MetaEditViewModel> createMetaEditViewModel,
         Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
@@ -40,12 +43,14 @@ public partial class MainShellViewModel : ObservableObject
         _fileDialogService = fileDialogService;
         _storageService = storageService;
         _currentProjectService = currentProjectService;
+        _themeService = themeService;
         _createMetaEditViewModel = createMetaEditViewModel;
         _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
 
         _currentProjectService.ProjectChanged += OnProjectChanged;
+        _themeService.ThemeApplied += OnThemeApplied;
         InitializeNavigation();
         // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
         SaveCommand.NotifyCanExecuteChanged();
@@ -195,5 +200,18 @@ public partial class MainShellViewModel : ObservableObject
     {
         for (var i = 0; i < Navigation.Items.Count; i++)
             Navigation.Items[i].IsActive = i == index;
+    }
+
+    private void OnThemeApplied(object? sender, EventArgs e)
+    {
+        if (CurrentContentViewModel is not SettingsViewModel)
+            return;
+
+        CurrentContentViewModel = null;
+        Dispatcher.UIThread.Post(() =>
+        {
+            CurrentContentViewModel = _createSettingsViewModel();
+            SetActiveNavigationItem(1);
+        }, DispatcherPriority.Loaded);
     }
 }

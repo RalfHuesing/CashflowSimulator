@@ -70,5 +70,7 @@ public sealed class ThemeService : IThemeService
 
         app.Styles.Insert(0, newTheme);
         _currentBaseTheme = newTheme;
+
+        ThemeApplied?.Invoke(this, EventArgs.Empty);
     }
 }

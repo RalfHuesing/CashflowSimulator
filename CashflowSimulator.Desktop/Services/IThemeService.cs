@@ -7,6 +7,12 @@ namespace CashflowSimulator.Desktop.Services;
 public interface IThemeService
 {
     /// <summary>
+    /// Wird ausgelöst, nachdem das Theme visuell angewendet wurde (Ende von ApplyThemeCore, UI-Thread).
+    /// Ermöglicht z. B. das Neuerzeugen der Einstellungs-View, um ComboBox-Zustand nach Theme-Swap zu vermeiden.
+    /// </summary>
+    event EventHandler? ThemeApplied;
+
+    /// <summary>
     /// Alle wählbaren Themes (für ComboBox etc.).
     /// </summary>
     IReadOnlyList<ThemeOption> GetAvailableThemes();
