@@ -73,9 +73,19 @@ flowchart TB
 
 - **Nur über Validatoren:** Alle fachlichen Regeln und Grenzen werden ausschließlich über FluentValidation im Projekt **CashflowSimulator.Validation** abgebildet (Single Source of Truth). Keine Validierung im XAML.
 - **Keine Validierung im XAML:** In Views keine `Minimum`/`Maximum` zur fachlichen Regelung setzen; keine Inline-Validierung. XAML dient nur Darstellung und Eingabe-UX (z. B. Schrittweite `Increment`).
-- **Desktop:** Feature-ViewModels erben von `ValidatingViewModelBase` (INotifyDataErrorInfo); Validierung über `ValidationRunner` bei Property-Änderung (debounced). Fehler werden inline am Control angezeigt (Avalonia-Standard). Kein „Übernehmen“/„Verwerfen“; Auto-Save bei jeder Änderung (auch bei ungültigen Daten).
+- **Desktop:** Feature-ViewModels erben von `ValidatingViewModelBase` (INotifyDataErrorInfo); Validierung über `ValidationRunner` bei Property-Änderung (debounced). **Fehler werden nur im rechten Info-Panel** des jeweiligen Feature-Bereichs angezeigt; die Anzeige unter den Controls ist per App-Theme deaktiviert (DataValidationErrors.ErrorTemplate leer). Kein „Übernehmen“/„Verwerfen“; Auto-Save bei jeder Änderung (auch bei ungültigen Daten).
 - **Engine:** Validiert eingehende `SimulationProjectDto` an den Einstiegspunkten (z. B. vor Simulation); bei Fehlern Result mit Validierungsfehlern zurückgeben.
 - **Partielle Validierung:** Pro DTO eigener Validator (z. B. `SimulationParametersValidator`, `MetaDtoValidator`); `SimulationProjectValidator` bündelt sie. Die Desktop-App kann gezielt nur das gerade bearbeitete Teil-DTO validieren.
+
+## Feature-Bereiche (Eckdaten, Einstellungen, Szenario)
+
+Neue Feature-Bereiche, die wie Eckdaten/Einstellungen funktionieren, folgen diesem Muster:
+
+- **Shell:** Keine Statusleiste. Content-Bereich nutzt die volle Höhe (eine Zeile); Platzhalter oder `ContentControl` für das aktuelle Feature-ViewModel.
+- **Layout:** Feature-View verwendet **FeatureLayoutView** (Common/Controls) als Wurzel: links scrollbarer Inhalt, rechts **Info-Panel** (Hilfetext + Block „VALIDIERUNGSFEHLER“).
+- **ViewModel:** Erbt von **ValidatingViewModelBase**; **IHelpProvider** per Constructor Injection; **PageHelpKey** im Konstruktor setzen (z. B. `PageHelpKey = "Eckdaten"`).
+- **Hilfe:** An jedem relevanten Control **FocusHelpBehavior.HelpKey** (und ggf. **ErrorPropertyName**) setzen. **FocusHelpBehavior** muss einmalig initialisiert werden (z. B. in MainWindow). Bei GotFocus wird ActiveHelpKey am ViewModel gesetzt; Titel/Beschreibung kommen aus dem HelpProvider und werden rechts angezeigt.
+- **Neues Feature:** Neuer Ordner unter `Features/<Name>/` mit View (UserControl, Wurzel = FeatureLayoutView) und ViewModel (ValidatingViewModelBase, PageHelpKey, IHelpProvider). Keine Statusleiste, keine Inline-Fehler unter den Controls.
 
 ## Avalonia und MVVM
 

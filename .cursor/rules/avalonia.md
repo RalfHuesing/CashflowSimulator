@@ -31,3 +31,9 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 ## Validierung
 
 - **Keine Validierung im XAML.** Grenzen und fachliche Regeln nur über die Validation-Schicht (CashflowSimulator.Validation); in Views keine `Minimum`/`Maximum` zur Regelung setzen.
+- **Fehleranzeige:** Nur im rechten Info-Panel des Feature-Layouts (Block „VALIDIERUNGSFEHLER“). Die Standard-Anzeige unter den Controls ist in dieser App per Style deaktiviert (`DataValidationErrors` mit leerer `ErrorTemplate` in Default.axaml).
+
+## Feature-Layout und Hilfe
+
+- **FeatureLayoutView** (Common/Controls): Wrapper für Feature-Seiten mit zweigeteiltem Layout – links scrollbarer Content, rechts festes Info-Panel (Hilfetext + Validierungsfehler). Neue Feature-Views wie Eckdaten/Einstellungen nutzen dieses Control als Wurzel.
+- **FocusHelpBehavior** + **HelpKey:** Attached Property `FocusHelpBehavior.HelpKey` (und optional `ErrorPropertyName`) an Eingabe-Controls setzen. Bei GotFocus wird das ViewModel (ValidatingViewModelBase) mit dem HelpKey aktualisiert; Hilfetext kommt aus IHelpProvider und wird im Info-Panel angezeigt. Einmalige Initialisierung z. B. in MainWindow: `FocusHelpBehavior.Initialize(this)`.

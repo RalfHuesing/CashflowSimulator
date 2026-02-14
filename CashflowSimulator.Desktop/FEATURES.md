@@ -5,44 +5,51 @@ Die Desktop-App ist **nach Domänen-Features** organisiert, nicht nach technisch
 ## Prinzip
 
 - **Features/** = eine Ordnerhierarchie pro fachlichem Bereich.
-- **Services/** = app-weite UI-Dienste (z. B. Dateidialog), die von mehreren Features genutzt werden.
-- **Common/** = themes, wiederverwendbare Controls – unverändert.
+- **Services/** = app-weite UI-Dienste (z. B. Dateidialog, HelpProvider), die von mehreren Features genutzt werden.
+- **Common/** = Themes, wiederverwendbare Controls (z. B. FeatureLayoutView, FocusHelpBehavior).
 
-So findest du alles zu „Meta“ unter `Features/Meta/`, alles zu „Cashflow“ später unter `Features/Cashflow/`.
+So findest du alles zu „Eckdaten“ unter `Features/Eckdaten/`, alles zu „Meta“ unter `Features/Meta/`, alles zu „Cashflow“ später unter `Features/Cashflow/`.
 
 ## Aktuelle Struktur
 
 ```
 CashflowSimulator.Desktop/
 ├── App.*, Program.cs, CompositionRoot.cs, MainWindow.*   # Root, Host
-├── Common/Themes/, Common/Controls/                       # Unverändert
-├── Services/                                              # App-weit, plattformunabhängige Abstraktionen
-│   ├── IFileDialogService.cs                             # Öffnen/Speichern-Dialog (Avalonia = plattformunabhängig)
-│   ├── AvaloniaFileDialogService.cs
-│   └── IMetaEditDialogService.cs                         # Stammdaten-Dialog (Owner in MainWindow.OnLoaded)
+├── Common/Themes/, Common/Controls/, Common/Behaviors/    # Themes, FeatureLayoutView, FocusHelpBehavior
+├── Services/                                              # App-weit (Dateidialog, HelpProvider, …)
 └── Features/
-    ├── Main/                                              # Shell: Banner, Navigation, Content-Bereich, Laden/Speichern
-    │   ├── MainShellView.axaml(.cs)
-    │   ├── MainShellViewModel.cs
-    │   ├── Navigation/
-    │   │   ├── NavigationView.axaml(.cs)                  # Links: Icon + Text
-    │   │   └── NavigationViewModel.cs
-    │   └── BottomBarView.axaml(.cs)                       # Unten: Laden, Speichern
-    ├── Meta/                                              # Stammdaten / Szenario-Metadaten
-    │   ├── MetaEditDialog.axaml(.cs)                      # Modal-Dialog zum Bearbeiten von MetaDto
-    │   └── MetaEditDialogViewModel.cs
+    ├── Main/                                              # Shell: Sidebar (Logo, Navigation, Laden/Speichern), Content-Bereich (volle Höhe, keine Statusleiste)
+    │   ├── MainShellView.axaml(.cs), MainShellViewModel.cs
+    │   └── Navigation/NavigationView*, NavigationViewModel
+    ├── Meta/                                              # Szenario-Stammdaten (MetaEditView*, MetaEditViewModel)
+    ├── Eckdaten/                                          # Eckdaten (EckdatenView*, EckdatenViewModel)
+    ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
     └── Cashflow/                                          # (später) Liste, Dialoge, …
 ```
 
 ## Namespaces
 
-- `CashflowSimulator.Desktop.Services` – Dateidialog etc.
-- `CashflowSimulator.Desktop.Features.Main` – Shell, Navigation, BottomBar
+- `CashflowSimulator.Desktop.Services` – Dateidialog, HelpProvider etc.
+- `CashflowSimulator.Desktop.Features.Main` – Shell, Navigation
 - `CashflowSimulator.Desktop.Features.Main.Navigation` – Navigation-UI
-- `CashflowSimulator.Desktop.Features.Meta` – Meta-Dialog
+- `CashflowSimulator.Desktop.Features.Meta` – Szenario-Metadaten
+- `CashflowSimulator.Desktop.Features.Eckdaten` – Eckdaten
+- `CashflowSimulator.Desktop.Features.Settings` – Einstellungen
 - `CashflowSimulator.Desktop.Features.Cashflow` – (später)
+
+## Pattern für neue Feature-Bereiche (wie Eckdaten, Einstellungen)
+
+Damit neue Features gleich funktionieren wie Eckdaten/Einstellungen:
+
+1. **Ordner** unter `Features/<Name>/` mit `*View.axaml`(.cs) und `*ViewModel.cs`.
+2. **View:** UserControl mit **FeatureLayoutView** als Wurzel; Inhalt links (ScrollViewer im Template), rechts automatisch Info-Panel (Hilfe + Validierungsfehler).
+3. **ViewModel:** Erbt von **ValidatingViewModelBase**; im Konstruktor **PageHelpKey** setzen (z. B. `"Eckdaten"`); **IHelpProvider** per Constructor Injection.
+4. **Hilfe:** An jedem Eingabe-Control `FocusHelpBehavior.HelpKey="PropertyName"` und ggf. `FocusHelpBehavior.ErrorPropertyName="PropertyName"` setzen. FocusHelpBehavior wird einmalig in MainWindow initialisiert.
+5. **Validierung:** Nur über FluentValidation; Fehler erscheinen **nur im rechten Info-Panel** (nicht unter den Controls). Keine Statusleiste.
+
+Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.cursor/rules/avalonia.md` („Feature-Layout und Hilfe“).
 
 ## Erweiterung
 
-- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen.
+- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey).
 - Gemeinsam genutzte Dialoge/Services bleiben in `Services/` oder werden bei Bedarf in ein gemeinsames Feature (z. B. `Features/Shared/`) ausgelagert.

@@ -22,11 +22,12 @@ CashflowSimulator.Desktop/
 │   ├── IFileDialogService.cs                           # Öffnen/Speichern (Avalonia StorageProvider)
 │   └── AvaloniaFileDialogService.cs
 └── Features/
-    ├── Main/                                            # Shell: Banner, Navigation links, Content, Laden/Speichern unten
+    ├── Main/                                            # Shell: Sidebar (Navigation, Laden/Speichern), Content (volle Höhe, keine Statusleiste)
     │   ├── MainShellView*, MainShellViewModel
-    │   ├── Navigation/NavigationView*, NavigationViewModel
-    │   └── BottomBarView*
-    ├── Meta/                                            # Stammdaten: MetaEditDialog
+    │   └── Navigation/NavigationView*, NavigationViewModel
+    ├── Meta/                                            # Szenario-Stammdaten
+    ├── Eckdaten/                                        # Eckdaten
+    ├── Settings/                                        # Einstellungen
     └── Cashflow/                                        # (später) Liste, Dialoge
 ```
 
@@ -50,7 +51,7 @@ Keine hardcodierten Farben oder Margins in View-XAML. Alle Werte kommen aus **Co
 - **Lifetime:** Hauptfenster per `desktop.MainWindow = ...` setzen; Dialog-Owner ist `TopLevel`/`Visual` (z. B. MainWindow), nicht WPF-Window-Owner.
 - **Ressourcen:** Über `StyleInclude` in App.axaml einbinden; StaticResource nur auf Ressourcen aus erreichbaren Styles zugreifen.
 - **MVVM:** CommunityToolkit.Mvvm (`[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`); Details in `.cursor/rules/main.md` und `.cursor/rules/avalonia.md`.
-- **Validierung:** Nur über Validatoren (CashflowSimulator.Validation); Fehleranzeige im zentralen Meldungsbereich der Shell. Keine Validierung im XAML – siehe `.cursor/rules/main.md`.
+- **Validierung:** Nur über Validatoren (CashflowSimulator.Validation); Fehleranzeige **nur im rechten Info-Panel** des jeweiligen Feature-Bereichs (nicht unter den Controls). Keine Validierung im XAML – siehe `.cursor/rules/main.md`.
 
 ## Für AI / spätere Kontexteinordnung
 
