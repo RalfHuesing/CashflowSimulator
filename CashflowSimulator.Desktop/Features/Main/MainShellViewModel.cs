@@ -96,24 +96,25 @@ public partial class MainShellViewModel : ObservableObject
     public bool HasValidationMessages => _validationMessageService.Messages.Count > 0;
 
     /// <summary>
-    /// Text für die Statusleiste: bei Fehlern "{n} Fehler gefunden", sonst "Bereit" oder aktueller Dateipfad.
+    /// Text für die Statusleiste: 0 Fehler = "Bereit" oder Dateipfad; 1 Fehler = Fehlertext; N &gt; 1 = "N Fehler gefunden".
     /// </summary>
-    public string StatusText => StatusBarTextProvider.GetStatusText(
+    public string StatusBarDisplayText => StatusBarTextProvider.GetStatusBarDisplayText(
         HasValidationMessages,
         _validationMessageService.Messages.Count,
+        _validationMessageService.Messages.Count > 0 ? _validationMessageService.Messages[0].DisplayText : null,
         CurrentFilePath);
 
     private void OnValidationMessagesChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(HasValidationMessages));
-        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(StatusBarDisplayText));
     }
 
     private void OnProjectChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(CurrentProjectTitle));
         OnPropertyChanged(nameof(CurrentFilePath));
-        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(StatusBarDisplayText));
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
         OpenEckdatenCommand.NotifyCanExecuteChanged();

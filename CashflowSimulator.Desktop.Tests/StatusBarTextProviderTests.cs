@@ -50,4 +50,33 @@ public sealed class StatusBarTextProviderTests
         var result = StatusBarTextProvider.GetStatusText(true, 2, @"C:\wird-ignoriert.json");
         Assert.Equal("2 Fehler gefunden", result);
     }
+
+    [Fact]
+    public void GetStatusBarDisplayText_WhenOneErrorAndFirstMessageSet_ReturnsFirstMessageText()
+    {
+        const string msg = "Eckdaten · Renteneintritt: Rente muss nach Geburt liegen.";
+        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 1, msg, null);
+        Assert.Equal(msg, result);
+    }
+
+    [Fact]
+    public void GetStatusBarDisplayText_WhenOneErrorAndFirstMessageNull_ReturnsOneFehlerGefunden()
+    {
+        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 1, null, null);
+        Assert.Equal("1 Fehler gefunden", result);
+    }
+
+    [Fact]
+    public void GetStatusBarDisplayText_WhenNoErrors_ReturnsBereit()
+    {
+        var result = StatusBarTextProvider.GetStatusBarDisplayText(false, 0, null, null);
+        Assert.Equal("Bereit", result);
+    }
+
+    [Fact]
+    public void GetStatusBarDisplayText_WhenMultipleErrors_ReturnsCountFehlerGefunden()
+    {
+        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 5, "irrelevant", @"C:\x.json");
+        Assert.Equal("5 Fehler gefunden", result);
+    }
 }

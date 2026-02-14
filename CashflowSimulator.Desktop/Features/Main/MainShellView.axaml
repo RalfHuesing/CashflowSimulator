@@ -5,6 +5,7 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Main"
              xmlns:nav="using:CashflowSimulator.Desktop.Features.Main.Navigation"
+             xmlns:primitives="using:Avalonia.Controls.Primitives"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="CashflowSimulator.Desktop.Features.Main.MainShellView"
              x:DataType="vm:MainShellViewModel">
@@ -50,7 +51,7 @@
         <Border Grid.Column="1" 
                 Background="{DynamicResource ContentBackgroundBrush}"
                 Padding="{DynamicResource PagePadding}">
-            <Grid RowDefinitions="*, Auto, 36">
+            <Grid RowDefinitions="*, 36">
                 <Border Grid.Row="0" Classes="card">
                     <Grid>
                         <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
@@ -72,30 +73,33 @@
                                          VerticalContentAlignment="Stretch"/>
                     </Grid>
                 </Border>
-                <Border Grid.Row="1" Classes="error-tray"
-                        IsVisible="{Binding HasValidationMessages}">
-                    <ScrollViewer MaxHeight="{StaticResource ErrorTrayMaxHeight}"
-                                  VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="{StaticResource SpacingSmallValue}">
-                            <TextBlock Text="Validierungsfehler" Classes="error-tray-caption"/>
-                            <ItemsControl ItemsSource="{Binding ValidationMessages}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayText}" Classes="error-tray-item"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
+                <Border x:Name="StatusBarHost" Grid.Row="1" Background="Transparent"
+                        PointerPressed="StatusBarHost_OnPointerPressed">
+                    <primitives:FlyoutBase.AttachedFlyout>
+                        <Flyout Placement="Top" ShowMode="Transient">
+                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Spacing="4" Margin="12,8">
+                                    <TextBlock Text="Validierungsfehler" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ItemsControl ItemsSource="{Binding ValidationMessages}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" FontSize="13"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Flyout>
+                    </primitives:FlyoutBase.AttachedFlyout>
+                    <Grid>
+                        <Border Classes="status-bar" IsVisible="{Binding !HasValidationMessages}">
+                            <TextBlock Text="{Binding StatusBarDisplayText}" Classes="status-bar-text"/>
+                        </Border>
+                        <Border Classes="status-bar-error" IsVisible="{Binding HasValidationMessages}">
+                            <TextBlock Text="{Binding StatusBarDisplayText}" Classes="status-bar-text-error"/>
+                        </Border>
+                    </Grid>
                 </Border>
-                <Grid Grid.Row="2">
-                    <Border Classes="status-bar" IsVisible="{Binding !HasValidationMessages}">
-                        <TextBlock Text="{Binding StatusText}" Classes="status-bar-text"/>
-                    </Border>
-                    <Border Classes="status-bar-error" IsVisible="{Binding HasValidationMessages}">
-                        <TextBlock Text="{Binding StatusText}" Classes="status-bar-text-error"/>
-                    </Border>
-                </Grid>
             </Grid>
         </Border>
     </Grid>
