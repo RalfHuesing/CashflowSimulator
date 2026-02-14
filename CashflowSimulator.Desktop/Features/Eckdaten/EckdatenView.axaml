@@ -20,8 +20,8 @@
                            Classes="feature-page-description"/>
             </StackPanel>
 
-            <Grid ColumnDefinitions="180, 220" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-                  VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+                  VerticalAlignment="Top" HorizontalAlignment="Stretch">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>

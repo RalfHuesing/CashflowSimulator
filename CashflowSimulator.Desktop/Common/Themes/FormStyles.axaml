@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Form input: flat border, fixed width via FormInputWidth in layout -->
+    <!-- Form input: flat border, dynamisch maximale Breite (Stretch) -->
     <Style Selector="TextBox.form-input">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource FormInputBorderBrush}"/>
@@ -9,8 +9,7 @@
         <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="Padding" Value="6,8"/>
         <Setter Property="MinWidth" Value="0"/>
-        <Setter Property="Width" Value="{StaticResource FormInputWidth}"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
     </Style>
     <Style Selector="TextBox.form-input /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{StaticResource FormInputBorderBrush}"/>
@@ -32,8 +31,7 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="Padding" Value="6,8"/>
-        <Setter Property="Width" Value="{StaticResource FormInputWidth}"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
     </Style>
     <Style Selector="NumericUpDown.form-input.has-error">
         <Setter Property="BorderBrush" Value="{StaticResource FormInputErrorBorderBrush}"/>
@@ -45,9 +43,8 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="Padding" Value="6,8"/>
-        <Setter Property="Width" Value="{StaticResource FormInputWidth}"/>
         <Setter Property="MinWidth" Value="0"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
     </Style>
 
 </Styles>
