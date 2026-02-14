@@ -73,7 +73,7 @@ flowchart TB
 
 - **Nur über Validatoren:** Alle fachlichen Regeln und Grenzen werden ausschließlich über FluentValidation im Projekt **CashflowSimulator.Validation** abgebildet (Single Source of Truth). Keine Validierung im XAML.
 - **Keine Validierung im XAML:** In Views keine `Minimum`/`Maximum` zur fachlichen Regelung setzen; keine Inline-Validierung. XAML dient nur Darstellung und Eingabe-UX (z. B. Schrittweite `Increment`).
-- **Desktop:** Feature-ViewModels rufen vor Übernahme (Apply) den passenden Validator über `ValidationRunner` auf; Fehler werden über den zentralen Meldungsdienst angezeigt (statischer Bereich in der Shell, Option B).
+- **Desktop:** Feature-ViewModels erben von `ValidatingViewModelBase` (INotifyDataErrorInfo); Validierung über `ValidationRunner` bei Property-Änderung (debounced). Fehler werden inline am Control angezeigt (Avalonia-Standard). Kein „Übernehmen“/„Verwerfen“; Auto-Save bei jeder Änderung (auch bei ungültigen Daten).
 - **Engine:** Validiert eingehende `SimulationProjectDto` an den Einstiegspunkten (z. B. vor Simulation); bei Fehlern Result mit Validierungsfehlern zurückgeben.
 - **Partielle Validierung:** Pro DTO eigener Validator (z. B. `SimulationParametersValidator`, `MetaDtoValidator`); `SimulationProjectValidator` bündelt sie. Die Desktop-App kann gezielt nur das gerade bearbeitete Teil-DTO validieren.
 

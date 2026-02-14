@@ -1,9 +1,7 @@
-using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Eckdaten;
-using CashflowSimulator.Validation;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Settings;
@@ -28,7 +26,6 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
-    private readonly IValidationMessageService _validationMessageService;
     private readonly IThemeService _themeService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
     private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
@@ -39,7 +36,6 @@ public partial class MainShellViewModel : ObservableObject
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
-        IValidationMessageService validationMessageService,
         IThemeService themeService,
         Func<MetaEditViewModel> createMetaEditViewModel,
         Func<EckdatenViewModel> createEckdatenViewModel,
@@ -50,7 +46,6 @@ public partial class MainShellViewModel : ObservableObject
         _fileDialogService = fileDialogService;
         _storageService = storageService;
         _currentProjectService = currentProjectService;
-        _validationMessageService = validationMessageService;
         _themeService = themeService;
         _createMetaEditViewModel = createMetaEditViewModel;
         _createEckdatenViewModel = createEckdatenViewModel;
@@ -60,7 +55,6 @@ public partial class MainShellViewModel : ObservableObject
 
         _currentProjectService.ProjectChanged += OnProjectChanged;
         _themeService.ThemeApplied += OnThemeApplied;
-        _validationMessageService.Messages.CollectionChanged += (_, _) => OnValidationMessagesChanged(null, EventArgs.Empty);
         InitializeNavigation();
         // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
         SaveCommand.NotifyCanExecuteChanged();
@@ -86,29 +80,9 @@ public partial class MainShellViewModel : ObservableObject
     public bool IsContentPlaceholderVisible => CurrentContentViewModel is null;
 
     /// <summary>
-    /// Meldungen für den zentralen Validierungsbereich (Option B).
+    /// Text für die Statusleiste: Dateipfad oder "Bereit".
     /// </summary>
-    public ObservableCollection<ValidationMessageEntry> ValidationMessages => _validationMessageService.Messages;
-
-    /// <summary>
-    /// True, wenn mindestens eine Validierungsmeldung angezeigt werden soll.
-    /// </summary>
-    public bool HasValidationMessages => _validationMessageService.Messages.Count > 0;
-
-    /// <summary>
-    /// Text für die Statusleiste: 0 Fehler = "Bereit" oder Dateipfad; 1 Fehler = Fehlertext; N &gt; 1 = "N Fehler gefunden".
-    /// </summary>
-    public string StatusBarDisplayText => StatusBarTextProvider.GetStatusBarDisplayText(
-        HasValidationMessages,
-        _validationMessageService.Messages.Count,
-        _validationMessageService.Messages.Count > 0 ? _validationMessageService.Messages[0].DisplayText : null,
-        CurrentFilePath);
-
-    private void OnValidationMessagesChanged(object? sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(HasValidationMessages));
-        OnPropertyChanged(nameof(StatusBarDisplayText));
-    }
+    public string StatusBarDisplayText => string.IsNullOrWhiteSpace(CurrentFilePath) ? "Bereit" : CurrentFilePath;
 
     private void OnProjectChanged(object? sender, EventArgs e)
     {
@@ -178,12 +152,6 @@ public partial class MainShellViewModel : ObservableObject
 
             var project = result.Value!;
             _currentProjectService.SetCurrent(project, path);
-
-            var validationResult = ValidationRunner.Validate(project);
-            if (!validationResult.IsValid)
-                _validationMessageService.SetErrors("Projekt", validationResult.Errors);
-            else
-                _validationMessageService.ClearSource("Projekt");
 
             _logger.LogInformation("Projekt erfolgreich geladen aus {Path}", path);
         }

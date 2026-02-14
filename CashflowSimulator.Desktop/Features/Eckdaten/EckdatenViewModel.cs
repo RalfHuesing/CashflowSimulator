@@ -1,9 +1,9 @@
+using CashflowSimulator.Contracts.Common;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
-using CashflowSimulator.Desktop.Services;
+using CashflowSimulator.Desktop.ViewModels;
 using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace CashflowSimulator.Desktop.Features.Eckdaten;
 
@@ -11,10 +11,22 @@ namespace CashflowSimulator.Desktop.Features.Eckdaten;
 /// ViewModel für die Eckdaten-Seite (Simulationsparameter).
 /// UI zeigt menschliche Eingaben (Geburtsdatum, Rentenalter, Lebenserwartung);
 /// Transformation in <see cref="SimulationParametersDto"/> für die Engine erfolgt hier.
-/// Validierung ausschließlich über <see cref="ValidationRunner"/>; Fehler im zentralen Meldungsbereich.
+/// Validierung über <see cref="ValidationRunner"/>; Fehler inline am Control (INotifyDataErrorInfo).
+/// Auto-Save bei jeder Änderung (auch bei ungültigen Daten).
 /// </summary>
-public partial class EckdatenViewModel : ObservableObject
+public partial class EckdatenViewModel : ValidatingViewModelBase
 {
+    private const int ValidationDebounceMs = 300;
+
+    private static readonly IReadOnlyDictionary<string, string> DtoToVmPropertyMap = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        { "DateOfBirth", nameof(BirthDate) },
+        { "RetirementDate", nameof(RetirementAge) },
+        { "SimulationEnd", nameof(LifeExpectancy) },
+        { "InitialLiquidCash", nameof(InitialLiquidCash) },
+        { "CurrencyCode", nameof(InitialLiquidCash) }
+    };
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentAgeText))]
     private DateTimeOffset? _birthDate;
@@ -29,13 +41,13 @@ public partial class EckdatenViewModel : ObservableObject
     private decimal _initialLiquidCash;
 
     private readonly ICurrentProjectService _currentProjectService;
-    private readonly IValidationMessageService _validationMessageService;
+    private bool _isLoading;
 
-    public EckdatenViewModel(ICurrentProjectService currentProjectService, IValidationMessageService validationMessageService)
+    public EckdatenViewModel(ICurrentProjectService currentProjectService)
     {
         _currentProjectService = currentProjectService;
-        _validationMessageService = validationMessageService;
         LoadFromProject();
+        ValidateAndSave();
     }
 
     /// <summary>Read-only: aktuelles Alter in Jahren (zur Kontrolle).</summary>
@@ -43,16 +55,36 @@ public partial class EckdatenViewModel : ObservableObject
         ? $"{GetAgeInYears(BirthDate.Value)} Jahre"
         : "—";
 
+    partial void OnBirthDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnRetirementAgeChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnLifeExpectancyChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnInitialLiquidCashChanged(decimal value) => ScheduleValidateAndSave();
+
+    private void ScheduleValidateAndSave()
+    {
+        if (_isLoading)
+            return;
+        ScheduleDebounced(ValidationDebounceMs, ValidateAndSave);
+    }
+
     private void LoadFromProject()
     {
         var p = _currentProjectService.Current?.Parameters;
         if (p is null)
             return;
 
-        BirthDate = new DateTimeOffset(p.DateOfBirth.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-        RetirementAge = p.RetirementDate.Year - p.DateOfBirth.Year;
-        LifeExpectancy = p.SimulationEnd.Year - p.DateOfBirth.Year;
-        InitialLiquidCash = p.InitialLiquidCash;
+        _isLoading = true;
+        try
+        {
+            BirthDate = new DateTimeOffset(p.DateOfBirth.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            RetirementAge = p.RetirementDate.Year - p.DateOfBirth.Year;
+            LifeExpectancy = p.SimulationEnd.Year - p.DateOfBirth.Year;
+            InitialLiquidCash = p.InitialLiquidCash;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
     }
 
     private static int GetAgeInYears(DateTimeOffset birth)
@@ -65,20 +97,24 @@ public partial class EckdatenViewModel : ObservableObject
         return age;
     }
 
-    [RelayCommand]
-    private void Discard()
+    private void ValidateAndSave()
     {
-        LoadFromProject();
-    }
-
-    [RelayCommand]
-    private void Apply()
-    {
-        if (!BirthDate.HasValue)
+        var dto = BuildDto();
+        if (dto is null)
         {
-            _validationMessageService.SetErrors("Eckdaten", [new Contracts.Common.ValidationError("DateOfBirth", "Geburtsdatum muss angegeben werden.")]);
+            SetValidationErrors([new ValidationError("DateOfBirth", "Geburtsdatum muss angegeben werden.")], DtoToVmPropertyMap);
             return;
         }
+
+        var validationResult = ValidationRunner.Validate(dto);
+        SetValidationErrors(validationResult.Errors, DtoToVmPropertyMap);
+        _currentProjectService.UpdateParameters(dto);
+    }
+
+    private SimulationParametersDto? BuildDto()
+    {
+        if (!BirthDate.HasValue)
+            return null;
 
         var dob = DateOnly.FromDateTime(BirthDate.Value.Date);
         var simulationStart = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -87,7 +123,7 @@ public partial class EckdatenViewModel : ObservableObject
         var retirementDate = FirstOfMonthWhenAge(dob, retirementYears);
         var simulationEnd = FirstOfMonthWhenAge(dob, lifeYears);
 
-        var dto = new SimulationParametersDto
+        return new SimulationParametersDto
         {
             SimulationStart = simulationStart,
             SimulationEnd = simulationEnd,
@@ -96,16 +132,6 @@ public partial class EckdatenViewModel : ObservableObject
             InitialLiquidCash = InitialLiquidCash,
             CurrencyCode = "EUR"
         };
-
-        var validationResult = ValidationRunner.Validate(dto);
-        if (!validationResult.IsValid)
-        {
-            _validationMessageService.SetErrors("Eckdaten", validationResult.Errors);
-            return;
-        }
-
-        _validationMessageService.ClearSource("Eckdaten");
-        _currentProjectService.UpdateParameters(dto);
     }
 
     private static DateOnly FirstOfMonthWhenAge(DateOnly dateOfBirth, int age)

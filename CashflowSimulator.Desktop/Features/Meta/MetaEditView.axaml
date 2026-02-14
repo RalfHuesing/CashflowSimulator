@@ -7,7 +7,7 @@
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
              x:DataType="vm:MetaEditViewModel">
 
-    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
+    <Grid RowDefinitions="Auto, *" Margin="{StaticResource SpacingLarge}">
         <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
                     Margin="{StaticResource FormHeaderBlockMargin}"
                     HorizontalAlignment="Left">
@@ -37,16 +37,5 @@
                        Opacity="0.8" VerticalAlignment="Center"/>
 
         </Grid>
-
-        <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                    Orientation="Horizontal" Spacing="{StaticResource FormActionsSpacing}"
-                    Margin="{StaticResource FormActionsMargin}">
-            <Button Command="{Binding DiscardCommand}"
-                    Content="Verwerfen"
-                    Classes="bs-secondary" />
-            <Button Command="{Binding ApplyCommand}"
-                    Content="Übernehmen"
-                    Classes="bs-primary" />
-        </StackPanel>
     </Grid>
 </UserControl>

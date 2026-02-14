@@ -7,7 +7,7 @@
              x:Class="CashflowSimulator.Desktop.Features.Eckdaten.EckdatenView"
              x:DataType="vm:EckdatenViewModel">
 
-    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
+    <Grid RowDefinitions="Auto, *" Margin="{StaticResource SpacingLarge}">
         <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
                     Margin="{StaticResource FormHeaderBlockMargin}"
                     HorizontalAlignment="Left">
@@ -17,6 +17,15 @@
             <TextBlock Text="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation."
                        Classes="feature-page-description"
                        Foreground="{StaticResource TextSecondaryBrush}"/>
+            <ItemsControl ItemsSource="{Binding FormLevelErrors}" IsVisible="{Binding HasFormLevelErrors}"
+                          Margin="0,8,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Foreground="{StaticResource ErrorTrayTextBrush}"
+                                  TextWrapping="Wrap" FontSize="12"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
@@ -65,16 +74,5 @@
                            HorizontalAlignment="Left" MinWidth="160"/>
 
         </Grid>
-
-        <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                    Orientation="Horizontal" Spacing="{StaticResource FormActionsSpacing}"
-                    Margin="{StaticResource FormActionsMargin}">
-            <Button Command="{Binding DiscardCommand}"
-                    Content="Verwerfen"
-                    Classes="bs-secondary" />
-            <Button Command="{Binding ApplyCommand}"
-                    Content="Übernehmen"
-                    Classes="bs-primary" />
-        </StackPanel>
     </Grid>
 </UserControl>

@@ -1,82 +1,104 @@
+using CashflowSimulator.Contracts.Common;
+using CashflowSimulator.Contracts.Dtos;
+using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Features.Main;
+using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Services;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace CashflowSimulator.Desktop.Tests;
 
 /// <summary>
-/// Unit-Tests für die zentrale Statusleisten-Text-Logik.
+/// Tests für die Statusleisten-Anzeige in <see cref="MainShellViewModel"/> (nur Dateipfad oder "Bereit").
 /// </summary>
-public sealed class StatusBarTextProviderTests
+public sealed class MainShellViewModelStatusBarTests
 {
     [Fact]
-    public void GetStatusText_WhenNoErrorsAndNoFilePath_ReturnsBereit()
+    public void StatusBarDisplayText_WhenCurrentFilePathIsNull_ReturnsBereit()
     {
-        var result = StatusBarTextProvider.GetStatusText(false, 0, null);
-        Assert.Equal("Bereit", result);
+        var currentProject = new StubCurrentProjectService { CurrentFilePath = null };
+        var vm = CreateMainShellViewModel(currentProject);
+        Assert.Equal("Bereit", vm.StatusBarDisplayText);
     }
 
     [Fact]
-    public void GetStatusText_WhenNoErrorsAndEmptyFilePath_ReturnsBereit()
+    public void StatusBarDisplayText_WhenCurrentFilePathIsEmpty_ReturnsBereit()
     {
-        var result = StatusBarTextProvider.GetStatusText(false, 0, "");
-        Assert.Equal("Bereit", result);
+        var currentProject = new StubCurrentProjectService { CurrentFilePath = "" };
+        var vm = CreateMainShellViewModel(currentProject);
+        Assert.Equal("Bereit", vm.StatusBarDisplayText);
     }
 
     [Fact]
-    public void GetStatusText_WhenNoErrorsAndFilePathSet_ReturnsFilePath()
+    public void StatusBarDisplayText_WhenCurrentFilePathIsSet_ReturnsFilePath()
     {
         const string path = @"C:\Szenarien\mein.json";
-        var result = StatusBarTextProvider.GetStatusText(false, 0, path);
-        Assert.Equal(path, result);
+        var currentProject = new StubCurrentProjectService { CurrentFilePath = path };
+        var vm = CreateMainShellViewModel(currentProject);
+        Assert.Equal(path, vm.StatusBarDisplayText);
     }
 
-    [Fact]
-    public void GetStatusText_WhenOneError_ReturnsOneFehlerGefunden()
+    private static MainShellViewModel CreateMainShellViewModel(ICurrentProjectService currentProjectService)
     {
-        var result = StatusBarTextProvider.GetStatusText(true, 1, null);
-        Assert.Equal("1 Fehler gefunden", result);
+        var fileDialog = new StubFileDialogService();
+        var storage = new StubStorageService();
+        var theme = new StubThemeService();
+        var nav = new NavigationViewModel();
+
+        return new MainShellViewModel(
+            fileDialog,
+            storage,
+            currentProjectService,
+            theme,
+            () => null!,
+            () => null!,
+            () => null!,
+            nav,
+            NullLogger.Instance);
     }
 
-    [Fact]
-    public void GetStatusText_WhenMultipleErrors_ReturnsCountFehlerGefunden()
+#pragma warning disable CS0067 // Event never used (stub for tests)
+    private sealed class StubCurrentProjectService : ICurrentProjectService
     {
-        var result = StatusBarTextProvider.GetStatusText(true, 10, @"C:\x.json");
-        Assert.Equal("10 Fehler gefunden", result);
+        public SimulationProjectDto? Current => null;
+        public string? CurrentFilePath { get; set; }
+        public void SetCurrent(SimulationProjectDto project, string? filePath = null) { }
+        public void UpdateMeta(MetaDto meta) { }
+        public void UpdateUiSettings(UiSettingsDto uiSettings) { }
+        public void UpdateParameters(SimulationParametersDto parameters) { }
+        public event EventHandler? ProjectChanged;
+    }
+#pragma warning restore CS0067
+
+    private sealed class StubFileDialogService : IFileDialogService
+    {
+        public Task<string?> OpenAsync(FileDialogOptions options, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
+        public Task<string?> SaveAsync(SaveFileDialogOptions options, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
     }
 
-    [Fact]
-    public void GetStatusText_WhenErrors_IgnoresFilePath()
+    private sealed class StubStorageService : IStorageService<SimulationProjectDto>
     {
-        var result = StatusBarTextProvider.GetStatusText(true, 2, @"C:\wird-ignoriert.json");
-        Assert.Equal("2 Fehler gefunden", result);
+        public Task<Result<SimulationProjectDto>> LoadAsync(string path, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Result> SaveAsync(string path, SimulationProjectDto data, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
-    [Fact]
-    public void GetStatusBarDisplayText_WhenOneErrorAndFirstMessageSet_ReturnsFirstMessageText()
+#pragma warning disable CS0067
+    private sealed class StubThemeService : IThemeService
     {
-        const string msg = "Eckdaten · Renteneintritt: Rente muss nach Geburt liegen.";
-        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 1, msg, null);
-        Assert.Equal(msg, result);
+        public IReadOnlyList<ThemeOption> GetAvailableThemes() => [];
+        public string GetDefaultThemeId() => "default";
+        public void ApplyTheme(string? themeId) { }
+        public event EventHandler? ThemeApplied;
     }
+#pragma warning restore CS0067
 
-    [Fact]
-    public void GetStatusBarDisplayText_WhenOneErrorAndFirstMessageNull_ReturnsOneFehlerGefunden()
+    private sealed class NullLogger : ILogger<MainShellViewModel>
     {
-        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 1, null, null);
-        Assert.Equal("1 Fehler gefunden", result);
-    }
+        internal static readonly ILogger<MainShellViewModel> Instance = new NullLogger();
 
-    [Fact]
-    public void GetStatusBarDisplayText_WhenNoErrors_ReturnsBereit()
-    {
-        var result = StatusBarTextProvider.GetStatusBarDisplayText(false, 0, null, null);
-        Assert.Equal("Bereit", result);
-    }
-
-    [Fact]
-    public void GetStatusBarDisplayText_WhenMultipleErrors_ReturnsCountFehlerGefunden()
-    {
-        var result = StatusBarTextProvider.GetStatusBarDisplayText(true, 5, "irrelevant", @"C:\x.json");
-        Assert.Equal("5 Fehler gefunden", result);
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { }
+        public bool IsEnabled(LogLevel logLevel) => false;
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
     }
 }

@@ -48,7 +48,6 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
                 services.AddSingleton<IThemeService, ThemeService>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
-                services.AddSingleton<IValidationMessageService, ValidationMessageService>();
 
                 // Shell / Main-Feature (Func<T> wird von MS.DI nicht automatisch bereitgestellt)
                 services.AddTransient<NavigationViewModel>();
