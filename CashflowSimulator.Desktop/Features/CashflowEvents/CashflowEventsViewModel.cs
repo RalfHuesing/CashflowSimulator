@@ -11,19 +11,11 @@ namespace CashflowSimulator.Desktop.Features.CashflowEvents;
 /// <summary>
 /// ViewModel für geplante Cashflow-Events, gefiltert nach Einnahmen oder Ausgaben.
 /// Validierung über <see cref="ValidationRunner"/>; Fehler nur im Info-Panel.
+/// Property-Namen 1:1 wie im DTO (Rules-konform).
 /// </summary>
 public partial class CashflowEventsViewModel : ValidatingViewModelBase
 {
     private const int ValidationDebounceMs = 300;
-
-    private static readonly IReadOnlyDictionary<string, string> DtoToVmPropertyMap = new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-        { nameof(CashflowEventDto.Name), nameof(EditName) },
-        { nameof(CashflowEventDto.Amount), nameof(EditAmount) },
-        { nameof(CashflowEventDto.TargetDate), nameof(EditTargetDate) },
-        { nameof(CashflowEventDto.EarliestMonthOffset), nameof(EditEarliestMonthOffset) },
-        { nameof(CashflowEventDto.LatestMonthOffset), nameof(EditLatestMonthOffset) }
-    };
 
     private readonly ICurrentProjectService _currentProjectService;
     private readonly CashflowType _cashflowType;
@@ -34,19 +26,19 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     private CashflowEventDto? _selectedItem;
 
     [ObservableProperty]
-    private string _editName = string.Empty;
+    private string _name = string.Empty;
 
     [ObservableProperty]
-    private decimal _editAmount;
+    private decimal _amount;
 
     [ObservableProperty]
-    private DateTimeOffset? _editTargetDate;
+    private DateTimeOffset? _targetDate;
 
     [ObservableProperty]
-    private int? _editEarliestMonthOffset;
+    private int? _earliestMonthOffset;
 
     [ObservableProperty]
-    private int? _editLatestMonthOffset;
+    private int? _latestMonthOffset;
 
     [ObservableProperty]
     private string? _editingId;
@@ -82,11 +74,11 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         try
         {
             EditingId = value.Id;
-            EditName = value.Name;
-            EditAmount = value.Amount;
-            EditTargetDate = new DateTimeOffset(value.TargetDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-            EditEarliestMonthOffset = value.EarliestMonthOffset;
-            EditLatestMonthOffset = value.LatestMonthOffset;
+            Name = value.Name;
+            Amount = value.Amount;
+            TargetDate = new DateTimeOffset(value.TargetDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            EarliestMonthOffset = value.EarliestMonthOffset;
+            LatestMonthOffset = value.LatestMonthOffset;
         }
         finally
         {
@@ -94,11 +86,11 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         }
     }
 
-    partial void OnEditNameChanged(string value) => ScheduleValidateAndSave();
-    partial void OnEditAmountChanged(decimal value) => ScheduleValidateAndSave();
-    partial void OnEditTargetDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
-    partial void OnEditEarliestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
-    partial void OnEditLatestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
+    partial void OnNameChanged(string value) => ScheduleValidateAndSave();
+    partial void OnAmountChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnTargetDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnEarliestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
+    partial void OnLatestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
 
     private void ScheduleValidateAndSave()
     {
@@ -111,21 +103,21 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     {
         var dto = BuildEventDtoFromForm();
         var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors, DtoToVmPropertyMap);
+        SetValidationErrors(validationResult.Errors);
     }
 
     private CashflowEventDto BuildEventDtoFromForm()
     {
-        var targetDate = EditTargetDate.HasValue ? DateOnly.FromDateTime(EditTargetDate.Value.Date) : default;
+        var targetDateValue = TargetDate.HasValue ? DateOnly.FromDateTime(TargetDate.Value.Date) : default;
         return new CashflowEventDto
         {
             Id = EditingId ?? Guid.NewGuid().ToString(),
-            Name = EditName?.Trim() ?? string.Empty,
+            Name = Name?.Trim() ?? string.Empty,
             Type = _cashflowType,
-            Amount = EditAmount,
-            TargetDate = targetDate,
-            EarliestMonthOffset = EditEarliestMonthOffset,
-            LatestMonthOffset = EditLatestMonthOffset
+            Amount = Amount,
+            TargetDate = targetDateValue,
+            EarliestMonthOffset = EarliestMonthOffset,
+            LatestMonthOffset = LatestMonthOffset
         };
     }
 
@@ -144,11 +136,11 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     private void ClearForm()
     {
         EditingId = null;
-        EditName = string.Empty;
-        EditAmount = 0;
-        EditTargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
-        EditEarliestMonthOffset = null;
-        EditLatestMonthOffset = null;
+        Name = string.Empty;
+        Amount = 0;
+        TargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+        EarliestMonthOffset = null;
+        LatestMonthOffset = null;
         ClearValidationErrors();
     }
 
@@ -157,7 +149,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     {
         SelectedItem = null;
         ClearForm();
-        EditTargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+        TargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
     }
 
     [RelayCommand(CanExecute = nameof(HasCurrentProject))]
@@ -169,23 +161,23 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
 
         var dto = BuildEventDtoFromForm();
         var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors, DtoToVmPropertyMap);
+        SetValidationErrors(validationResult.Errors);
         if (!validationResult.IsValid)
             return;
 
-        var targetDate = DateOnly.FromDateTime(EditTargetDate!.Value.Date);
+        var targetDateValue = DateOnly.FromDateTime(TargetDate!.Value.Date);
         var list = current.Events.ToList();
         if (EditingId is null)
         {
             var newItem = new CashflowEventDto
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = EditName.Trim(),
+                Name = Name.Trim(),
                 Type = _cashflowType,
-                Amount = EditAmount,
-                TargetDate = targetDate,
-                EarliestMonthOffset = EditEarliestMonthOffset,
-                LatestMonthOffset = EditLatestMonthOffset
+                Amount = Amount,
+                TargetDate = targetDateValue,
+                EarliestMonthOffset = EarliestMonthOffset,
+                LatestMonthOffset = LatestMonthOffset
             };
             list.Add(newItem);
             _currentProjectService.UpdateEvents(list);
@@ -200,11 +192,11 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
                 return;
             list[idx] = list[idx] with
             {
-                Name = EditName.Trim(),
-                Amount = EditAmount,
-                TargetDate = targetDate,
-                EarliestMonthOffset = EditEarliestMonthOffset,
-                LatestMonthOffset = EditLatestMonthOffset
+                Name = Name.Trim(),
+                Amount = Amount,
+                TargetDate = targetDateValue,
+                EarliestMonthOffset = EarliestMonthOffset,
+                LatestMonthOffset = LatestMonthOffset
             };
             _currentProjectService.UpdateEvents(list);
             RefreshItems();

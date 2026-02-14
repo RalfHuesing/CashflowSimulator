@@ -69,8 +69,8 @@ public sealed class CashflowStreamsViewModelTests
         var projectService = new CurrentProjectService();
         projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
-        vm.EditName = "";
-        vm.EditStartDate = null;
+        vm.Name = "";
+        vm.StartDate = null;
 
         vm.SaveCommand.Execute(null);
 
@@ -84,10 +84,10 @@ public sealed class CashflowStreamsViewModelTests
         var projectService = new CurrentProjectService();
         projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
-        vm.EditName = "Gehalt";
-        vm.EditAmount = 2000;
-        vm.EditStartDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc), TimeSpan.Zero);
-        vm.EditInterval = "Monthly";
+        vm.Name = "Gehalt";
+        vm.Amount = 2000;
+        vm.StartDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc), TimeSpan.Zero);
+        vm.Interval = "Monthly";
 
         vm.SaveCommand.Execute(null);
 
@@ -103,8 +103,8 @@ public sealed class CashflowStreamsViewModelTests
         var projectService = new CurrentProjectService();
         projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
-        vm.EditName = "";
-        vm.EditStartDate = null;
+        vm.Name = "";
+        vm.StartDate = null;
         vm.SaveCommand.Execute(null);
         Assert.True(vm.HasErrors);
 

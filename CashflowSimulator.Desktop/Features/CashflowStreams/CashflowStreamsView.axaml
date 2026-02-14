@@ -31,42 +31,42 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
-                         Text="{Binding EditName}" Margin="{StaticResource FormInputMargin}"
-                         behaviors:FocusHelpBehavior.HelpKey="StreamName"
-                         behaviors:FocusHelpBehavior.ErrorPropertyName="EditName"/>
+                         Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
+                         behaviors:FocusHelpBehavior.HelpKey="Name"
+                         behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Betrag"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
-                               Value="{Binding EditAmount}" Increment="100"
+                               Value="{Binding Amount}" Increment="100"
                                Margin="{StaticResource FormInputMargin}"
                                behaviors:FocusHelpBehavior.HelpKey="Amount"
-                               behaviors:FocusHelpBehavior.ErrorPropertyName="EditAmount"/>
+                               behaviors:FocusHelpBehavior.ErrorPropertyName="Amount"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Intervall"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
                           ItemsSource="{x:Static vm:CashflowStreamsViewModel.IntervalOptions}"
-                          SelectedItem="{Binding EditInterval}"
+                          SelectedItem="{Binding Interval}"
                           Margin="{StaticResource FormInputMargin}"
                           behaviors:FocusHelpBehavior.HelpKey="Interval"
-                          behaviors:FocusHelpBehavior.ErrorPropertyName="EditInterval"/>
+                          behaviors:FocusHelpBehavior.ErrorPropertyName="Interval"/>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Von (Datum)"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <DatePicker Grid.Row="3" Grid.Column="1" Classes="form-input"
-                            SelectedDate="{Binding EditStartDate}"
+                            SelectedDate="{Binding StartDate}"
                             Margin="{StaticResource FormInputMargin}"
                             behaviors:FocusHelpBehavior.HelpKey="StartDate"
-                            behaviors:FocusHelpBehavior.ErrorPropertyName="EditStartDate"/>
+                            behaviors:FocusHelpBehavior.ErrorPropertyName="StartDate"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Bis (Datum, leer = unbegrenzt)"
                            Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
                 <DatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
-                            SelectedDate="{Binding EditEndDate}"
+                            SelectedDate="{Binding EndDate}"
                             Margin="{StaticResource FormInputMarginLast}"
                             behaviors:FocusHelpBehavior.HelpKey="EndDate"
-                            behaviors:FocusHelpBehavior.ErrorPropertyName="EditEndDate"/>
+                            behaviors:FocusHelpBehavior.ErrorPropertyName="EndDate"/>
             </Grid>
         </Grid>
     </controls:FeatureLayoutView>

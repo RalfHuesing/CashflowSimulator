@@ -11,19 +11,11 @@ namespace CashflowSimulator.Desktop.Features.CashflowStreams;
 /// <summary>
 /// ViewModel für laufende Cashflows (Streams), gefiltert nach Einnahmen oder Ausgaben.
 /// Validierung über <see cref="ValidationRunner"/>; Fehler nur im Info-Panel.
+/// Property-Namen 1:1 wie im DTO (Rules-konform).
 /// </summary>
 public partial class CashflowStreamsViewModel : ValidatingViewModelBase
 {
     private const int ValidationDebounceMs = 300;
-
-    private static readonly IReadOnlyDictionary<string, string> DtoToVmPropertyMap = new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-        { nameof(CashflowStreamDto.Name), nameof(EditName) },
-        { nameof(CashflowStreamDto.Amount), nameof(EditAmount) },
-        { nameof(CashflowStreamDto.Interval), nameof(EditInterval) },
-        { nameof(CashflowStreamDto.StartDate), nameof(EditStartDate) },
-        { nameof(CashflowStreamDto.EndDate), nameof(EditEndDate) }
-    };
 
     private readonly ICurrentProjectService _currentProjectService;
     private readonly CashflowType _cashflowType;
@@ -34,19 +26,19 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     private CashflowStreamDto? _selectedItem;
 
     [ObservableProperty]
-    private string _editName = string.Empty;
+    private string _name = string.Empty;
 
     [ObservableProperty]
-    private decimal _editAmount;
+    private decimal _amount;
 
     [ObservableProperty]
-    private string _editInterval = "Monthly";
+    private string _interval = "Monthly";
 
     [ObservableProperty]
-    private DateTimeOffset? _editStartDate;
+    private DateTimeOffset? _startDate;
 
     [ObservableProperty]
-    private DateTimeOffset? _editEndDate;
+    private DateTimeOffset? _endDate;
 
     /// <summary>Id des Eintrags im Bearbeitungsformular (null = Neu).</summary>
     [ObservableProperty]
@@ -85,11 +77,11 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         try
         {
             EditingId = value.Id;
-            EditName = value.Name;
-            EditAmount = value.Amount;
-            EditInterval = value.Interval;
-            EditStartDate = new DateTimeOffset(value.StartDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-            EditEndDate = value.EndDate.HasValue ? new DateTimeOffset(value.EndDate.Value.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero) : null;
+            Name = value.Name;
+            Amount = value.Amount;
+            Interval = value.Interval;
+            StartDate = new DateTimeOffset(value.StartDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            EndDate = value.EndDate.HasValue ? new DateTimeOffset(value.EndDate.Value.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero) : null;
         }
         finally
         {
@@ -97,11 +89,11 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         }
     }
 
-    partial void OnEditNameChanged(string value) => ScheduleValidateAndSave();
-    partial void OnEditAmountChanged(decimal value) => ScheduleValidateAndSave();
-    partial void OnEditIntervalChanged(string value) => ScheduleValidateAndSave();
-    partial void OnEditStartDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
-    partial void OnEditEndDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnNameChanged(string value) => ScheduleValidateAndSave();
+    partial void OnAmountChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnIntervalChanged(string value) => ScheduleValidateAndSave();
+    partial void OnStartDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnEndDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
 
     private void ScheduleValidateAndSave()
     {
@@ -114,22 +106,22 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     {
         var dto = BuildStreamDtoFromForm();
         var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors, DtoToVmPropertyMap);
+        SetValidationErrors(validationResult.Errors);
     }
 
     private CashflowStreamDto BuildStreamDtoFromForm()
     {
-        var startDate = EditStartDate.HasValue ? DateOnly.FromDateTime(EditStartDate.Value.Date) : default;
-        var endDate = EditEndDate.HasValue ? (DateOnly?)DateOnly.FromDateTime(EditEndDate.Value.Date) : null;
+        var startDateValue = StartDate.HasValue ? DateOnly.FromDateTime(StartDate.Value.Date) : default;
+        var endDateValue = EndDate.HasValue ? (DateOnly?)DateOnly.FromDateTime(EndDate.Value.Date) : null;
         return new CashflowStreamDto
         {
             Id = EditingId ?? Guid.NewGuid().ToString(),
-            Name = EditName?.Trim() ?? string.Empty,
+            Name = Name?.Trim() ?? string.Empty,
             Type = _cashflowType,
-            Amount = EditAmount,
-            Interval = EditInterval,
-            StartDate = startDate,
-            EndDate = endDate
+            Amount = Amount,
+            Interval = Interval,
+            StartDate = startDateValue,
+            EndDate = endDateValue
         };
     }
 
@@ -148,12 +140,12 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     private void ClearForm()
     {
         EditingId = null;
-        EditName = string.Empty;
-        EditAmount = 0;
-        EditInterval = "Monthly";
+        Name = string.Empty;
+        Amount = 0;
+        Interval = "Monthly";
         var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
-        EditStartDate = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-        EditEndDate = null;
+        StartDate = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+        EndDate = null;
         ClearValidationErrors();
     }
 
@@ -163,7 +155,7 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         SelectedItem = null;
         ClearForm();
         var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
-        EditStartDate = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+        StartDate = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
     }
 
     [RelayCommand(CanExecute = nameof(HasCurrentProject))]
@@ -175,24 +167,24 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
 
         var dto = BuildStreamDtoFromForm();
         var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors, DtoToVmPropertyMap);
+        SetValidationErrors(validationResult.Errors);
         if (!validationResult.IsValid)
             return;
 
-        var startDate = DateOnly.FromDateTime(EditStartDate!.Value.Date);
-        var endDate = EditEndDate.HasValue ? (DateOnly?)DateOnly.FromDateTime(EditEndDate.Value.Date) : null;
+        var startDateValue = DateOnly.FromDateTime(StartDate!.Value.Date);
+        var endDateValue = EndDate.HasValue ? (DateOnly?)DateOnly.FromDateTime(EndDate.Value.Date) : null;
         var list = current.Streams.ToList();
         if (EditingId is null)
         {
             var newItem = new CashflowStreamDto
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = EditName.Trim(),
+                Name = Name.Trim(),
                 Type = _cashflowType,
-                Amount = EditAmount,
-                Interval = EditInterval,
-                StartDate = startDate,
-                EndDate = endDate
+                Amount = Amount,
+                Interval = Interval,
+                StartDate = startDateValue,
+                EndDate = endDateValue
             };
             list.Add(newItem);
             _currentProjectService.UpdateStreams(list);
@@ -207,11 +199,11 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
                 return;
             list[idx] = list[idx] with
             {
-                Name = EditName.Trim(),
-                Amount = EditAmount,
-                Interval = EditInterval,
-                StartDate = startDate,
-                EndDate = endDate
+                Name = Name.Trim(),
+                Amount = Amount,
+                Interval = Interval,
+                StartDate = startDateValue,
+                EndDate = endDateValue
             };
             _currentProjectService.UpdateStreams(list);
             RefreshItems();
