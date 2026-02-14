@@ -43,21 +43,39 @@ public static class FocusHelpBehavior
         window.AddHandler(InputElement.GotFocusEvent, OnGlobalGotFocus, Avalonia.Interactivity.RoutingStrategies.Bubble);
     }
 
+    /// <summary>
+    /// Findet das erste Control in der visuellen Hierarchie (self oder Ancestor), an dem HelpKey gesetzt ist.
+    /// Ermöglicht Fokus-Hilfe auch bei Composite-Controls (DatePicker, NumericUpDown), wo e.Source ein inneres Control ist.
+    /// </summary>
+    private static bool TryGetFocusHost(Control focusSource, out Control? host)
+    {
+        host = null;
+        foreach (var visual in focusSource.GetSelfAndVisualAncestors())
+        {
+            if (visual is Control c && !string.IsNullOrEmpty(GetHelpKey(c)))
+            {
+                host = c;
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void OnGlobalGotFocus(object? sender, GotFocusEventArgs e)
     {
         if (e.Source is not Control control)
             return;
 
-        var helpKey = GetHelpKey(control);
-        if (!string.IsNullOrEmpty(helpKey))
-        {
-            if (control.DataContext is ValidatingViewModelBase vm)
-                vm.ActiveHelpKey = helpKey;
-        }
+        if (!TryGetFocusHost(control, out var host) || host is null)
+            return;
 
-        var errorProp = GetErrorPropertyName(control);
-        if (!string.IsNullOrEmpty(errorProp) && control.DataContext is INotifyDataErrorInfo notifyDataErrorInfo)
-            EnsureErrorSubscription(control, notifyDataErrorInfo, errorProp);
+        var helpKey = GetHelpKey(host);
+        if (!string.IsNullOrEmpty(helpKey) && host.DataContext is ValidatingViewModelBase vm)
+            vm.ActiveHelpKey = helpKey;
+
+        var errorProp = GetErrorPropertyName(host);
+        if (!string.IsNullOrEmpty(errorProp) && host.DataContext is INotifyDataErrorInfo notifyDataErrorInfo)
+            EnsureErrorSubscription(host, notifyDataErrorInfo, errorProp);
     }
 
     private static void EnsureErrorSubscription(Control control, INotifyDataErrorInfo vm, string propertyName)
