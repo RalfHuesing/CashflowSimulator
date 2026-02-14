@@ -67,6 +67,18 @@ public sealed class CurrentProjectService : ICurrentProjectService
         OnProjectChanged();
     }
 
+    /// <inheritdoc />
+    public void UpdateParameters(SimulationParametersDto parameters)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { Parameters = parameters };
+        });
+        OnProjectChanged();
+    }
+
     private void WithLock(Action action)
     {
         using (_lock.EnterScope())

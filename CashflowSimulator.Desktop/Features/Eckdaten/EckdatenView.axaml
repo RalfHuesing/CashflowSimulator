@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Eckdaten"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CashflowSimulator.Desktop.Features.Eckdaten.EckdatenView"
+             x:DataType="vm:EckdatenViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
+                    Margin="{StaticResource FormHeaderBlockMargin}"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="Eckdaten"
+                       Classes="feature-page-title"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation."
+                       Classes="feature-page-description"
+                       Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
+            <DatePicker Grid.Row="0" Grid.Column="1"
+                        SelectedDate="{Binding BirthDate}"
+                        Margin="{StaticResource FormInputMargin}"
+                        HorizontalAlignment="Left"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Aktuelles Alter"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1"
+                       Text="{Binding CurrentAgeText}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       VerticalAlignment="Center"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Renteneintritt (Alter)"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
+            <NumericUpDown Grid.Row="2" Grid.Column="1"
+                           Value="{Binding RetirementAge}"
+                           Minimum="50" Maximum="75" Increment="1"
+                           Margin="{StaticResource FormInputMargin}"
+                           HorizontalAlignment="Left" MinWidth="120"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Lebenserwartung (Alter)"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
+            <NumericUpDown Grid.Row="3" Grid.Column="1"
+                           Value="{Binding LifeExpectancy}"
+                           Minimum="60" Maximum="120" Increment="1"
+                           Margin="{StaticResource FormInputMargin}"
+                           HorizontalAlignment="Left" MinWidth="120"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Start-Kapital (flüssig)"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMarginLast}"/>
+            <NumericUpDown Grid.Row="4" Grid.Column="1"
+                           Value="{Binding InitialLiquidCash}"
+                           Minimum="0" Increment="1000"
+                           Margin="{StaticResource FormInputMarginLast}"
+                           HorizontalAlignment="Left" MinWidth="160"/>
+
+        </Grid>
+
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Orientation="Horizontal" Spacing="{StaticResource FormActionsSpacing}"
+                    Margin="{StaticResource FormActionsMargin}">
+            <Button Command="{Binding DiscardCommand}"
+                    Content="Verwerfen"
+                    Classes="bs-secondary" />
+            <Button Command="{Binding ApplyCommand}"
+                    Content="Übernehmen"
+                    Classes="bs-primary" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -37,6 +37,12 @@ public interface ICurrentProjectService
     void UpdateUiSettings(UiSettingsDto uiSettings);
 
     /// <summary>
+    /// Aktualisiert nur die Simulationsparameter des aktuellen Projekts (z. B. aus Eckdaten).
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateParameters(SimulationParametersDto parameters);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

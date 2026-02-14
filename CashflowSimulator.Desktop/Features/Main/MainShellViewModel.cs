@@ -1,6 +1,7 @@
 using Avalonia.Threading;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Settings;
@@ -27,6 +28,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly ICurrentProjectService _currentProjectService;
     private readonly IThemeService _themeService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
+    private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
     private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
@@ -36,6 +38,7 @@ public partial class MainShellViewModel : ObservableObject
         ICurrentProjectService currentProjectService,
         IThemeService themeService,
         Func<MetaEditViewModel> createMetaEditViewModel,
+        Func<EckdatenViewModel> createEckdatenViewModel,
         Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
@@ -45,6 +48,7 @@ public partial class MainShellViewModel : ObservableObject
         _currentProjectService = currentProjectService;
         _themeService = themeService;
         _createMetaEditViewModel = createMetaEditViewModel;
+        _createEckdatenViewModel = createEckdatenViewModel;
         _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
@@ -55,6 +59,7 @@ public partial class MainShellViewModel : ObservableObject
         // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
+        OpenEckdatenCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
@@ -80,6 +85,7 @@ public partial class MainShellViewModel : ObservableObject
         OnPropertyChanged(nameof(CurrentFilePath));
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
+        OpenEckdatenCommand.NotifyCanExecuteChanged();
     }
 
     private string GetCurrentProjectTitle()
@@ -101,6 +107,13 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenSzenarioCommand,
             IsActive = false
         };
+        var eckdatenItem = new NavItemViewModel
+        {
+            DisplayName = "Eckdaten",
+            Icon = Symbol.Calendar,
+            Command = OpenEckdatenCommand,
+            IsActive = false
+        };
         var einstellungenItem = new NavItemViewModel
         {
             DisplayName = "Einstellungen",
@@ -110,6 +123,7 @@ public partial class MainShellViewModel : ObservableObject
         };
 
         Navigation.Items.Add(szenarioItem);
+        Navigation.Items.Add(eckdatenItem);
         Navigation.Items.Add(einstellungenItem);
     }
 
@@ -188,12 +202,22 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanOpenSzenario() => _currentProjectService.Current is not null;
 
+    [RelayCommand(CanExecute = nameof(CanOpenEckdaten))]
+    private void OpenEckdaten()
+    {
+        _logger.LogDebug("Eckdaten geöffnet.");
+        CurrentContentViewModel = _createEckdatenViewModel();
+        SetActiveNavigationItem(1);
+    }
+
+    private bool CanOpenEckdaten() => _currentProjectService.Current is not null;
+
     [RelayCommand]
     private void OpenSettings()
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _createSettingsViewModel();
-        SetActiveNavigationItem(1);
+        SetActiveNavigationItem(2);
     }
 
     private void SetActiveNavigationItem(int index)
@@ -211,7 +235,7 @@ public partial class MainShellViewModel : ObservableObject
         Dispatcher.UIThread.Post(() =>
         {
             CurrentContentViewModel = _createSettingsViewModel();
-            SetActiveNavigationItem(1);
+            SetActiveNavigationItem(2);
         }, DispatcherPriority.Loaded);
     }
 }

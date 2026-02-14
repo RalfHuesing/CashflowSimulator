@@ -3,6 +3,7 @@ using System.IO;
 using Avalonia;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
@@ -52,6 +53,8 @@ namespace CashflowSimulator.Desktop
                 services.AddTransient<NavigationViewModel>();
                 services.AddTransient<MetaEditViewModel>();
                 services.AddSingleton<Func<MetaEditViewModel>>(sp => () => sp.GetRequiredService<MetaEditViewModel>());
+                services.AddTransient<EckdatenViewModel>();
+                services.AddSingleton<Func<EckdatenViewModel>>(sp => () => sp.GetRequiredService<EckdatenViewModel>());
                 services.AddTransient<SettingsViewModel>();
                 services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
                 services.AddTransient<MainShellViewModel>();

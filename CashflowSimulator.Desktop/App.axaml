@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta;assembly=CashflowSimulator.Desktop"
+             xmlns:eckdaten="clr-namespace:CashflowSimulator.Desktop.Features.Eckdaten;assembly=CashflowSimulator.Desktop"
              xmlns:settings="clr-namespace:CashflowSimulator.Desktop.Features.Settings;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
@@ -9,6 +10,11 @@
             <meta:MetaEditView DataContext="{Binding}"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="eckdaten:EckdatenViewModel">
+            <eckdaten:EckdatenView DataContext="{Binding}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
         </DataTemplate>
         <DataTemplate DataType="settings:SettingsViewModel">
             <settings:SettingsView DataContext="{Binding}"
