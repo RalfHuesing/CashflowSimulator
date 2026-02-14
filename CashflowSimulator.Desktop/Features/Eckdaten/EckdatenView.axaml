@@ -26,11 +26,11 @@
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>
                 <DatePicker Grid.Row="0" Grid.Column="1"
-                            SelectedDate="{Binding BirthDate}"
+                            SelectedDate="{Binding DateOfBirth}"
                             Margin="{StaticResource FormInputMargin}"
                             TabIndex="1"
-                            behaviors:FocusHelpBehavior.HelpKey="BirthDate"
-                            behaviors:FocusHelpBehavior.ErrorPropertyName="BirthDate"/>
+                            behaviors:FocusHelpBehavior.HelpKey="DateOfBirth"
+                            behaviors:FocusHelpBehavior.ErrorPropertyName="DateOfBirth"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Aktuelles Alter"
                            Classes="form-label"

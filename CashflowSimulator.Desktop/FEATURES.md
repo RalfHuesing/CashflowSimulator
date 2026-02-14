@@ -49,6 +49,11 @@ Damit neue Features gleich funktionieren wie Eckdaten/Einstellungen:
 
 Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.cursor/rules/avalonia.md` („Feature-Layout und Hilfe“).
 
+## Coding Guidelines (ViewModel/DTO)
+
+- VM-Properties, die 1:1 DTO-Daten repräsentieren, müssen denselben Namen wie im DTO tragen (Ausnahme: andere Semantik, z. B. Alter vs. Datum).
+- Validierungs-Mapping DTO → VM nur mit `nameof(DtoType.Property)` und `nameof(VmProperty)` – keine String-Literale. Siehe `.cursor/rules/main.md` (Validierung).
+
 ## Erweiterung
 
 - Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey).

@@ -76,6 +76,9 @@ flowchart TB
 - **Desktop:** Feature-ViewModels erben von `ValidatingViewModelBase` (INotifyDataErrorInfo); Validierung über `ValidationRunner` bei Property-Änderung (debounced). **Fehler werden nur im rechten Info-Panel** des jeweiligen Feature-Bereichs angezeigt; die Anzeige unter den Controls ist per App-Theme deaktiviert (DataValidationErrors.ErrorTemplate leer). Kein „Übernehmen“/„Verwerfen“; Auto-Save bei jeder Änderung (auch bei ungültigen Daten).
 - **Engine:** Validiert eingehende `SimulationProjectDto` an den Einstiegspunkten (z. B. vor Simulation); bei Fehlern Result mit Validierungsfehlern zurückgeben.
 - **Partielle Validierung:** Pro DTO eigener Validator (z. B. `SimulationParametersValidator`, `MetaDtoValidator`); `SimulationProjectValidator` bündelt sie. Die Desktop-App kann gezielt nur das gerade bearbeitete Teil-DTO validieren.
+- **ViewModel/DTO-Namenskonvention (Coding Guidelines):**
+  - ViewModel-Properties, die 1:1 Daten aus einem DTO repräsentieren, **müssen** exakt so heißen wie die zugehörige DTO-Property. Ausnahme: abweichende Semantik (z. B. Alter in Jahren im VM vs. Datum im DTO).
+  - Das Mapping von Validierungsfehlern (DTO → VM) darf **keine** hardcodierten Property-Namen enthalten. Es muss `nameof(DtoType.Property)` für den Key und `nameof(VmProperty)` für den Value verwendet werden, um Refactoring-Sicherheit zu garantieren.
 
 ## Feature-Bereiche (Eckdaten, Einstellungen, Szenario)
 

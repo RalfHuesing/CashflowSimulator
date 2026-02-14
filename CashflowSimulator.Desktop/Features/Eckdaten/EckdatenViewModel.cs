@@ -20,16 +20,16 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
 
     private static readonly IReadOnlyDictionary<string, string> DtoToVmPropertyMap = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        { "DateOfBirth", nameof(BirthDate) },
-        { "RetirementDate", nameof(RetirementAge) },
-        { "SimulationEnd", nameof(LifeExpectancy) },
-        { "InitialLiquidCash", nameof(InitialLiquidCash) },
-        { "CurrencyCode", nameof(InitialLiquidCash) }
+        { nameof(SimulationParametersDto.DateOfBirth), nameof(DateOfBirth) },
+        { nameof(SimulationParametersDto.RetirementDate), nameof(RetirementAge) },
+        { nameof(SimulationParametersDto.SimulationEnd), nameof(LifeExpectancy) },
+        { nameof(SimulationParametersDto.InitialLiquidCash), nameof(InitialLiquidCash) },
+        { nameof(SimulationParametersDto.CurrencyCode), nameof(InitialLiquidCash) }
     };
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentAgeText))]
-    private DateTimeOffset? _birthDate;
+    private DateTimeOffset? _dateOfBirth;
 
     [ObservableProperty]
     private decimal _retirementAge = 67;
@@ -53,11 +53,11 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
     }
 
     /// <summary>Read-only: aktuelles Alter in Jahren (zur Kontrolle).</summary>
-    public string CurrentAgeText => BirthDate.HasValue
-        ? $"{GetAgeInYears(BirthDate.Value)} Jahre"
+    public string CurrentAgeText => DateOfBirth.HasValue
+        ? $"{GetAgeInYears(DateOfBirth.Value)} Jahre"
         : "—";
 
-    partial void OnBirthDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnDateOfBirthChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
     partial void OnRetirementAgeChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnLifeExpectancyChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnInitialLiquidCashChanged(decimal value) => ScheduleValidateAndSave();
@@ -78,7 +78,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         _isLoading = true;
         try
         {
-            BirthDate = new DateTimeOffset(p.DateOfBirth.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            DateOfBirth = new DateTimeOffset(p.DateOfBirth.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
             RetirementAge = p.RetirementDate.Year - p.DateOfBirth.Year;
             LifeExpectancy = p.SimulationEnd.Year - p.DateOfBirth.Year;
             InitialLiquidCash = p.InitialLiquidCash;
@@ -104,7 +104,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         var dto = BuildDto();
         if (dto is null)
         {
-            SetValidationErrors([new ValidationError("DateOfBirth", "Geburtsdatum muss angegeben werden.")], DtoToVmPropertyMap);
+            SetValidationErrors([new ValidationError(nameof(SimulationParametersDto.DateOfBirth), "Geburtsdatum muss angegeben werden.")], DtoToVmPropertyMap);
             return;
         }
 
@@ -115,10 +115,10 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
 
     private SimulationParametersDto? BuildDto()
     {
-        if (!BirthDate.HasValue)
+        if (!DateOfBirth.HasValue)
             return null;
 
-        var dob = DateOnly.FromDateTime(BirthDate.Value.Date);
+        var dob = DateOnly.FromDateTime(DateOfBirth.Value.Date);
         var simulationStart = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
         var retirementYears = (int)Math.Round(RetirementAge);
         var lifeYears = (int)Math.Round(LifeExpectancy);

@@ -1,4 +1,5 @@
 using CashflowSimulator.Contracts.Common;
+using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Desktop.ViewModels;
 using Xunit;
 
@@ -40,13 +41,16 @@ public sealed class ValidatingViewModelBaseTests
     public void SetValidationErrors_WithDtoToVmMapping_MapsPropertyName()
     {
         var vm = new TestableValidatingViewModel();
-        var map = new Dictionary<string, string>(StringComparer.Ordinal) { { "DateOfBirth", "BirthDate" } };
-        vm.SetErrorsPublic([new ValidationError("DateOfBirth", "Ungültig.")], map);
+        var map = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            { nameof(SimulationParametersDto.RetirementDate), "RetirementAge" }
+        };
+        vm.SetErrorsPublic([new ValidationError(nameof(SimulationParametersDto.RetirementDate), "Ungültig.")], map);
 
-        Assert.Empty(vm.GetErrors("DateOfBirth").Cast<string>().ToList());
-        var birthDateErrors = vm.GetErrors("BirthDate").Cast<string>().ToList();
-        Assert.Single(birthDateErrors);
-        Assert.Equal("Ungültig.", birthDateErrors[0]);
+        Assert.Empty(vm.GetErrors(nameof(SimulationParametersDto.RetirementDate)).Cast<string>().ToList());
+        var vmErrors = vm.GetErrors("RetirementAge").Cast<string>().ToList();
+        Assert.Single(vmErrors);
+        Assert.Equal("Ungültig.", vmErrors[0]);
     }
 
     [Fact]
