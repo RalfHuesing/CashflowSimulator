@@ -16,25 +16,19 @@
                 Padding="{DynamicResource PagePadding}">
             <Grid RowDefinitions="Auto, *, Auto">
                 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,40">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" 
+                            Spacing="{StaticResource SpacingSmallValue}" 
+                            Margin="{StaticResource SidebarLogoMargin}">
                     <fi:SymbolIcon Symbol="ArrowTrendingLines" 
-                                   FontSize="28" 
+                                   FontSize="{StaticResource SidebarLogoIconSize}" 
                                    Foreground="{DynamicResource PrimaryActionBrush}"/>
-                    <TextBlock Text="CS.Desktop" 
-                               FontSize="20" 
-                               FontWeight="Bold" 
-                               Foreground="White" 
-                               VerticalAlignment="Center"/>
+                    <TextBlock Text="CashflowSimulator" Classes="sidebar-logo-title"/>
                 </StackPanel>
 
                 <nav:NavigationView Grid.Row="1" DataContext="{Binding Navigation}"/>
 
-                <StackPanel Grid.Row="2" Spacing="8">
-                    <TextBlock Text="SZENARIO" 
-                               FontSize="10" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="4,0,0,4"/>
+                <StackPanel Grid.Row="2" Spacing="{StaticResource SpacingSmallValue}">
+                    <TextBlock Text="SZENARIO" Classes="sidebar-section-caption"/>
                     
                     <Button Classes="ghost" Command="{Binding LoadCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" Spacing="12">
@@ -59,24 +53,17 @@
             
             <Grid RowDefinitions="Auto, *">
                 
-                <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,24">
-                    <Border Grid.Column="0" 
-                            Width="48" Height="48" 
-                            CornerRadius="12"
-                            Background="White"
-                            BoxShadow="0 2 4 0 #10000000"
-                            Margin="0,0,16,0">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="{StaticResource ContentHeaderMargin}">
+                    <Border Grid.Column="0" Classes="header-icon">
                         <fi:SymbolIcon Symbol="Briefcase" 
-                                       FontSize="24" 
+                                       FontSize="{StaticResource HeaderIconSize}" 
                                        Foreground="{DynamicResource PrimaryActionBrush}"
                                        VerticalAlignment="Center" 
                                        HorizontalAlignment="Center"/>
                     </Border>
                     
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Aktuelles Szenario" 
-                                   FontSize="12" 
-                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="Aktuelles Szenario" Classes="content-header-label"/>
                         <TextBlock Text="{Binding CurrentProjectTitle}" 
                                    Classes="h1"
                                    Margin="0"/>
@@ -86,14 +73,16 @@
                 <Border Grid.Row="1" Classes="card">
                     <Grid>
                         <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
-                                    Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <fi:SymbolIcon Symbol="ArrowTrendingLines" FontSize="64" Foreground="#E5E7EB"/>
+                                    Spacing="{StaticResource SpacingMediumValue}"
+                                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <fi:SymbolIcon Symbol="ArrowTrendingLines"
+                                           FontSize="{StaticResource PlaceholderIconSize}"
+                                           Foreground="{DynamicResource PlaceholderIconBrush}"/>
                             <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        HorizontalAlignment="Center"/>
                             <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Classes="placeholder-secondary"
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
                         <ContentControl Content="{Binding CurrentContentViewModel}"

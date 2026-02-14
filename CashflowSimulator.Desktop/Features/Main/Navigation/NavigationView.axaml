@@ -16,7 +16,7 @@
                     <Button Classes="ghost" 
                             Command="{Binding $parent[main:MainShellView].((main:MainShellViewModel)DataContext).OpenSzenarioCommand}"
                             HorizontalAlignment="Stretch"
-                            Margin="0,2">
+                            Margin="{StaticResource NavItemMargin}">
                         <Grid ColumnDefinitions="Auto, 16, *">
                             <Border Grid.Column="0"
                                     Width="4" Height="16"
@@ -27,13 +27,12 @@
                             
                             <fi:SymbolIcon Grid.Column="0" 
                                            Symbol="{Binding Icon}" 
-                                           FontSize="20"
-                                           Margin="8,0,0,0"/>
+                                           FontSize="{StaticResource NavIconSize}"
+                                           Margin="{StaticResource NavIconMargin}"/>
 
                             <TextBlock Grid.Column="2" 
                                        Text="{Binding DisplayName}" 
-                                       VerticalAlignment="Center"
-                                       FontSize="14"/>
+                                       Classes="nav-item-text"/>
                         </Grid>
                     </Button>
                 </DataTemplate>

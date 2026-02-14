@@ -12,6 +12,7 @@
         <Color x:Key="TextPrimaryColor">#111827</Color>
         <Color x:Key="TextSecondaryColor">#6B7280</Color>
         <Color x:Key="TextOnDarkColor">#F9FAFB</Color>
+        <Color x:Key="PlaceholderIconColor">#E5E7EB</Color>
 
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
         <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
@@ -21,11 +22,24 @@
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
         <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
         <SolidColorBrush x:Key="TextOnDarkBrush" Color="{StaticResource TextOnDarkColor}" />
+        <SolidColorBrush x:Key="PlaceholderIconBrush" Color="{StaticResource PlaceholderIconColor}" />
 
         <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
         <Thickness x:Key="PagePadding">24</Thickness>
+        <Thickness x:Key="SidebarLogoMargin">0,0,0,40</Thickness>
+        <Thickness x:Key="ContentHeaderMargin">0,0,0,24</Thickness>
+        <Thickness x:Key="HeaderIconMargin">0,0,16,0</Thickness>
+        <Thickness x:Key="NavItemMargin">0,2</Thickness>
+        <Thickness x:Key="NavIconMargin">8,0,0,0</Thickness>
         
         <sys:Double x:Key="SpacingMediumValue">20</sys:Double>
+        <sys:Double x:Key="SpacingSmallValue">8</sys:Double>
+        <sys:Double x:Key="SidebarWidth">260</sys:Double>
+        <sys:Double x:Key="SidebarLogoIconSize">28</sys:Double>
+        <sys:Double x:Key="HeaderIconSize">24</sys:Double>
+        <sys:Double x:Key="PlaceholderIconSize">64</sys:Double>
+        <sys:Double x:Key="NavIconSize">20</sys:Double>
+        <sys:Double x:Key="NavItemFontSize">14</sys:Double>
         <Thickness x:Key="SpacingLarge">0</Thickness>
     </Styles.Resources>
 
@@ -97,6 +111,45 @@
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="Margin" Value="0,0,0,24"/>
+    </Style>
+
+    <Style Selector="TextBlock.sidebar-logo-title">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="TextBlock.sidebar-section-caption">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="Margin" Value="4,0,0,4"/>
+    </Style>
+
+    <Style Selector="TextBlock.content-header-label">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.placeholder-secondary">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="Border.header-icon">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="BoxShadow" Value="0 2 4 0 #10000000"/>
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="Margin" Value="{StaticResource HeaderIconMargin}"/>
+    </Style>
+
+    <Style Selector="TextBlock.nav-item-text">
+        <Setter Property="FontSize" Value="{StaticResource NavItemFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
 </Styles>
