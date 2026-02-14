@@ -43,6 +43,18 @@ public interface ICurrentProjectService
     void UpdateParameters(SimulationParametersDto parameters);
 
     /// <summary>
+    /// Aktualisiert die laufenden Cashflows (Streams) des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateStreams(IReadOnlyList<CashflowStreamDto> streams);
+
+    /// <summary>
+    /// Aktualisiert die geplanten Cashflow-Events des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateEvents(IReadOnlyList<CashflowEventDto> events);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

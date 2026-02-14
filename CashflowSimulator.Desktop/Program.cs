@@ -3,6 +3,8 @@ using System.IO;
 using Avalonia;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Features.CashflowEvents;
+using CashflowSimulator.Desktop.Features.CashflowStreams;
 using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
@@ -57,6 +59,10 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<Func<EckdatenViewModel>>(sp => () => sp.GetRequiredService<EckdatenViewModel>());
                 services.AddTransient<SettingsViewModel>();
                 services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
+                services.AddSingleton<Func<CashflowType, CashflowStreamsViewModel>>(sp => type =>
+                    new CashflowStreamsViewModel(sp.GetRequiredService<ICurrentProjectService>(), sp.GetRequiredService<IHelpProvider>(), type));
+                services.AddSingleton<Func<CashflowType, CashflowEventsViewModel>>(sp => type =>
+                    new CashflowEventsViewModel(sp.GetRequiredService<ICurrentProjectService>(), sp.GetRequiredService<IHelpProvider>(), type));
                 services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MainWindow>();
 

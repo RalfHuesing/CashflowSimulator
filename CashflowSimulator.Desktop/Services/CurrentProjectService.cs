@@ -75,6 +75,30 @@ public sealed class CurrentProjectService : ICurrentProjectService
         OnProjectChanged();
     }
 
+    /// <inheritdoc />
+    public void UpdateStreams(IReadOnlyList<CashflowStreamDto> streams)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { Streams = streams.ToList() };
+        });
+        OnProjectChanged();
+    }
+
+    /// <inheritdoc />
+    public void UpdateEvents(IReadOnlyList<CashflowEventDto> events)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { Events = events.ToList() };
+        });
+        OnProjectChanged();
+    }
+
     private void WithLock(Action action)
     {
         using (_lock.EnterScope())

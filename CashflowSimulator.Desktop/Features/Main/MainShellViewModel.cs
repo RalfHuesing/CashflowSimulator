@@ -1,5 +1,7 @@
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Features.CashflowEvents;
+using CashflowSimulator.Desktop.Features.CashflowStreams;
 using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
@@ -25,6 +27,8 @@ public partial class MainShellViewModel : ObservableObject
     private readonly ICurrentProjectService _currentProjectService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
     private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
+    private readonly Func<CashflowType, CashflowStreamsViewModel> _createStreamsViewModel;
+    private readonly Func<CashflowType, CashflowEventsViewModel> _createEventsViewModel;
     private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
@@ -34,6 +38,8 @@ public partial class MainShellViewModel : ObservableObject
         ICurrentProjectService currentProjectService,
         Func<MetaEditViewModel> createMetaEditViewModel,
         Func<EckdatenViewModel> createEckdatenViewModel,
+        Func<CashflowType, CashflowStreamsViewModel> createStreamsViewModel,
+        Func<CashflowType, CashflowEventsViewModel> createEventsViewModel,
         Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
@@ -43,6 +49,8 @@ public partial class MainShellViewModel : ObservableObject
         _currentProjectService = currentProjectService;
         _createMetaEditViewModel = createMetaEditViewModel;
         _createEckdatenViewModel = createEckdatenViewModel;
+        _createStreamsViewModel = createStreamsViewModel;
+        _createEventsViewModel = createEventsViewModel;
         _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
@@ -53,6 +61,10 @@ public partial class MainShellViewModel : ObservableObject
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
         OpenEckdatenCommand.NotifyCanExecuteChanged();
+        OpenLaufendeEinnahmenCommand.NotifyCanExecuteChanged();
+        OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
+        OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
+        OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
@@ -92,6 +104,10 @@ public partial class MainShellViewModel : ObservableObject
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
         OpenEckdatenCommand.NotifyCanExecuteChanged();
+        OpenLaufendeEinnahmenCommand.NotifyCanExecuteChanged();
+        OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
+        OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
+        OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
     }
 
     private string GetCurrentProjectTitle()
@@ -120,6 +136,34 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenEckdatenCommand,
             IsActive = false
         };
+        var laufendeEinnahmenItem = new NavItemViewModel
+        {
+            DisplayName = "Laufende Einnahmen",
+            Icon = Symbol.ArrowUp,
+            Command = OpenLaufendeEinnahmenCommand,
+            IsActive = false
+        };
+        var laufendeAusgabenItem = new NavItemViewModel
+        {
+            DisplayName = "Laufende Ausgaben",
+            Icon = Symbol.ArrowDown,
+            Command = OpenLaufendeAusgabenCommand,
+            IsActive = false
+        };
+        var geplanteEinnahmenItem = new NavItemViewModel
+        {
+            DisplayName = "Geplante Einnahmen",
+            Icon = Symbol.CalendarAdd,
+            Command = OpenGeplanteEinnahmenCommand,
+            IsActive = false
+        };
+        var geplanteAusgabenItem = new NavItemViewModel
+        {
+            DisplayName = "Geplante Ausgaben",
+            Icon = Symbol.CalendarCancel,
+            Command = OpenGeplanteAusgabenCommand,
+            IsActive = false
+        };
         var einstellungenItem = new NavItemViewModel
         {
             DisplayName = "Einstellungen",
@@ -130,6 +174,10 @@ public partial class MainShellViewModel : ObservableObject
 
         Navigation.Items.Add(szenarioItem);
         Navigation.Items.Add(eckdatenItem);
+        Navigation.Items.Add(laufendeEinnahmenItem);
+        Navigation.Items.Add(laufendeAusgabenItem);
+        Navigation.Items.Add(geplanteEinnahmenItem);
+        Navigation.Items.Add(geplanteAusgabenItem);
         Navigation.Items.Add(einstellungenItem);
     }
 
@@ -220,12 +268,42 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanOpenEckdaten() => _currentProjectService.Current is not null;
 
+    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
+    private void OpenLaufendeEinnahmen()
+    {
+        CurrentContentViewModel = _createStreamsViewModel(CashflowType.Income);
+        SetActiveNavigationItem(2);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
+    private void OpenLaufendeAusgaben()
+    {
+        CurrentContentViewModel = _createStreamsViewModel(CashflowType.Expense);
+        SetActiveNavigationItem(3);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
+    private void OpenGeplanteEinnahmen()
+    {
+        CurrentContentViewModel = _createEventsViewModel(CashflowType.Income);
+        SetActiveNavigationItem(4);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
+    private void OpenGeplanteAusgaben()
+    {
+        CurrentContentViewModel = _createEventsViewModel(CashflowType.Expense);
+        SetActiveNavigationItem(5);
+    }
+
+    private bool CanOpenCashflow() => _currentProjectService.Current is not null;
+
     [RelayCommand]
     private void OpenSettings()
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _createSettingsViewModel();
-        SetActiveNavigationItem(2);
+        SetActiveNavigationItem(6);
     }
 
     private void SetActiveNavigationItem(int index)
