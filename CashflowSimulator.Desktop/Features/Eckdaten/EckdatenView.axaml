@@ -26,6 +26,7 @@
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>
                 <DatePicker Grid.Row="0" Grid.Column="1"
+                            Classes="form-input"
                             SelectedDate="{Binding DateOfBirth}"
                             Margin="{StaticResource FormInputMargin}"
                             TabIndex="1"

@@ -1,6 +1,11 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- Globale Sans-Serif für sachliche Finanz-App (Segoe UI unter Windows) -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+    </Style>
+
     <Style Selector="TextBlock.h1">
         <Setter Property="FontSize" Value="24" />
         <Setter Property="FontWeight" Value="Bold" />
@@ -32,7 +37,7 @@
     <Style Selector="TextBlock.sidebar-section-caption">
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}"/>
         <Setter Property="Margin" Value="4,0,0,4"/>
     </Style>
 

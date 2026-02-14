@@ -2,6 +2,6 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
                 x:Class="CashflowSimulator.Desktop.Common.Controls.FeatureLayoutView">
-  <!-- Layout kommt aus Style-Template in Default.axaml (Content | GridSplitter | InfoPanel). Fallback: nur Content. -->
+  <!-- Layout kommt aus Style-Template in FeatureLayoutViewStyle.axaml (Content | GridSplitter | InfoPanel). Fallback: nur Content. -->
   <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource AncestorType=controls:FeatureLayoutView}}"/>
 </ContentControl>

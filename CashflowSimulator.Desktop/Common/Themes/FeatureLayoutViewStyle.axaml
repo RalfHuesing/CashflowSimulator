@@ -47,7 +47,7 @@
                                 <TextBlock Text="{Binding ActiveHelpTitle}"
                                           FontWeight="SemiBold"
                                           FontSize="14"
-                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                          Foreground="{StaticResource InfoPanelTitleBrush}"/>
                                 <TextBlock Text="{Binding ActiveHelpDescription}"
                                           TextWrapping="Wrap"
                                           FontSize="13"
