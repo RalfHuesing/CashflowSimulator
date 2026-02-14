@@ -43,8 +43,8 @@ Damit neue Features gleich funktionieren wie Eckdaten/Einstellungen:
 
 1. **Ordner** unter `Features/<Name>/` mit `*View.axaml`(.cs) und `*ViewModel.cs`.
 2. **View:** UserControl mit **FeatureLayoutView** als Wurzel; Inhalt links (ScrollViewer im Template), rechts automatisch Info-Panel (Hilfe + Validierungsfehler).
-3. **ViewModel:** Erbt von **ValidatingViewModelBase**; im Konstruktor **PageHelpKey** setzen (z. B. `"Eckdaten"`); **IHelpProvider** per Constructor Injection.
-4. **Hilfe:** An jedem Eingabe-Control `FocusHelpBehavior.HelpKey="PropertyName"` und ggf. `FocusHelpBehavior.ErrorPropertyName="PropertyName"` setzen. FocusHelpBehavior wird einmalig in MainWindow initialisiert.
+3. **ViewModel:** Erbt von **ValidatingViewModelBase**; **HelpKeyPrefix** implementieren (abstrakt, z. B. `=> "Eckdaten"`); im Konstruktor optional **PageHelpKey** setzen (default ist HelpKeyPrefix); **IHelpProvider** per Constructor Injection.
+4. **Hilfe:** An jedem Eingabe-Control `FocusHelpBehavior.HelpKey="PropertyName"` setzen (kurzer Name; Lookup im HelpProvider erfolgt als `HelpKeyPrefix.PropertyName`). FocusHelpBehavior wird einmalig in MainWindow initialisiert.
 5. **Validierung:** Nur über FluentValidation; Fehler erscheinen **nur im rechten Info-Panel** (nicht unter den Controls). Keine Statusleiste.
 
 Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.cursor/rules/avalonia.md` („Feature-Layout und Hilfe“).

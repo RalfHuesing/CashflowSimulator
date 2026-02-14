@@ -21,6 +21,9 @@ public partial class MetaEditViewModel : ValidatingViewModelBase
     private readonly ICurrentProjectService _currentProjectService;
     private bool _isLoading;
 
+    /// <inheritdoc />
+    protected override string HelpKeyPrefix => "Szenario";
+
     public MetaEditViewModel(ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
         : base(helpProvider)
     {

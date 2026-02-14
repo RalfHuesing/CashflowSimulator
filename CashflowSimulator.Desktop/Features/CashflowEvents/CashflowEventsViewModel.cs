@@ -41,6 +41,9 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
 
     public string Title => _cashflowType == CashflowType.Income ? "Geplante Einnahmen" : "Geplante Ausgaben";
 
+    /// <inheritdoc />
+    protected override string HelpKeyPrefix => "CashflowEvents";
+
     public CashflowEventsViewModel(
         ICurrentProjectService currentProjectService,
         IHelpProvider helpProvider,

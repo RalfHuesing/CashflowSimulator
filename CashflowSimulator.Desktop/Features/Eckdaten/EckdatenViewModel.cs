@@ -27,6 +27,9 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         { nameof(SimulationParametersDto.CurrencyCode), nameof(InitialLiquidCash) }
     };
 
+    /// <inheritdoc />
+    protected override string HelpKeyPrefix => "Eckdaten";
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentAgeText))]
     private DateTimeOffset? _dateOfBirth;

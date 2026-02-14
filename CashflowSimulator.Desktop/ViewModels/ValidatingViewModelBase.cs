@@ -38,6 +38,12 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     }
 
     /// <summary>
+    /// Eindeutiger Präfix für Help-Keys dieses Features (z. B. "Eckdaten").
+    /// Lookup im HelpProvider erfolgt als "HelpKeyPrefix.PropertyName" bzw. HelpKeyPrefix für die Seite (Zero-State).
+    /// </summary>
+    protected abstract string HelpKeyPrefix { get; }
+
+    /// <summary>
     /// HelpKey des aktuell fokussierten Feldes (wird von FocusHelpBehavior bei GotFocus gesetzt).
     /// </summary>
     public string? ActiveHelpKey
@@ -191,7 +197,9 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
 
     private void RefreshHelpText()
     {
-        var key = ActiveHelpKey ?? PageHelpKey;
+        var key = !string.IsNullOrEmpty(ActiveHelpKey)
+            ? $"{HelpKeyPrefix}.{ActiveHelpKey}"
+            : (PageHelpKey ?? HelpKeyPrefix);
         if (_helpProvider != null && !string.IsNullOrEmpty(key) && _helpProvider.TryGetHelp(key, out var title, out var description))
         {
             ActiveHelpTitle = title;

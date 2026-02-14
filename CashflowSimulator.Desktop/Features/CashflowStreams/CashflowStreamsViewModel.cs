@@ -44,6 +44,9 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
 
     public static IReadOnlyList<string> IntervalOptions { get; } = ["Monthly", "Yearly"];
 
+    /// <inheritdoc />
+    protected override string HelpKeyPrefix => "CashflowStreams";
+
     public CashflowStreamsViewModel(
         ICurrentProjectService currentProjectService,
         IHelpProvider helpProvider,

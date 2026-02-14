@@ -86,8 +86,8 @@ Neue Feature-Bereiche, die wie Eckdaten/Einstellungen funktionieren, folgen dies
 
 - **Shell:** Keine Statusleiste. Content-Bereich nutzt die volle Höhe (eine Zeile); Platzhalter oder `ContentControl` für das aktuelle Feature-ViewModel.
 - **Layout:** Feature-View verwendet **FeatureLayoutView** (Common/Controls) als Wurzel: links scrollbarer Inhalt, rechts **Info-Panel** (Hilfetext + Block „VALIDIERUNGSFEHLER“).
-- **ViewModel:** Erbt von **ValidatingViewModelBase**; **IHelpProvider** per Constructor Injection; **PageHelpKey** im Konstruktor setzen (z. B. `PageHelpKey = "Eckdaten"`).
-- **Hilfe:** An jedem relevanten Control **FocusHelpBehavior.HelpKey** (und ggf. **ErrorPropertyName**) setzen. **FocusHelpBehavior** muss einmalig initialisiert werden (z. B. in MainWindow). Bei GotFocus wird ActiveHelpKey am ViewModel gesetzt; Titel/Beschreibung kommen aus dem HelpProvider und werden rechts angezeigt.
+- **ViewModel:** Erbt von **ValidatingViewModelBase**; **HelpKeyPrefix** implementieren (abstrakte Property, z. B. `=> "Eckdaten"`); optional **PageHelpKey** im Konstruktor (Standard ist HelpKeyPrefix); **IHelpProvider** per Constructor Injection.
+- **Hilfe:** An jedem relevanten Control **FocusHelpBehavior.HelpKey** (und ggf. **ErrorPropertyName**) setzen. Lookup im HelpProvider erfolgt als **HelpKeyPrefix.PropertyName** (eindeutig pro Feature). **FocusHelpBehavior** einmalig initialisieren (z. B. in MainWindow). Bei GotFocus wird ActiveHelpKey am ViewModel gesetzt; Titel/Beschreibung kommen aus dem HelpProvider.
 - **Neues Feature:** Neuer Ordner unter `Features/<Name>/` mit View (UserControl, Wurzel = FeatureLayoutView) und ViewModel (ValidatingViewModelBase, PageHelpKey, IHelpProvider). Keine Statusleiste, keine Inline-Fehler unter den Controls.
 
 ## Avalonia und MVVM

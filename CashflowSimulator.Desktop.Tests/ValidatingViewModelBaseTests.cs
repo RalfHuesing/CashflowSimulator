@@ -12,6 +12,8 @@ public sealed class ValidatingViewModelBaseTests
 {
     private sealed class TestableValidatingViewModel : ValidatingViewModelBase
     {
+        protected override string HelpKeyPrefix => "Test";
+
         public void SetErrorsPublic(IReadOnlyList<ValidationError> errors, IReadOnlyDictionary<string, string>? map = null) =>
             SetValidationErrors(errors, map);
 

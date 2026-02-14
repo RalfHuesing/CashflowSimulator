@@ -10,6 +10,9 @@ namespace CashflowSimulator.Desktop.Features.Settings;
 /// </summary>
 public partial class SettingsViewModel : ValidatingViewModelBase
 {
+    /// <inheritdoc />
+    protected override string HelpKeyPrefix => "Einstellungen";
+
     public SettingsViewModel(ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
         : base(helpProvider)
     {
