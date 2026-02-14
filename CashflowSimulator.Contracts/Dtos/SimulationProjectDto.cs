@@ -7,4 +7,5 @@ public record SimulationProjectDto
 {
     public MetaDto Meta { get; init; } = new();
     public SimulationParametersDto Parameters { get; init; } = new();
+    public UiSettingsDto UiSettings { get; init; } = new();
 }

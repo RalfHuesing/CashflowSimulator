@@ -31,7 +31,8 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 RetirementYear = retirementYear,
                 InitialLiquidCash = 0,
                 CurrencyCode = "EUR"
-            }
+            },
+            UiSettings = new UiSettingsDto()
         };
     }
 }
