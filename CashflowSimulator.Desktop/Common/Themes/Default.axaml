@@ -1,10 +1,19 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard">
 
     <Styles.Resources>
-        <Color x:Key="SidebarBackgroundColor">#0F172A</Color> <Color x:Key="ContentBackgroundColor">#F3F4F6</Color> <Color x:Key="SurfaceColor">#FFFFFF</Color>
+        <Color x:Key="SidebarBackgroundColor">#0F172A</Color>
+        <Color x:Key="ContentBackgroundColor">#F3F4F6</Color>
+        <Color x:Key="SurfaceColor">#FFFFFF</Color>
         
-        <Color x:Key="PrimaryActionColor">#10B981</Color>     <Color x:Key="PrimaryActionHoverColor">#059669</Color> <Color x:Key="TextPrimaryColor">#111827</Color>       <Color x:Key="TextSecondaryColor">#6B7280</Color>     <Color x:Key="TextOnDarkColor">#F9FAFB</Color>        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
+        <Color x:Key="PrimaryActionColor">#10B981</Color>
+        <Color x:Key="PrimaryActionHoverColor">#059669</Color>
+        <Color x:Key="TextPrimaryColor">#111827</Color>
+        <Color x:Key="TextSecondaryColor">#6B7280</Color>
+        <Color x:Key="TextOnDarkColor">#F9FAFB</Color>
+
+        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
         <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
         <SolidColorBrush x:Key="PrimaryActionBrush" Color="{StaticResource PrimaryActionColor}" />
@@ -15,6 +24,9 @@
 
         <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
         <Thickness x:Key="PagePadding">24</Thickness>
+        
+        <sys:Double x:Key="SpacingMediumValue">20</sys:Double>
+        <Thickness x:Key="SpacingLarge">0</Thickness>
     </Styles.Resources>
 
     <Style Selector="Button.primary">
@@ -40,14 +52,29 @@
         <Setter Property="Cursor" Value="Hand" />
         
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#33FFFFFF" /> <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#33FFFFFF" /> 
+            <Setter Property="Foreground" Value="White" />
         </Style>
     </Style>
     
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{StaticResource PrimaryActionBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="24,10" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PrimaryActionHoverBrush}" />
+        </Style>
+    </Style>
+
     <Style Selector="Border.card">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="BoxShadow" Value="0 4 6 0 #1A000000" /> <Setter Property="Padding" Value="24" />
+        <Setter Property="BoxShadow" Value="0 4 6 0 #1A000000" /> 
+        <Setter Property="Padding" Value="24" />
         <Setter Property="Margin" Value="0,0,0,0" />
     </Style>
 
@@ -56,6 +83,20 @@
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
+    <Style Selector="TextBlock.feature-page-title">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style Selector="TextBlock.feature-page-description">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,0,0,24"/>
     </Style>
 
 </Styles>
