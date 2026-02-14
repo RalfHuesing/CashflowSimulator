@@ -17,6 +17,9 @@
         </DataTemplate>
     </Application.DataTemplates>
 
-    <!-- Themes werden zur Laufzeit von IThemeService gesetzt (Start + Projektwechsel). -->
-    <Application.Styles/>
+    <!-- Basis-Themes hier, damit die App sauber startet; Projekt-Theme wird in MainWindow.OnLoaded angewendet. -->
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="/Common/Themes/Default.axaml" />
+    </Application.Styles>
 </Application>
