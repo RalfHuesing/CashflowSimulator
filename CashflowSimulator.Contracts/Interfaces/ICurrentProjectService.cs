@@ -31,6 +31,12 @@ public interface ICurrentProjectService
     void UpdateMeta(MetaDto meta);
 
     /// <summary>
+    /// Aktualisiert nur die UI-Einstellungen des aktuellen Projekts (z. B. aus Einstellungen).
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateUiSettings(UiSettingsDto uiSettings);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

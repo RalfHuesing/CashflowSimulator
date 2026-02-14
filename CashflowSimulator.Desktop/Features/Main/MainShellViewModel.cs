@@ -2,6 +2,7 @@ using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
+using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -24,6 +25,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
+    private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
@@ -31,6 +33,7 @@ public partial class MainShellViewModel : ObservableObject
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
         Func<MetaEditViewModel> createMetaEditViewModel,
+        Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
@@ -38,6 +41,7 @@ public partial class MainShellViewModel : ObservableObject
         _storageService = storageService;
         _currentProjectService = currentProjectService;
         _createMetaEditViewModel = createMetaEditViewModel;
+        _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
 
@@ -92,8 +96,16 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenSzenarioCommand,
             IsActive = false
         };
+        var einstellungenItem = new NavItemViewModel
+        {
+            DisplayName = "Einstellungen",
+            Icon = Symbol.Settings,
+            Command = OpenSettingsCommand,
+            IsActive = false
+        };
 
         Navigation.Items.Add(szenarioItem);
+        Navigation.Items.Add(einstellungenItem);
     }
 
     [RelayCommand]
@@ -166,13 +178,22 @@ public partial class MainShellViewModel : ObservableObject
     {
         _logger.LogDebug("Szenario-Bereich geöffnet.");
         CurrentContentViewModel = _createMetaEditViewModel();
-        if (Navigation.Items.Count > 0)
-        {
-            foreach (var item in Navigation.Items)
-                item.IsActive = false;
-            Navigation.Items[0].IsActive = true;
-        }
+        SetActiveNavigationItem(0);
     }
 
     private bool CanOpenSzenario() => _currentProjectService.Current is not null;
+
+    [RelayCommand]
+    private void OpenSettings()
+    {
+        _logger.LogDebug("Einstellungen geöffnet.");
+        CurrentContentViewModel = _createSettingsViewModel();
+        SetActiveNavigationItem(1);
+    }
+
+    private void SetActiveNavigationItem(int index)
+    {
+        for (var i = 0; i < Navigation.Items.Count; i++)
+            Navigation.Items[i].IsActive = i == index;
+    }
 }

@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Settings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CashflowSimulator.Desktop.Features.Settings.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
+                    Margin="{StaticResource FormHeaderBlockMargin}"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="Einstellungen"
+                       Classes="feature-page-title"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Design und weitere Optionen für dieses Szenario."
+                       Classes="feature-page-description"
+                       Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto"
+              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Design (Theme)"
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
+            <ComboBox Grid.Row="0" Grid.Column="1"
+                      ItemsSource="{Binding AvailableThemes}"
+                      SelectedItem="{Binding SelectedTheme}"
+                      Margin="{StaticResource FormInputMargin}"
+                      MinWidth="220"
+                      HorizontalAlignment="Left">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DisplayName}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+    </Grid>
+</UserControl>

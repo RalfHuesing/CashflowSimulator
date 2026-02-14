@@ -6,6 +6,7 @@ using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
+using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Infrastructure.Storage;
@@ -44,12 +45,15 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
                 services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
+                services.AddSingleton<IThemeService, ThemeService>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
 
                 // Shell / Main-Feature (Func<T> wird von MS.DI nicht automatisch bereitgestellt)
                 services.AddTransient<NavigationViewModel>();
                 services.AddTransient<MetaEditViewModel>();
                 services.AddSingleton<Func<MetaEditViewModel>>(sp => () => sp.GetRequiredService<MetaEditViewModel>());
+                services.AddTransient<SettingsViewModel>();
+                services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
                 services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MainWindow>();
 

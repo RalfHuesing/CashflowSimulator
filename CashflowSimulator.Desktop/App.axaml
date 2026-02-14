@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta;assembly=CashflowSimulator.Desktop"
+             xmlns:settings="clr-namespace:CashflowSimulator.Desktop.Features.Settings;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
     <Application.DataTemplates>
@@ -9,11 +10,13 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
         </DataTemplate>
+        <DataTemplate DataType="settings:SettingsViewModel">
+            <settings:SettingsView DataContext="{Binding}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
+        </DataTemplate>
     </Application.DataTemplates>
 
-    <Application.Styles>
-        <FluentTheme />
-        
-        <StyleInclude Source="/Common/Themes/Default.axaml" />
-    </Application.Styles>
+    <!-- Themes werden zur Laufzeit von IThemeService gesetzt (Start + Projektwechsel). -->
+    <Application.Styles/>
 </Application>
