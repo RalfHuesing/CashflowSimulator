@@ -6,6 +6,8 @@
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="CashflowSimulator.Desktop.MainWindow"
         Title="CashflowSimulator"
-        Width="900" Height="600">
+        WindowState="Maximized"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="700">
   <main:MainShellView/>
 </Window>
