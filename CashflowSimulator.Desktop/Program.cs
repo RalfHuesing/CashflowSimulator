@@ -60,11 +60,6 @@ namespace CashflowSimulator.Desktop
                 var serviceProvider = services.BuildServiceProvider();
                 CompositionRoot.Services = serviceProvider;
 
-                // Default-Projekt einmalig setzen
-                var projectService = serviceProvider.GetRequiredService<ICurrentProjectService>();
-                var defaultProvider = serviceProvider.GetRequiredService<IDefaultProjectProvider>();
-                projectService.SetCurrent(defaultProvider.CreateDefault());
-
                 BuildAvaloniaApp()
                     .StartWithClassicDesktopLifetime(args);
             }
