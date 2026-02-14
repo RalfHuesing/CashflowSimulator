@@ -18,6 +18,16 @@ public partial class FeaturePageView : UserControl
     public static new readonly StyledProperty<object?> ContentProperty =
         AvaloniaProperty.Register<FeaturePageView, object?>(nameof(Content));
 
+    public FeaturePageView()
+    {
+        ContentProperty.Changed.AddClassHandler<FeaturePageView>(OnContentChanged);
+    }
+
+    private static void OnContentChanged(FeaturePageView control, AvaloniaPropertyChangedEventArgs e)
+    {
+        control.InvalidateMeasure();
+    }
+
     public string? Title
     {
         get => GetValue(TitleProperty);
