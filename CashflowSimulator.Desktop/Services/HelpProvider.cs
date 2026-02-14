@@ -24,9 +24,17 @@ public sealed class HelpProvider : IHelpProvider
         // CashflowStreams (HelpKeyPrefix = "CashflowStreams")
         ["CashflowStreams"] = ("Laufende Cashflows", "Einnahmen oder Ausgaben mit wiederkehrendem Betrag und Intervall (monatlich/jährlich)."),
         ["CashflowStreams.StreamName"] = ("Bezeichnung", "Kurzer Name für diesen Cashflow (z. B. Gehalt, Miete)."),
+        ["CashflowStreams.Amount"] = ("Betrag", "Wiederkehrender Betrag pro Intervall. Bei Einnahmen positiv, bei Ausgaben negativ eintragen."),
+        ["CashflowStreams.Interval"] = ("Intervall", "Häufigkeit: Monatlich (Monthly) oder Jährlich (Yearly). Der Betrag wird jeweils pro Intervall angesetzt."),
+        ["CashflowStreams.StartDate"] = ("Von (Datum)", "Startdatum des Cashflows. Ab diesem Datum wird der Betrag in der Simulation berücksichtigt."),
+        ["CashflowStreams.EndDate"] = ("Bis (Datum)", "Enddatum des Cashflows. Leer lassen für unbegrenzte Laufzeit. Nach diesem Datum wird der Betrag nicht mehr angesetzt."),
         // CashflowEvents (HelpKeyPrefix = "CashflowEvents")
         ["CashflowEvents"] = ("Geplante Cashflow-Events", "Einmalige oder zeitlich begrenzte Einnahmen oder Ausgaben mit Zielmonat und optionalem Zeitfenster."),
         ["CashflowEvents.EventName"] = ("Bezeichnung", "Kurzer Name für dieses Event (z. B. Urlaubsreise, Bonuszahlung)."),
+        ["CashflowEvents.Amount"] = ("Betrag", "Einmaliger Betrag des Events. Bei Einnahmen positiv, bei Ausgaben negativ."),
+        ["CashflowEvents.TargetDate"] = ("Zieldatum", "Planmonat, in dem das Event stattfinden soll. Dient als Referenz für den optionalen Toleranzbereich."),
+        ["CashflowEvents.EarliestMonthOffset"] = ("Frühestens (Monate vom Zieldatum)", "Negative Zahl: Wie viele Monate vor dem Zieldatum das Event frühestens eintreten kann. 0 = nur im Zieldatum."),
+        ["CashflowEvents.LatestMonthOffset"] = ("Spätestens (Monate vom Zieldatum)", "Positive Zahl: Wie viele Monate nach dem Zieldatum das Event spätestens eintreten kann. 0 = nur im Zieldatum."),
     }.ToFrozenDictionary();
 
     /// <inheritdoc />

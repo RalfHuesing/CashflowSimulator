@@ -38,27 +38,31 @@
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
                                Value="{Binding EditAmount}" Increment="100"
-                               Margin="{StaticResource FormInputMargin}"/>
+                               Margin="{StaticResource FormInputMargin}"
+                               behaviors:FocusHelpBehavior.HelpKey="Amount"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Zieldatum"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <DatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
                             SelectedDate="{Binding EditTargetDate}"
-                            Margin="{StaticResource FormInputMargin}"/>
+                            Margin="{StaticResource FormInputMargin}"
+                            behaviors:FocusHelpBehavior.HelpKey="TargetDate"/>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Frühestens (Monate vom Zieldatum)"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
                                Value="{Binding EditEarliestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMargin}"
-                               Minimum="-120" Maximum="0" AllowSpin="True"/>
+                               Minimum="-120" Maximum="0" AllowSpin="True"
+                               behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Spätestens (Monate vom Zieldatum)"
                            Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
                 <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
                                Value="{Binding EditLatestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMarginLast}"
-                               Minimum="0" Maximum="120" AllowSpin="True"/>
+                               Minimum="0" Maximum="120" AllowSpin="True"
+                               behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"/>
             </Grid>
         </Grid>
     </controls:FeatureLayoutView>
