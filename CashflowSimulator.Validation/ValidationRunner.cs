@@ -14,6 +14,8 @@ public static class ValidationRunner
     private static readonly SimulationParametersValidator ParametersValidator = new();
     private static readonly MetaDtoValidator MetaValidator = new();
     private static readonly SimulationProjectValidator ProjectValidator = new();
+    private static readonly CashflowStreamDtoValidator StreamValidator = new();
+    private static readonly CashflowEventDtoValidator EventValidator = new();
 
     /// <summary>
     /// Validiert <see cref="SimulationParametersDto"/> (z. B. für Eckdaten-Apply).
@@ -39,6 +41,24 @@ public static class ValidationRunner
     public static ValidationResult Validate(SimulationProjectDto dto)
     {
         var result = ProjectValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="CashflowStreamDto"/> (z. B. für das Bearbeitungsformular Laufende Cashflows).
+    /// </summary>
+    public static ValidationResult Validate(CashflowStreamDto dto)
+    {
+        var result = StreamValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="CashflowEventDto"/> (z. B. für das Bearbeitungsformular Geplante Cashflows).
+    /// </summary>
+    public static ValidationResult Validate(CashflowEventDto dto)
+    {
+        var result = EventValidator.Validate(dto);
         return ToValidationResult(result);
     }
 

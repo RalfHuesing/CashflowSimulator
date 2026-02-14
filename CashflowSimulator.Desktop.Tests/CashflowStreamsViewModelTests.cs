@@ -7,18 +7,27 @@ namespace CashflowSimulator.Desktop.Tests;
 
 public sealed class CashflowStreamsViewModelTests
 {
+    private static SimulationProjectDto ProjectWithParameters() => new()
+    {
+        Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
+        Parameters = new SimulationParametersDto
+        {
+            SimulationStart = DateOnly.FromDateTime(DateTime.Today),
+            SimulationEnd = DateOnly.FromDateTime(DateTime.Today.AddYears(30)),
+            DateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-40)),
+            RetirementDate = DateOnly.FromDateTime(DateTime.Today.AddYears(27)),
+            InitialLiquidCash = 0,
+            CurrencyCode = "EUR"
+        },
+        Streams = [],
+        Events = [],
+        UiSettings = new UiSettingsDto()
+    };
     [Fact]
     public void Constructor_WithIncome_SetsTitleLaufendeEinnahmen()
     {
         var projectService = new CurrentProjectService();
-        projectService.SetCurrent(new SimulationProjectDto
-        {
-            Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
-            Parameters = new SimulationParametersDto(),
-            Streams = [],
-            Events = [],
-            UiSettings = new UiSettingsDto()
-        });
+        projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
 
         Assert.Equal("Laufende Einnahmen", vm.Title);
@@ -28,14 +37,7 @@ public sealed class CashflowStreamsViewModelTests
     public void Constructor_WithExpense_SetsTitleLaufendeAusgaben()
     {
         var projectService = new CurrentProjectService();
-        projectService.SetCurrent(new SimulationProjectDto
-        {
-            Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
-            Parameters = new SimulationParametersDto(),
-            Streams = [],
-            Events = [],
-            UiSettings = new UiSettingsDto()
-        });
+        projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Expense);
 
         Assert.Equal("Laufende Ausgaben", vm.Title);
@@ -59,5 +61,55 @@ public sealed class CashflowStreamsViewModelTests
 
         Assert.Single(vm.Items);
         Assert.Equal("Gehalt", vm.Items[0].Name);
+    }
+
+    [Fact]
+    public void Save_WhenInvalid_SetsValidationErrorsAndDoesNotPersist()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "";
+        vm.EditStartDate = null;
+
+        vm.SaveCommand.Execute(null);
+
+        Assert.True(vm.HasErrors);
+        Assert.Empty(vm.Items);
+    }
+
+    [Fact]
+    public void Save_WhenValid_PersistsNewStream()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "Gehalt";
+        vm.EditAmount = 2000;
+        vm.EditStartDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc), TimeSpan.Zero);
+        vm.EditInterval = "Monthly";
+
+        vm.SaveCommand.Execute(null);
+
+        Assert.False(vm.HasErrors);
+        Assert.Single(vm.Items);
+        Assert.Equal("Gehalt", vm.Items[0].Name);
+        Assert.Equal(2000, vm.Items[0].Amount);
+    }
+
+    [Fact]
+    public void New_ClearsValidationErrors()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "";
+        vm.EditStartDate = null;
+        vm.SaveCommand.Execute(null);
+        Assert.True(vm.HasErrors);
+
+        vm.NewCommand.Execute(null);
+
+        Assert.False(vm.HasErrors);
     }
 }

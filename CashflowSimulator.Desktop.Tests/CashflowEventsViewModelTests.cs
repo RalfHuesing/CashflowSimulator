@@ -7,18 +7,20 @@ namespace CashflowSimulator.Desktop.Tests;
 
 public sealed class CashflowEventsViewModelTests
 {
+    private static SimulationProjectDto ProjectWithParameters() => new()
+    {
+        Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
+        Parameters = new SimulationParametersDto(),
+        Streams = [],
+        Events = [],
+        UiSettings = new UiSettingsDto()
+    };
+
     [Fact]
     public void Constructor_WithIncome_SetsTitleGeplanteEinnahmen()
     {
         var projectService = new CurrentProjectService();
-        projectService.SetCurrent(new SimulationProjectDto
-        {
-            Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
-            Parameters = new SimulationParametersDto(),
-            Streams = [],
-            Events = [],
-            UiSettings = new UiSettingsDto()
-        });
+        projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Income);
 
         Assert.Equal("Geplante Einnahmen", vm.Title);
@@ -28,14 +30,7 @@ public sealed class CashflowEventsViewModelTests
     public void Constructor_WithExpense_SetsTitleGeplanteAusgaben()
     {
         var projectService = new CurrentProjectService();
-        projectService.SetCurrent(new SimulationProjectDto
-        {
-            Meta = new MetaDto { ScenarioName = "T", CreatedAt = DateTimeOffset.UtcNow },
-            Parameters = new SimulationParametersDto(),
-            Streams = [],
-            Events = [],
-            UiSettings = new UiSettingsDto()
-        });
+        projectService.SetCurrent(ProjectWithParameters());
         var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Expense);
 
         Assert.Equal("Geplante Ausgaben", vm.Title);
@@ -59,5 +54,54 @@ public sealed class CashflowEventsViewModelTests
 
         Assert.Single(vm.Items);
         Assert.Equal("Auto", vm.Items[0].Name);
+    }
+
+    [Fact]
+    public void Save_WhenInvalid_SetsValidationErrorsAndDoesNotPersist()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "";
+        vm.EditTargetDate = null;
+
+        vm.SaveCommand.Execute(null);
+
+        Assert.True(vm.HasErrors);
+        Assert.Empty(vm.Items);
+    }
+
+    [Fact]
+    public void Save_WhenValid_PersistsNewEvent()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "Bonus";
+        vm.EditAmount = 2000;
+        vm.EditTargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+
+        vm.SaveCommand.Execute(null);
+
+        Assert.False(vm.HasErrors);
+        Assert.Single(vm.Items);
+        Assert.Equal("Bonus", vm.Items[0].Name);
+        Assert.Equal(2000, vm.Items[0].Amount);
+    }
+
+    [Fact]
+    public void New_ClearsValidationErrors()
+    {
+        var projectService = new CurrentProjectService();
+        projectService.SetCurrent(ProjectWithParameters());
+        var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Income);
+        vm.EditName = "";
+        vm.EditTargetDate = null;
+        vm.SaveCommand.Execute(null);
+        Assert.True(vm.HasErrors);
+
+        vm.NewCommand.Execute(null);
+
+        Assert.False(vm.HasErrors);
     }
 }

@@ -32,21 +32,24 @@
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
                          Text="{Binding EditName}" Margin="{StaticResource FormInputMargin}"
-                         behaviors:FocusHelpBehavior.HelpKey="EventName"/>
+                         behaviors:FocusHelpBehavior.HelpKey="EventName"
+                         behaviors:FocusHelpBehavior.ErrorPropertyName="EditName"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Betrag"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
                                Value="{Binding EditAmount}" Increment="100"
                                Margin="{StaticResource FormInputMargin}"
-                               behaviors:FocusHelpBehavior.HelpKey="Amount"/>
+                               behaviors:FocusHelpBehavior.HelpKey="Amount"
+                               behaviors:FocusHelpBehavior.ErrorPropertyName="EditAmount"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Zieldatum"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                 <DatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
                             SelectedDate="{Binding EditTargetDate}"
                             Margin="{StaticResource FormInputMargin}"
-                            behaviors:FocusHelpBehavior.HelpKey="TargetDate"/>
+                            behaviors:FocusHelpBehavior.HelpKey="TargetDate"
+                            behaviors:FocusHelpBehavior.ErrorPropertyName="EditTargetDate"/>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Frühestens (Monate vom Zieldatum)"
                            Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
@@ -54,7 +57,8 @@
                                Value="{Binding EditEarliestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMargin}"
                                Minimum="-120" Maximum="0" AllowSpin="True"
-                               behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"/>
+                               behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"
+                               behaviors:FocusHelpBehavior.ErrorPropertyName="EditEarliestMonthOffset"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Spätestens (Monate vom Zieldatum)"
                            Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
@@ -62,7 +66,8 @@
                                Value="{Binding EditLatestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMarginLast}"
                                Minimum="0" Maximum="120" AllowSpin="True"
-                               behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"/>
+                               behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
+                               behaviors:FocusHelpBehavior.ErrorPropertyName="EditLatestMonthOffset"/>
             </Grid>
         </Grid>
     </controls:FeatureLayoutView>
