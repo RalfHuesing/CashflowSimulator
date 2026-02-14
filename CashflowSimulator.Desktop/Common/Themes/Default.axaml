@@ -1,6 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=netstandard">
+        xmlns:sys="clr-namespace:System;assembly=netstandard"
+        xmlns:controls="clr-namespace:CashflowSimulator.Desktop.Common.Controls;assembly=CashflowSimulator.Desktop"
+        xmlns:vm="clr-namespace:CashflowSimulator.Desktop.ViewModels;assembly=CashflowSimulator.Desktop">
 
     <Styles.Resources>
         <Color x:Key="SidebarBackgroundColor">#0F172A</Color>
@@ -264,6 +266,62 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource ErrorTrayTextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+
+    <!-- FeatureLayoutView: Content links, GridSplitter, InfoPanel rechts. Template sorgt dafür, dass Kind-Content nur im ContentPresenter landet. -->
+    <Style Selector="controls|FeatureLayoutView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="400" MinWidth="280"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                    </ScrollViewer>
+                    <GridSplitter Grid.Column="1"
+                                  Width="4"
+                                  Background="{StaticResource GridSplitterBackgroundBrush}"
+                                  ResizeDirection="Columns"
+                                  ResizeBehavior="PreviousAndNext"/>
+                    <Border Grid.Column="2"
+                            Background="{StaticResource InfoPanelBackgroundBrush}"
+                            BorderBrush="{StaticResource InfoPanelBorderBrush}"
+                            BorderThickness="1,0,0,0"
+                            Padding="16"
+                            DataContext="{TemplateBinding DataContext}">
+                        <StackPanel Spacing="16" x:DataType="vm:ValidatingViewModelBase">
+                            <StackPanel IsVisible="{Binding HasActiveHelpErrors}" Spacing="4">
+                                <Border Classes="error-tray" Padding="12,8">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="VALIDIERUNGSFEHLER" Classes="error-tray-caption"/>
+                                        <ItemsControl ItemsSource="{Binding ActiveHelpErrors}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="sys:String">
+                                                    <TextBlock Text="{Binding}" Classes="error-tray-item"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding ActiveHelpTitle}"
+                                          FontWeight="SemiBold"
+                                          FontSize="14"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding ActiveHelpDescription}"
+                                          TextWrapping="Wrap"
+                                          FontSize="13"
+                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
     </Style>
 
 </Styles>

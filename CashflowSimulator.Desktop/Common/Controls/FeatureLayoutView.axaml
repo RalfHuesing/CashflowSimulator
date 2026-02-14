@@ -1,62 +1,7 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
-             xmlns:vm="using:CashflowSimulator.Desktop.ViewModels"
-             x:Class="CashflowSimulator.Desktop.Common.Controls.FeatureLayoutView"
-             x:DataType="vm:ValidatingViewModelBase">
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="4"/>
-            <ColumnDefinition Width="400" MinWidth="280"/>
-        </Grid.ColumnDefinitions>
-
-        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                              ContentTemplate="{Binding ContentTemplate, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        </ScrollViewer>
-
-        <GridSplitter Grid.Column="1"
-                      Width="4"
-                      Background="{StaticResource GridSplitterBackgroundBrush}"
-                      ResizeDirection="Columns"
-                      ResizeBehavior="PreviousAndNext"/>
-
-        <Border Grid.Column="2"
-                Background="{StaticResource InfoPanelBackgroundBrush}"
-                BorderBrush="{StaticResource InfoPanelBorderBrush}"
-                BorderThickness="1,0,0,0"
-                Padding="16">
-            <StackPanel Spacing="16">
-                <!-- Validierungsfehler für aktuellen Fokus -->
-                <StackPanel IsVisible="{Binding HasActiveHelpErrors}" Spacing="4">
-                    <Border Classes="error-tray" Padding="12,8">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="VALIDIERUNGSFEHLER" Classes="error-tray-caption"/>
-                            <ItemsControl ItemsSource="{Binding ActiveHelpErrors}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" Classes="error-tray-item"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-
-                <!-- Hilfetext (Feld oder Seite) -->
-                <StackPanel Spacing="8">
-                    <TextBlock Text="{Binding ActiveHelpTitle}"
-                              FontWeight="SemiBold"
-                              FontSize="14"
-                              Foreground="{StaticResource TextPrimaryBrush}"/>
-                    <TextBlock Text="{Binding ActiveHelpDescription}"
-                              TextWrapping="Wrap"
-                              FontSize="13"
-                              Foreground="{StaticResource TextSecondaryBrush}"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-    </Grid>
-</UserControl>
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+                x:Class="CashflowSimulator.Desktop.Common.Controls.FeatureLayoutView">
+  <!-- Layout kommt aus Style-Template in Default.axaml (Content | GridSplitter | InfoPanel). Fallback: nur Content. -->
+  <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource AncestorType=controls:FeatureLayoutView}}"/>
+</ContentControl>
