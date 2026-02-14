@@ -1,0 +1,32 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="Border.error-tray">
+        <Setter Property="Background" Value="{StaticResource ErrorTrayBackgroundBrush}"/>
+        <Setter Property="Padding" Value="{StaticResource ErrorTrayPadding}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorTrayTextBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.error-tray-item">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorTrayTextBrush}"/>
+        <Setter Property="Margin" Value="{StaticResource ErrorTrayItemSpacing}"/>
+    </Style>
+    <Style Selector="TextBlock.error-tray-caption">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorTrayTextBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+
+    <!-- Fehlertext unter Controls ausblenden; Fehler nur im InfoPanel rechts anzeigen -->
+    <Style Selector="DataValidationErrors">
+        <Setter Property="ErrorTemplate">
+            <DataTemplate>
+                <Border Height="0" IsVisible="False"/>
+            </DataTemplate>
+        </Setter>
+    </Style>
+
+</Styles>

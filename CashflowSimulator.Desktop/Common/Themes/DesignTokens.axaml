@@ -1,0 +1,84 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard">
+
+    <Styles.Resources>
+        <Color x:Key="SidebarBackgroundColor">#0F172A</Color>
+        <Color x:Key="ContentBackgroundColor">#F3F4F6</Color>
+        <Color x:Key="SurfaceColor">#FFFFFF</Color>
+        <Color x:Key="PrimaryActionColor">#0d6efd</Color>
+        <Color x:Key="PrimaryActionHoverColor">#0b5ed7</Color>
+        <Color x:Key="TextPrimaryColor">#111827</Color>
+        <Color x:Key="TextSecondaryColor">#6B7280</Color>
+        <Color x:Key="TextOnDarkColor">#F9FAFB</Color>
+        <Color x:Key="PlaceholderIconColor">#E5E7EB</Color>
+
+        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
+        <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="PrimaryActionBrush" Color="{StaticResource PrimaryActionColor}" />
+        <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="{StaticResource PrimaryActionHoverColor}" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+        <SolidColorBrush x:Key="TextOnDarkBrush" Color="{StaticResource TextOnDarkColor}" />
+        <SolidColorBrush x:Key="PlaceholderIconBrush" Color="{StaticResource PlaceholderIconColor}" />
+
+        <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+        <Thickness x:Key="PagePadding">24</Thickness>
+        <Thickness x:Key="SidebarLogoMargin">0,0,0,40</Thickness>
+        <Thickness x:Key="ContentHeaderMargin">0,0,0,24</Thickness>
+        <Thickness x:Key="HeaderIconMargin">0,0,16,0</Thickness>
+        <Thickness x:Key="NavItemMargin">0,2</Thickness>
+        <Thickness x:Key="NavIconMargin">8,0,0,0</Thickness>
+
+        <sys:Double x:Key="SpacingMediumValue">20</sys:Double>
+        <sys:Double x:Key="SpacingSmallValue">8</sys:Double>
+        <sys:Double x:Key="SidebarWidth">260</sys:Double>
+        <sys:Double x:Key="SidebarLogoIconSize">28</sys:Double>
+        <sys:Double x:Key="HeaderIconSize">24</sys:Double>
+        <sys:Double x:Key="PlaceholderIconSize">64</sys:Double>
+        <sys:Double x:Key="NavIconSize">20</sys:Double>
+        <sys:Double x:Key="NavItemFontSize">14</sys:Double>
+        <Thickness x:Key="SpacingLarge">0</Thickness>
+
+        <!-- Form / dialog layout -->
+        <Color x:Key="FormInputBorderColor">#ADADAD</Color>
+        <Color x:Key="FormInputErrorBorderColor">#B91C1C</Color>
+        <Color x:Key="FormInputErrorIconColor">#B91C1C</Color>
+        <SolidColorBrush x:Key="FormInputBorderBrush" Color="{StaticResource FormInputBorderColor}" />
+        <SolidColorBrush x:Key="FormInputErrorBorderBrush" Color="{StaticResource FormInputErrorBorderColor}" />
+        <SolidColorBrush x:Key="FormInputErrorIconBrush" Color="{StaticResource FormInputErrorIconColor}" />
+        <sys:Double x:Key="FormLabelWidth">180</sys:Double>
+        <sys:Double x:Key="FormInputWidth">220</sys:Double>
+        <sys:Double x:Key="FormRowSpacing">12</sys:Double>
+        <Thickness x:Key="FormLabelMargin">0,0,16,12</Thickness>
+        <Thickness x:Key="FormLabelMarginLast">0,0,16,0</Thickness>
+        <Thickness x:Key="FormInputMargin">0,0,0,12</Thickness>
+        <Thickness x:Key="FormInputMarginLast">0,0,0,0</Thickness>
+        <Thickness x:Key="FormHeaderBlockMargin">0,0,0,20</Thickness>
+        <Thickness x:Key="FormActionsMargin">0,24,0,0</Thickness>
+        <sys:Double x:Key="FormActionsSpacing">12</sys:Double>
+        <sys:Double x:Key="FormMaxWidth">600</sys:Double>
+
+        <!-- InfoPanel & GridSplitter -->
+        <Color x:Key="InfoPanelBackgroundColor">#F7FAFC</Color>
+        <Color x:Key="InfoPanelBorderColor">#E2E8F0</Color>
+        <Color x:Key="GridSplitterBackgroundColor">#E2E8F0</Color>
+        <SolidColorBrush x:Key="InfoPanelBackgroundBrush" Color="{StaticResource InfoPanelBackgroundColor}" />
+        <SolidColorBrush x:Key="InfoPanelBorderBrush" Color="{StaticResource InfoPanelBorderColor}" />
+        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource GridSplitterBackgroundColor}" />
+        <sys:Double x:Key="InfoPanelDefaultWidth">400</sys:Double>
+        <sys:Double x:Key="InfoPanelMinWidth">280</sys:Double>
+        <sys:Double x:Key="GridSplitterWidth">4</sys:Double>
+
+        <!-- Error Tray (Info-Panel) -->
+        <Color x:Key="ErrorTrayBackgroundColor">#FEE2E2</Color>
+        <Color x:Key="ErrorTrayTextColor">#991B1B</Color>
+        <SolidColorBrush x:Key="ErrorTrayBackgroundBrush" Color="{StaticResource ErrorTrayBackgroundColor}" />
+        <SolidColorBrush x:Key="ErrorTrayTextBrush" Color="{StaticResource ErrorTrayTextColor}" />
+        <sys:Double x:Key="ErrorTrayMaxHeight">150</sys:Double>
+        <Thickness x:Key="ErrorTrayPadding">12,8</Thickness>
+        <Thickness x:Key="ErrorTrayItemSpacing">0,4</Thickness>
+    </Styles.Resources>
+
+</Styles>

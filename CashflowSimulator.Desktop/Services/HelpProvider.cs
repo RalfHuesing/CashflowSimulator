@@ -17,8 +17,7 @@ public sealed class HelpProvider : IHelpProvider
         ["Eckdaten"] = ("Eckdaten der Simulation", "Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation. Hier legen Sie die zeitlichen Eckdaten und das anfängliche liquide Kapital fest."),
         ["ScenarioName"] = ("Szenario Name", "Name des Szenarios zur besseren Unterscheidung mehrerer durchgerechneter Varianten."),
         ["Szenario"] = ("Szenario-Einstellungen", "Hier können Metadaten des aktuellen Szenarios bearbeitet werden."),
-        ["SelectedTheme"] = ("Design (Theme)", "Wählen Sie das Farbschema und die Darstellung der Anwendung."),
-        ["Einstellungen"] = ("Einstellungen", "Design und weitere Optionen für dieses Szenario."),
+        ["Einstellungen"] = ("Einstellungen", "Weitere Optionen für dieses Szenario."),
     }.ToFrozenDictionary();
 
     /// <inheritdoc />

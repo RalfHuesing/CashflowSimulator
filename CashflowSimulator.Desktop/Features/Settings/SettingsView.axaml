@@ -16,30 +16,12 @@
                         HorizontalAlignment="Left">
                 <TextBlock Text="Einstellungen"
                            Classes="feature-page-title"/>
-                <TextBlock Text="Design und weitere Optionen für dieses Szenario."
+                <TextBlock Text="Weitere Optionen für dieses Szenario."
                            Classes="feature-page-description"/>
             </StackPanel>
 
-            <Grid ColumnDefinitions="180, 220" RowDefinitions="Auto"
-                  VerticalAlignment="Top" HorizontalAlignment="Left">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Design (Theme)"
-                           Classes="form-label"
-                           Margin="{StaticResource FormLabelMargin}"/>
-                <ComboBox Grid.Row="0" Grid.Column="1"
-                          ItemsSource="{Binding AvailableThemes}"
-                          SelectedItem="{Binding SelectedTheme}"
-                          Margin="{StaticResource FormInputMargin}"
-                          Width="{StaticResource FormInputWidth}"
-                          HorizontalAlignment="Left"
-                          TabIndex="1"
-                          behaviors:FocusHelpBehavior.HelpKey="SelectedTheme">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding DisplayName}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </Grid>
+            <TextBlock Text="Weitere Einstellungen folgen."
+                       Classes="placeholder-secondary"/>
         </StackPanel>
     </controls:FeatureLayoutView>
 </UserControl>

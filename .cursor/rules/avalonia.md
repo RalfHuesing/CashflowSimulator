@@ -31,7 +31,7 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 ## Validierung
 
 - **Keine Validierung im XAML.** Grenzen und fachliche Regeln nur über die Validation-Schicht (CashflowSimulator.Validation); in Views keine `Minimum`/`Maximum` zur Regelung setzen.
-- **Fehleranzeige:** Nur im rechten Info-Panel des Feature-Layouts (Block „VALIDIERUNGSFEHLER“). Die Standard-Anzeige unter den Controls ist in dieser App per Style deaktiviert (`DataValidationErrors` mit leerer `ErrorTemplate` in Default.axaml).
+- **Fehleranzeige:** Nur im rechten Info-Panel des Feature-Layouts (Block „VALIDIERUNGSFEHLER“). Die Standard-Anzeige unter den Controls ist in dieser App per Style deaktiviert (`DataValidationErrors` mit leerer `ErrorTemplate` in Common/Themes/ErrorTrayStyles.axaml).
 
 ## Feature-Layout und Hilfe
 

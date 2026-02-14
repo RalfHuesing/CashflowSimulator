@@ -6,7 +6,7 @@ Die Desktop-App ist **nach Domänen-Features** organisiert, nicht nach technisch
 
 - **Features/** = eine Ordnerhierarchie pro fachlichem Bereich.
 - **Services/** = app-weite UI-Dienste (z. B. Dateidialog, HelpProvider), die von mehreren Features genutzt werden.
-- **Common/** = Themes, wiederverwendbare Controls (z. B. FeatureLayoutView, FocusHelpBehavior).
+- **Common/** = Themes (mehrere AXAML-Dateien: DesignTokens, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle), wiederverwendbare Controls (z. B. FeatureLayoutView, FocusHelpBehavior).
 
 So findest du alles zu „Eckdaten“ unter `Features/Eckdaten/`, alles zu „Meta“ unter `Features/Meta/`, alles zu „Cashflow“ später unter `Features/Cashflow/`.
 
@@ -15,7 +15,7 @@ So findest du alles zu „Eckdaten“ unter `Features/Eckdaten/`, alles zu „Me
 ```
 CashflowSimulator.Desktop/
 ├── App.*, Program.cs, CompositionRoot.cs, MainWindow.*   # Root, Host
-├── Common/Themes/, Common/Controls/, Common/Behaviors/    # Themes, FeatureLayoutView, FocusHelpBehavior
+├── Common/Themes/*.axaml, Common/Controls/, Common/Behaviors/   # Styles (DesignTokens, ButtonStyles, …), FeatureLayoutView, FocusHelpBehavior
 ├── Services/                                              # App-weit (Dateidialog, HelpProvider, …)
 └── Features/
     ├── Main/                                              # Shell: Sidebar (Logo, Navigation, Laden/Speichern), Content-Bereich (volle Höhe, keine Statusleiste)
@@ -23,7 +23,7 @@ CashflowSimulator.Desktop/
     │   └── Navigation/NavigationView*, NavigationViewModel
     ├── Meta/                                              # Szenario-Stammdaten (MetaEditView*, MetaEditViewModel)
     ├── Eckdaten/                                          # Eckdaten (EckdatenView*, EckdatenViewModel)
-    ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
+    ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel; weitere Optionen folgen)
     └── Cashflow/                                          # (später) Liste, Dialoge, …
 ```
 

@@ -16,7 +16,7 @@ CashflowSimulator.Desktop/
 ├── App.axaml, App.axaml.cs, Program.cs, MainWindow.*   # Root – Einstieg, Hauptfenster (hostet Shell)
 ├── CompositionRoot.cs                                  # Zugriff auf ServiceProvider (gesetzt in Program.Main)
 ├── Common/
-│   ├── Themes/Default.axaml                            # Brushes, Thickness, ApplicationTitle – keine Hardcodes in Views
+│   ├── Themes/*.axaml                                  # DesignTokens, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle – keine Hardcodes in Views
 │   └── Controls/                                       # Wiederverwendbare UserControls
 ├── Services/                                            # App-weite UI-Dienste (plattformunabhängig)
 │   ├── IFileDialogService.cs                           # Öffnen/Speichern (Avalonia StorageProvider)
@@ -43,7 +43,7 @@ CashflowSimulator.Desktop/
 
 ## Styling-Regel
 
-Keine hardcodierten Farben oder Margins in View-XAML. Alle Werte kommen aus **Common/Themes/Default.axaml** (Brushes, Thickness, Strings). Views und Controls referenzieren nur Ressourcen (`{StaticResource Key}`).
+Keine hardcodierten Farben oder Margins in View-XAML. Alle Werte kommen aus **Common/Themes/** (DesignTokens.axaml, ButtonStyles.axaml, …). Views und Controls referenzieren nur Ressourcen (`{StaticResource Key}`). Es wird durchgängig das **Fluent-Theme** verwendet; kein dynamisches Theme-Switching.
 
 ## Avalonia – Hinweise (nicht WPF)
 

@@ -11,14 +11,12 @@ namespace CashflowSimulator.Desktop.Services;
 public sealed class CurrentProjectService : ICurrentProjectService
 {
     private readonly Lock _lock = new();
-    private readonly IThemeService _themeService;
 
     private SimulationProjectDto? _current;
     private string? _currentFilePath;
 
-    public CurrentProjectService(IThemeService themeService)
+    public CurrentProjectService()
     {
-        _themeService = themeService;
     }
 
     /// <inheritdoc />
@@ -38,7 +36,6 @@ public sealed class CurrentProjectService : ICurrentProjectService
             _current = project;
             _currentFilePath = filePath;
         });
-        _themeService.ApplyTheme(project.UiSettings.SelectedThemeId);
         OnProjectChanged();
     }
 
@@ -63,7 +60,6 @@ public sealed class CurrentProjectService : ICurrentProjectService
                 return;
             _current = _current with { UiSettings = uiSettings };
         });
-        _themeService.ApplyTheme(uiSettings.SelectedThemeId);
         OnProjectChanged();
     }
 

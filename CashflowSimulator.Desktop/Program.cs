@@ -46,7 +46,6 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
                 services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
-                services.AddSingleton<IThemeService, ThemeService>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
                 services.AddSingleton<IHelpProvider, HelpProvider>();
 

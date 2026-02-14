@@ -23,9 +23,14 @@
         </DataTemplate>
     </Application.DataTemplates>
 
-    <!-- Basis-Themes hier, damit die App sauber startet; Projekt-Theme wird in MainWindow.OnLoaded angewendet. -->
+    <!-- Fluent-Theme fest; App-Styles aus Common/Themes (Design-Tokens zuerst, dann Komponenten-Styles). -->
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="/Common/Themes/Default.axaml" />
+        <StyleInclude Source="/Common/Themes/DesignTokens.axaml" />
+        <StyleInclude Source="/Common/Themes/ButtonStyles.axaml" />
+        <StyleInclude Source="/Common/Themes/TypographyStyles.axaml" />
+        <StyleInclude Source="/Common/Themes/FormStyles.axaml" />
+        <StyleInclude Source="/Common/Themes/ErrorTrayStyles.axaml" />
+        <StyleInclude Source="/Common/Themes/FeatureLayoutViewStyle.axaml" />
     </Application.Styles>
 </Application>

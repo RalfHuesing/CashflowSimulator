@@ -1,0 +1,61 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
+    <Style Selector="TextBlock.feature-page-title">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style Selector="TextBlock.feature-page-description">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,0,0,24"/>
+    </Style>
+
+    <Style Selector="TextBlock.sidebar-logo-title">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="TextBlock.sidebar-section-caption">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="Margin" Value="4,0,0,4"/>
+    </Style>
+
+    <Style Selector="TextBlock.content-header-label">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.placeholder-secondary">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.nav-item-text">
+        <Setter Property="FontSize" Value="{StaticResource NavItemFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="TextBlock.form-label">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+</Styles>
