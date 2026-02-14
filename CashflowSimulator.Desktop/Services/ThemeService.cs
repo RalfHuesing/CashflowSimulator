@@ -24,6 +24,9 @@ public sealed class ThemeService : IThemeService
     private IStyle? _currentBaseTheme;
 
     /// <inheritdoc />
+    public event EventHandler? ThemeApplied;
+
+    /// <inheritdoc />
     public IReadOnlyList<ThemeOption> GetAvailableThemes() => Themes;
 
     /// <inheritdoc />
