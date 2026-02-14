@@ -1,41 +1,27 @@
-using System.Reflection;
 using Avalonia;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.Themes.Fluent;
 using Avalonia.Themes.Simple;
-using Avalonia.Markup.Xaml.Styling;
 
 namespace CashflowSimulator.Desktop.Services;
 
 /// <summary>
-/// Wendet zur Laufzeit Fluent- oder Simple-Basis-Theme an, optional mit Custom-Overlay.
-/// Wird beim Start und bei Projektwechsel (SetCurrent / UpdateUiSettings) genutzt.
+/// Wendet zur Laufzeit Fluent- oder Simple-Basis-Theme an.
+/// Default.axaml (StyleInclude) kommt aus App.axaml und bleibt unberührt; nur das Basis-Theme wird getauscht (Swap statt Clear).
 /// </summary>
 public sealed class ThemeService : IThemeService
 {
     public const string IdFluent = "Fluent";
     public const string IdSimple = "Simple";
 
-    /// <summary>
-    /// Beide Optionen laden immer unser Default.axaml-Overlay (Ressourcen wie TextPrimaryBrush, form-label etc.).
-    /// Es wird nur das Basis-Theme (Fluent vs. Simple) getauscht.
-    /// </summary>
     private static readonly IReadOnlyList<ThemeOption> Themes = new[]
     {
         new ThemeOption(IdFluent, "Fluent (Standard)"),
         new ThemeOption(IdSimple, "Simple (Standard)")
     };
 
-    private readonly FluentTheme _fluentTheme = new();
-    private readonly SimpleTheme _simpleTheme = new();
-    private readonly StyleInclude _customStyles;
-
-    public ThemeService()
-    {
-        var assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "CashflowSimulator.Desktop";
-        var uri = new Uri($"avares://{assemblyName}/Common/Themes/Default.axaml");
-        _customStyles = new StyleInclude(uri) { Source = uri };
-    }
+    private IStyle? _currentBaseTheme;
 
     /// <inheritdoc />
     public IReadOnlyList<ThemeOption> GetAvailableThemes() => Themes;
@@ -52,9 +38,7 @@ public sealed class ThemeService : IThemeService
 
         var id = string.IsNullOrWhiteSpace(themeId) ? GetDefaultThemeId() : themeId.Trim();
 
-        // Theme-Wechsel verzögern, damit offene Popups (z. B. ComboBox-Dropdown) zuerst
-        // geschlossen werden. Sonst: InvalidOperationException "already has a visual parent".
-        Dispatcher.UIThread.Post(() => ApplyThemeCore(app, id), DispatcherPriority.Loaded);
+        Dispatcher.UIThread.Post(() => ApplyThemeCore(app, id), DispatcherPriority.Normal);
     }
 
     private void ApplyThemeCore(Application app, string id)
@@ -62,19 +46,29 @@ public sealed class ThemeService : IThemeService
         if (Application.Current is null)
             return;
 
-        app.Styles.Clear();
-
-        switch (id)
+        IStyle newTheme = id switch
         {
-            case IdSimple:
-                app.Styles.Add(_simpleTheme);
-                app.Styles.Add(_customStyles);
-                break;
-            case IdFluent:
-            default:
-                app.Styles.Add(_fluentTheme);
-                app.Styles.Add(_customStyles);
-                break;
+            IdSimple => new SimpleTheme(),
+            IdFluent or _ => new FluentTheme()
+        };
+
+        if (_currentBaseTheme is not null && app.Styles.Contains(_currentBaseTheme))
+        {
+            app.Styles.Remove(_currentBaseTheme);
         }
+        else
+        {
+            for (var i = app.Styles.Count - 1; i >= 0; i--)
+            {
+                var style = app.Styles[i];
+                if (style is FluentTheme or SimpleTheme)
+                {
+                    app.Styles.RemoveAt(i);
+                }
+            }
+        }
+
+        app.Styles.Insert(0, newTheme);
+        _currentBaseTheme = newTheme;
     }
 }

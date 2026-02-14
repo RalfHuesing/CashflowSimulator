@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Services;
@@ -9,23 +11,23 @@ namespace CashflowSimulator.Desktop.Features.Settings;
 
 /// <summary>
 /// ViewModel für die Einstellungsseite (Theme-Auswahl, später weitere Optionen).
-/// Schreibt in <see cref="ICurrentProjectService"/> und wendet Theme über <see cref="IThemeService"/> an.
+/// Schreibt in <see cref="ICurrentProjectService"/>; Theme-Wechsel mit Debounce (300 ms), damit kein Wechsel während offenem ComboBox-Dropdown.
 /// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
-    private readonly IThemeService _themeService;
     private readonly ICurrentProjectService _currentProjectService;
+
+    private CancellationTokenSource? _debounceCts;
 
     public SettingsViewModel(IThemeService themeService, ICurrentProjectService currentProjectService)
     {
-        _themeService = themeService;
         _currentProjectService = currentProjectService;
 
-        var themes = _themeService.GetAvailableThemes();
+        var themes = themeService.GetAvailableThemes();
         AvailableThemes = new List<ThemeOption>(themes);
 
         var currentId = _currentProjectService.Current?.UiSettings.SelectedThemeId;
-        var id = string.IsNullOrWhiteSpace(currentId) ? _themeService.GetDefaultThemeId() : currentId.Trim();
+        var id = string.IsNullOrWhiteSpace(currentId) ? themeService.GetDefaultThemeId() : currentId.Trim();
         _selectedTheme = AvailableThemes.FirstOrDefault(t => t.Id == id) ?? AvailableThemes.First();
     }
 
@@ -37,6 +39,27 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnSelectedThemeChanged(ThemeOption? value)
     {
         if (value is null) return;
-        _currentProjectService.UpdateUiSettings(new UiSettingsDto { SelectedThemeId = value.Id });
+
+        _debounceCts?.Cancel();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
+
+        _ = ChangeThemeDebouncedAsync(value, token);
+    }
+
+    private async Task ChangeThemeDebouncedAsync(ThemeOption theme, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(300, token).ConfigureAwait(true);
+
+            if (token.IsCancellationRequested) return;
+
+            _currentProjectService.UpdateUiSettings(new UiSettingsDto { SelectedThemeId = theme.Id });
+        }
+        catch (TaskCanceledException)
+        {
+            // Gewollt bei erneutem Wechsel innerhalb der 300 ms
+        }
     }
 }
