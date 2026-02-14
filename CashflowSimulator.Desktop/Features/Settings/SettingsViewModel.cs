@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Services;
+using CashflowSimulator.Desktop.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CashflowSimulator.Desktop.Features.Settings;
@@ -12,16 +13,19 @@ namespace CashflowSimulator.Desktop.Features.Settings;
 /// <summary>
 /// ViewModel für die Einstellungsseite (Theme-Auswahl, später weitere Optionen).
 /// Schreibt in <see cref="ICurrentProjectService"/>; Theme-Wechsel mit Debounce (300 ms), damit kein Wechsel während offenem ComboBox-Dropdown.
+/// Erbt von <see cref="ValidatingViewModelBase"/> für FeatureLayout/Statusleiste; keine Validierung.
 /// </summary>
-public partial class SettingsViewModel : ObservableObject
+public partial class SettingsViewModel : ValidatingViewModelBase
 {
     private readonly ICurrentProjectService _currentProjectService;
 
     private CancellationTokenSource? _debounceCts;
 
-    public SettingsViewModel(IThemeService themeService, ICurrentProjectService currentProjectService)
+    public SettingsViewModel(IThemeService themeService, ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
+        : base(helpProvider)
     {
         _currentProjectService = currentProjectService;
+        PageHelpKey = "Einstellungen";
 
         var themes = themeService.GetAvailableThemes();
         AvailableThemes = new List<ThemeOption>(themes);

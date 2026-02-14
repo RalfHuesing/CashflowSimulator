@@ -3,39 +3,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Settings"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CashflowSimulator.Desktop.Features.Settings.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
-    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
-        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
-                    Margin="{StaticResource FormHeaderBlockMargin}"
-                    HorizontalAlignment="Left">
-            <TextBlock Text="Einstellungen"
-                       Classes="feature-page-title"
-                       Foreground="{StaticResource TextPrimaryBrush}"/>
-            <TextBlock Text="Design und weitere Optionen für dieses Szenario."
-                       Classes="feature-page-description"
-                       Foreground="{StaticResource TextSecondaryBrush}"/>
-        </StackPanel>
+    <controls:FeatureLayoutView>
+        <StackPanel Margin="{StaticResource SpacingLarge}">
+            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
+                        Margin="{StaticResource FormHeaderBlockMargin}"
+                        HorizontalAlignment="Left">
+                <TextBlock Text="Einstellungen"
+                           Classes="feature-page-title"/>
+                <TextBlock Text="Design und weitere Optionen für dieses Szenario."
+                           Classes="feature-page-description"/>
+            </StackPanel>
 
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto"
-              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Design (Theme)"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <ComboBox Grid.Row="0" Grid.Column="1"
-                      ItemsSource="{Binding AvailableThemes}"
-                      SelectedItem="{Binding SelectedTheme}"
-                      Margin="{StaticResource FormInputMargin}"
-                      MinWidth="220"
-                      HorizontalAlignment="Left">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding DisplayName}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </Grid>
-    </Grid>
+            <Grid ColumnDefinitions="180, 220" RowDefinitions="Auto"
+                  VerticalAlignment="Top" HorizontalAlignment="Left">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Design (Theme)"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1"
+                          ItemsSource="{Binding AvailableThemes}"
+                          SelectedItem="{Binding SelectedTheme}"
+                          Margin="{StaticResource FormInputMargin}"
+                          Width="{StaticResource FormInputWidth}"
+                          HorizontalAlignment="Left"
+                          TabIndex="1"
+                          behaviors:FocusHelpBehavior.HelpKey="SelectedTheme">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+        </StackPanel>
+    </controls:FeatureLayoutView>
 </UserControl>

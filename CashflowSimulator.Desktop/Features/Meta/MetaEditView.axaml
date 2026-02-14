@@ -3,39 +3,44 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Meta"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
              x:DataType="vm:MetaEditViewModel">
 
-    <Grid RowDefinitions="Auto, *" Margin="{StaticResource SpacingLarge}">
-        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
-                    Margin="{StaticResource FormHeaderBlockMargin}"
-                    HorizontalAlignment="Left">
-            <TextBlock Text="Szenario-Einstellungen"
-                       Classes="feature-page-title"
-                       Foreground="{StaticResource TextPrimaryBrush}"/>
-            <TextBlock Text="Hier können Metadaten des aktuellen Szenarios bearbeitet werden."
-                       Classes="feature-page-description"
-                       Foreground="{StaticResource TextSecondaryBrush}"/>
+    <controls:FeatureLayoutView>
+        <StackPanel Margin="{StaticResource SpacingLarge}">
+            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
+                        Margin="{StaticResource FormHeaderBlockMargin}"
+                        HorizontalAlignment="Left">
+                <TextBlock Text="Szenario-Einstellungen"
+                           Classes="feature-page-title"/>
+                <TextBlock Text="Hier können Metadaten des aktuellen Szenarios bearbeitet werden."
+                           Classes="feature-page-description"/>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="180, 220" RowDefinitions="Auto, Auto"
+                  VerticalAlignment="Top" HorizontalAlignment="Left">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ScenarioName}"
+                         Classes="form-input"
+                         Watermark="Name eingeben..."
+                         Margin="{StaticResource FormInputMargin}"
+                         TabIndex="1"
+                         behaviors:FocusHelpBehavior.HelpKey="ScenarioName"
+                         behaviors:FocusHelpBehavior.ErrorPropertyName="ScenarioName"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Erstellt am"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMarginLast}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Opacity="0.8" VerticalAlignment="Center"/>
+            </Grid>
         </StackPanel>
-
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto"
-              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ScenarioName}"
-                     Classes="form-input"
-                     Watermark="Name eingeben..." Margin="{StaticResource FormInputMargin}"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Erstellt am"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMarginLast}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1"
-                       Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       Opacity="0.8" VerticalAlignment="Center"/>
-
-        </Grid>
-    </Grid>
+    </controls:FeatureLayoutView>
 </UserControl>

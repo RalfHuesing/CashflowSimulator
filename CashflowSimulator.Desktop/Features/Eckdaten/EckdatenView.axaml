@@ -3,76 +3,79 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Eckdaten"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CashflowSimulator.Desktop.Features.Eckdaten.EckdatenView"
              x:DataType="vm:EckdatenViewModel">
 
-    <Grid RowDefinitions="Auto, *" Margin="{StaticResource SpacingLarge}">
-        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
-                    Margin="{StaticResource FormHeaderBlockMargin}"
-                    HorizontalAlignment="Left">
-            <TextBlock Text="Eckdaten"
-                       Classes="feature-page-title"
-                       Foreground="{StaticResource TextPrimaryBrush}"/>
-            <TextBlock Text="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation."
-                       Classes="feature-page-description"
-                       Foreground="{StaticResource TextSecondaryBrush}"/>
-            <ItemsControl ItemsSource="{Binding FormLevelErrors}" IsVisible="{Binding HasFormLevelErrors}"
-                          Margin="0,8,0,0">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Foreground="{StaticResource ErrorTrayTextBrush}"
-                                  TextWrapping="Wrap" FontSize="12"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+    <controls:FeatureLayoutView>
+        <StackPanel Margin="{StaticResource SpacingLarge}">
+            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
+                        Margin="{StaticResource FormHeaderBlockMargin}"
+                        HorizontalAlignment="Left">
+                <TextBlock Text="Eckdaten"
+                           Classes="feature-page-title"/>
+                <TextBlock Text="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation."
+                           Classes="feature-page-description"/>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="180, 220" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+                  VerticalAlignment="Top" HorizontalAlignment="Left">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <DatePicker Grid.Row="0" Grid.Column="1"
+                            SelectedDate="{Binding BirthDate}"
+                            Margin="{StaticResource FormInputMargin}"
+                            TabIndex="1"
+                            behaviors:FocusHelpBehavior.HelpKey="BirthDate"
+                            behaviors:FocusHelpBehavior.ErrorPropertyName="BirthDate"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Aktuelles Alter"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                          Text="{Binding CurrentAgeText}"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Renteneintritt (Alter)"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <NumericUpDown Grid.Row="2" Grid.Column="1"
+                              Classes="form-input"
+                              Value="{Binding RetirementAge}"
+                              Increment="1"
+                              Margin="{StaticResource FormInputMargin}"
+                              TabIndex="2"
+                              behaviors:FocusHelpBehavior.HelpKey="RetirementAge"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="RetirementAge"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Lebenserwartung (Alter)"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <NumericUpDown Grid.Row="3" Grid.Column="1"
+                              Classes="form-input"
+                              Value="{Binding LifeExpectancy}"
+                              Increment="1"
+                              Margin="{StaticResource FormInputMargin}"
+                              TabIndex="3"
+                              behaviors:FocusHelpBehavior.HelpKey="LifeExpectancy"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="LifeExpectancy"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Start-Kapital (flüssig)"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMarginLast}"/>
+                <NumericUpDown Grid.Row="4" Grid.Column="1"
+                              Classes="form-input"
+                              Value="{Binding InitialLiquidCash}"
+                              Increment="1000"
+                              Margin="{StaticResource FormInputMarginLast}"
+                              TabIndex="4"
+                              behaviors:FocusHelpBehavior.HelpKey="InitialLiquidCash"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="InitialLiquidCash"/>
+            </Grid>
         </StackPanel>
-
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <DatePicker Grid.Row="0" Grid.Column="1"
-                        SelectedDate="{Binding BirthDate}"
-                        Margin="{StaticResource FormInputMargin}"
-                        HorizontalAlignment="Left"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Aktuelles Alter"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1"
-                       Text="{Binding CurrentAgeText}"
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       VerticalAlignment="Center"/>
-
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Renteneintritt (Alter)"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <NumericUpDown Grid.Row="2" Grid.Column="1"
-                           Value="{Binding RetirementAge}"
-                           Increment="1"
-                           Margin="{StaticResource FormInputMargin}"
-                           HorizontalAlignment="Left" MinWidth="120"/>
-
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Lebenserwartung (Alter)"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMargin}"/>
-            <NumericUpDown Grid.Row="3" Grid.Column="1"
-                           Value="{Binding LifeExpectancy}"
-                           Increment="1"
-                           Margin="{StaticResource FormInputMargin}"
-                           HorizontalAlignment="Left" MinWidth="120"/>
-
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Start-Kapital (flüssig)"
-                       Classes="form-label"
-                       Margin="{StaticResource FormLabelMarginLast}"/>
-            <NumericUpDown Grid.Row="4" Grid.Column="1"
-                           Value="{Binding InitialLiquidCash}"
-                           Increment="1000"
-                           Margin="{StaticResource FormInputMarginLast}"
-                           HorizontalAlignment="Left" MinWidth="160"/>
-
-        </Grid>
-    </Grid>
+    </controls:FeatureLayoutView>
 </UserControl>

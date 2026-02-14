@@ -39,6 +39,21 @@ public sealed class MainShellViewModelStatusBarTests
         Assert.Equal(path, vm.StatusBarDisplayText);
     }
 
+    [Fact]
+    public void StatusBarDisplayText_WhenContentIsIStatusBarContentProvider_ReturnsPrefixAndProviderText()
+    {
+        var currentProject = new StubCurrentProjectService { CurrentFilePath = null };
+        var vm = CreateMainShellViewModel(currentProject);
+        vm.CurrentContentViewModel = new StubStatusBarContentProvider("Fokus: X | Validierung: OK");
+        Assert.Equal("Bereit | Fokus: X | Validierung: OK", vm.StatusBarDisplayText);
+    }
+
+    private sealed class StubStatusBarContentProvider : IStatusBarContentProvider
+    {
+        public StubStatusBarContentProvider(string statusBarText) => StatusBarText = statusBarText;
+        public string StatusBarText { get; }
+    }
+
     private static MainShellViewModel CreateMainShellViewModel(ICurrentProjectService currentProjectService)
     {
         var fileDialog = new StubFileDialogService();

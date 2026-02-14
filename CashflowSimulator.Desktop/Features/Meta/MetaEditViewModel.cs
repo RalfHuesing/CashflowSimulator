@@ -21,9 +21,11 @@ public partial class MetaEditViewModel : ValidatingViewModelBase
     private readonly ICurrentProjectService _currentProjectService;
     private bool _isLoading;
 
-    public MetaEditViewModel(ICurrentProjectService currentProjectService)
+    public MetaEditViewModel(ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
+        : base(helpProvider)
     {
         _currentProjectService = currentProjectService;
+        PageHelpKey = "Szenario";
         LoadFromProject();
         ValidateAndSave();
     }

@@ -43,9 +43,11 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
     private readonly ICurrentProjectService _currentProjectService;
     private bool _isLoading;
 
-    public EckdatenViewModel(ICurrentProjectService currentProjectService)
+    public EckdatenViewModel(ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
+        : base(helpProvider)
     {
         _currentProjectService = currentProjectService;
+        PageHelpKey = "Eckdaten";
         LoadFromProject();
         ValidateAndSave();
     }

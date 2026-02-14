@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Common.Behaviors;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Services;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,7 @@ public partial class MainWindow : Window
     {
         base.OnLoaded(e);
         _fileDialogService.SetOwner(this);
+        FocusHelpBehavior.Initialize(this);
 
         var themeId = _currentProjectService.Current?.UiSettings.SelectedThemeId;
         _themeService.ApplyTheme(string.IsNullOrWhiteSpace(themeId) ? _themeService.GetDefaultThemeId() : themeId);

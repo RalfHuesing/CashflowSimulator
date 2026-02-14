@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using CashflowSimulator.Contracts.Common;
+using CashflowSimulator.Contracts.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CashflowSimulator.Desktop.ViewModels;
@@ -8,9 +9,9 @@ namespace CashflowSimulator.Desktop.ViewModels;
 /// <summary>
 /// Basis für Edit-ViewModels mit Avalonia-Standard-Validierung (INotifyDataErrorInfo).
 /// Fehler werden ausschließlich von außen gesetzt (z. B. aus FluentValidation); keine DataAnnotations.
-/// Unterstützt Property-Mapping (DTO → VM) und Objekt-Fehler (FormLevelErrors).
+/// Unterstützt Property-Mapping (DTO → VM), Objekt-Fehler (FormLevelErrors), Help-Panel und Statusleiste.
 /// </summary>
-public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErrorInfo
+public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErrorInfo, IStatusBarContentProvider
 {
     /// <summary>
     /// Synthetische Property für Fehler ohne Property (z. B. RuleFor(x => x) in FluentValidation).
@@ -20,6 +21,82 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
 
     private readonly Dictionary<string, List<string>> _errors = new();
     private readonly Debouncer _debouncer = new();
+    private readonly IHelpProvider? _helpProvider;
+
+    private string? _activeHelpKey;
+    private string? _pageHelpKey;
+    private string? _activeHelpTitle;
+    private string? _activeHelpDescription;
+
+    /// <summary>
+    /// Konstruktor für abgeleitete ViewModels. Optional kann ein <see cref="IHelpProvider"/> übergeben werden,
+    /// um <see cref="ActiveHelpTitle"/> und <see cref="ActiveHelpDescription"/> automatisch zu befüllen.
+    /// </summary>
+    protected ValidatingViewModelBase(IHelpProvider? helpProvider = null)
+    {
+        _helpProvider = helpProvider;
+    }
+
+    /// <summary>
+    /// HelpKey des aktuell fokussierten Feldes (wird von FocusHelpBehavior bei GotFocus gesetzt).
+    /// </summary>
+    public string? ActiveHelpKey
+    {
+        get => _activeHelpKey;
+        set
+        {
+            if (SetProperty(ref _activeHelpKey, value))
+            {
+                RefreshHelpText();
+                OnPropertyChanged(nameof(ActiveHelpErrors));
+                OnPropertyChanged(nameof(HasActiveHelpErrors));
+            }
+        }
+    }
+
+    /// <summary>
+    /// HelpKey für die Seite (Zero-State), wenn kein Feld fokussiert ist. In abgeleiteten ViewModels setzen.
+    /// </summary>
+    public string? PageHelpKey
+    {
+        get => _pageHelpKey;
+        set
+        {
+            if (SetProperty(ref _pageHelpKey, value))
+                RefreshHelpText();
+        }
+    }
+
+    /// <summary>
+    /// Titel für den aktuell angezeigten Hilfetext (aus <see cref="IHelpProvider"/>).
+    /// </summary>
+    public string? ActiveHelpTitle
+    {
+        get => _activeHelpTitle;
+        private set => SetProperty(ref _activeHelpTitle, value);
+    }
+
+    /// <summary>
+    /// Beschreibung für den aktuell angezeigten Hilfetext (aus <see cref="IHelpProvider"/>).
+    /// </summary>
+    public string? ActiveHelpDescription
+    {
+        get => _activeHelpDescription;
+        private set => SetProperty(ref _activeHelpDescription, value);
+    }
+
+    /// <summary>
+    /// Fehlermeldungen für das aktuell fokussierte Feld (für Bindung im InfoPanel).
+    /// </summary>
+    public IReadOnlyList<string> ActiveHelpErrors => GetErrors(ActiveHelpKey).Cast<string>().ToList();
+
+    /// <summary>
+    /// True, wenn für das aktuell fokussierte Feld Validierungsfehler vorliegen (für Sichtbarkeit des Fehler-Blocks).
+    /// </summary>
+    public bool HasActiveHelpErrors => ActiveHelpErrors.Count > 0;
+
+    /// <inheritdoc />
+    public string StatusBarText => BuildStatusBarText();
 
     /// <summary>
     /// Für Bindung in der View: Objekt-Fehler (kein einzelnes Feld zugeordnet).
@@ -42,8 +119,6 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     /// Setzt die Validierungsfehler; mappt DTO-Property-Namen auf VM-Property-Namen.
     /// Leere oder unbekannte PropertyNames landen in <see cref="FormLevelErrorsKey"/>.
     /// </summary>
-    /// <param name="errors">Fehler von ValidationRunner / FluentValidation.</param>
-    /// <param name="dtoToVmPropertyMap">Optional: DTO-PropertyName → VM-PropertyName (z. B. DateOfBirth → BirthDate).</param>
     protected void SetValidationErrors(
         IReadOnlyList<ValidationError> errors,
         IReadOnlyDictionary<string, string>? dtoToVmPropertyMap = null)
@@ -77,6 +152,9 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
         OnPropertyChanged(nameof(FormLevelErrors));
         OnPropertyChanged(nameof(HasFormLevelErrors));
         OnPropertyChanged(nameof(HasErrors));
+        OnPropertyChanged(nameof(StatusBarText));
+        OnPropertyChanged(nameof(ActiveHelpErrors));
+        OnPropertyChanged(nameof(HasActiveHelpErrors));
     }
 
     /// <summary>
@@ -94,6 +172,9 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
         OnPropertyChanged(nameof(FormLevelErrors));
         OnPropertyChanged(nameof(HasFormLevelErrors));
         OnPropertyChanged(nameof(HasErrors));
+        OnPropertyChanged(nameof(StatusBarText));
+        OnPropertyChanged(nameof(ActiveHelpErrors));
+        OnPropertyChanged(nameof(HasActiveHelpErrors));
     }
 
     /// <inheritdoc />
@@ -111,6 +192,33 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     protected void ScheduleDebounced(int delayMs, Action action)
     {
         _debouncer.Run(delayMs, action);
+    }
+
+    private void RefreshHelpText()
+    {
+        var key = ActiveHelpKey ?? PageHelpKey;
+        if (_helpProvider != null && !string.IsNullOrEmpty(key) && _helpProvider.TryGetHelp(key, out var title, out var description))
+        {
+            ActiveHelpTitle = title;
+            ActiveHelpDescription = description;
+        }
+        else
+        {
+            ActiveHelpTitle = null;
+            ActiveHelpDescription = null;
+        }
+        OnPropertyChanged(nameof(StatusBarText));
+    }
+
+    private string BuildStatusBarText()
+    {
+        var focusPart = string.IsNullOrEmpty(ActiveHelpKey)
+            ? "—"
+            : (_helpProvider != null && _helpProvider.TryGetHelp(ActiveHelpKey, out var title, out _) ? title : ActiveHelpKey);
+        var validationPart = HasErrors
+            ? $"{_errors.Values.Sum(l => l.Count)} Fehler"
+            : "OK";
+        return $"Fokus: {focusPart} | Validierung: {validationPart}";
     }
 
     private void OnErrorsChanged(string propertyName)
