@@ -17,8 +17,15 @@
                       IsReadOnly="True"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                    <DataGridTextColumn Header="Betrag" Width="100" Binding="{Binding Amount}"/>
+                    <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding Name}"/>
+                    <DataGridTemplateColumn Header="Betrag" Width="100" SortMemberPath="Amount">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Amount, StringFormat='{}{0:C}'}"
+                                           TextAlignment="Right" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Zieldatum" Width="120" Binding="{Binding TargetDate}"/>
                     <DataGridTextColumn Header="Frühestens" Width="90" Binding="{Binding EarliestMonthOffset}"/>
                     <DataGridTextColumn Header="Spätestens" Width="90" Binding="{Binding LatestMonthOffset}"/>
