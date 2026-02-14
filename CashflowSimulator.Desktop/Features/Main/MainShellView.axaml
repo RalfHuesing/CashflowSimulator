@@ -50,8 +50,8 @@
         <Border Grid.Column="1" 
                 Background="{DynamicResource ContentBackgroundBrush}"
                 Padding="{DynamicResource PagePadding}">
-            
-            <Border Classes="card">
+            <Grid RowDefinitions="*, Auto">
+                <Border Grid.Row="0" Classes="card">
                     <Grid>
                         <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
                                     Spacing="{StaticResource SpacingMediumValue}"
@@ -72,6 +72,24 @@
                                          VerticalContentAlignment="Stretch"/>
                     </Grid>
                 </Border>
+                <Border Grid.Row="1" IsVisible="{Binding HasValidationMessages}"
+                        Background="{StaticResource BsDangerBrush}" Opacity="0.12"
+                        Padding="{StaticResource FormInputMargin}" Margin="0,12,0,0"
+                        CornerRadius="{StaticResource ControlCornerRadius}">
+                    <StackPanel Spacing="{StaticResource SpacingSmallValue}">
+                        <TextBlock Text="Validierungsfehler" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <ItemsControl ItemsSource="{Binding ValidationMessages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimaryBrush}" FontSize="13"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

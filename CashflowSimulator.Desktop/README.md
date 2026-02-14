@@ -50,6 +50,7 @@ Keine hardcodierten Farben oder Margins in View-XAML. Alle Werte kommen aus **Co
 - **Lifetime:** Hauptfenster per `desktop.MainWindow = ...` setzen; Dialog-Owner ist `TopLevel`/`Visual` (z. B. MainWindow), nicht WPF-Window-Owner.
 - **Ressourcen:** Über `StyleInclude` in App.axaml einbinden; StaticResource nur auf Ressourcen aus erreichbaren Styles zugreifen.
 - **MVVM:** CommunityToolkit.Mvvm (`[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`); Details in `.cursor/rules/main.md` und `.cursor/rules/avalonia.md`.
+- **Validierung:** Nur über Validatoren (CashflowSimulator.Validation); Fehleranzeige im zentralen Meldungsbereich der Shell. Keine Validierung im XAML – siehe `.cursor/rules/main.md`.
 
 ## Für AI / spätere Kontexteinordnung
 

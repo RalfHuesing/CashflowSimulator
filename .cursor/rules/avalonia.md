@@ -27,3 +27,7 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 
 - Keine Business-Logik im Code-Behind; nur `InitializeComponent` und UI-Events, die nicht per Binding abbildbar sind.
 - UserControls und ContentControls: Avalonia-spezifische Basisklassen verwenden.
+
+## Validierung
+
+- **Keine Validierung im XAML.** Grenzen und fachliche Regeln nur über die Validation-Schicht (CashflowSimulator.Validation); in Views keine `Minimum`/`Maximum` zur Regelung setzen.

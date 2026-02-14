@@ -1,7 +1,9 @@
+using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Eckdaten;
+using CashflowSimulator.Validation;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Settings;
@@ -26,6 +28,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
+    private readonly IValidationMessageService _validationMessageService;
     private readonly IThemeService _themeService;
     private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
     private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
@@ -36,6 +39,7 @@ public partial class MainShellViewModel : ObservableObject
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
+        IValidationMessageService validationMessageService,
         IThemeService themeService,
         Func<MetaEditViewModel> createMetaEditViewModel,
         Func<EckdatenViewModel> createEckdatenViewModel,
@@ -46,6 +50,7 @@ public partial class MainShellViewModel : ObservableObject
         _fileDialogService = fileDialogService;
         _storageService = storageService;
         _currentProjectService = currentProjectService;
+        _validationMessageService = validationMessageService;
         _themeService = themeService;
         _createMetaEditViewModel = createMetaEditViewModel;
         _createEckdatenViewModel = createEckdatenViewModel;
@@ -55,6 +60,7 @@ public partial class MainShellViewModel : ObservableObject
 
         _currentProjectService.ProjectChanged += OnProjectChanged;
         _themeService.ThemeApplied += OnThemeApplied;
+        _validationMessageService.Messages.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasValidationMessages));
         InitializeNavigation();
         // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
         SaveCommand.NotifyCanExecuteChanged();
@@ -78,6 +84,16 @@ public partial class MainShellViewModel : ObservableObject
     /// True, wenn der Platzhalter im Content-Bereich angezeigt werden soll (kein Bereich ausgewählt).
     /// </summary>
     public bool IsContentPlaceholderVisible => CurrentContentViewModel is null;
+
+    /// <summary>
+    /// Meldungen für den zentralen Validierungsbereich (Option B).
+    /// </summary>
+    public ObservableCollection<ValidationMessageEntry> ValidationMessages => _validationMessageService.Messages;
+
+    /// <summary>
+    /// True, wenn mindestens eine Validierungsmeldung angezeigt werden soll.
+    /// </summary>
+    public bool HasValidationMessages => _validationMessageService.Messages.Count > 0;
 
     private void OnProjectChanged(object? sender, EventArgs e)
     {
@@ -144,7 +160,15 @@ public partial class MainShellViewModel : ObservableObject
                 return;
             }
 
-            _currentProjectService.SetCurrent(result.Value!, path);
+            var project = result.Value!;
+            _currentProjectService.SetCurrent(project, path);
+
+            var validationResult = ValidationRunner.Validate(project);
+            if (!validationResult.IsValid)
+                _validationMessageService.SetErrors("Projekt", validationResult.Errors);
+            else
+                _validationMessageService.ClearSource("Projekt");
+
             _logger.LogInformation("Projekt erfolgreich geladen aus {Path}", path);
         }
         catch (Exception ex)

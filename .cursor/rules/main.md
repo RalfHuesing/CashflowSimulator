@@ -14,7 +14,8 @@ Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Archite
 
 | Projekt | Verantwortung |
 | --- | --- |
-| **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. IPriceProvider). |
+| **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. IPriceProvider), ValidationError/ValidationResult. |
+| **CashflowSimulator.Validation** | FluentValidation-Validatoren für DTOs (SimulationParametersDto, MetaDto, SimulationProjectDto); Single Source of Truth für fachliche Regeln. |
 | **CashflowSimulator.Core** | Stateless Mathematik – SimulationEngine, Wachstumsmodelle, Steuerlogik; keine UI, keine I/O. |
 | **CashflowSimulator.Infrastructure** | Außenwelt – Persistenz (Laden/Speichern Szenarien), Kursdaten (z. B. StockPriceEngine/Cache), Implementierungen für Contracts-Interfaces. |
 | **CashflowSimulator.Desktop** | Avalonia-UI; Einstiegspunkt, Composition Root; ViewModels wrappen DTOs aus Contracts; keine Business-Logik in Core/Engine nachbauen. |
@@ -24,11 +25,14 @@ Keine separaten „Feature“-Projekte; klare Schichtentrennung reicht.
 ```mermaid
 flowchart TB
     Contracts[CashflowSimulator.Contracts]
+    Validation[CashflowSimulator.Validation]
     Core[CashflowSimulator.Core]
     Infra[CashflowSimulator.Infrastructure]
     Desktop[CashflowSimulator.Desktop]
+    Validation --> Contracts
     Core --> Contracts
     Infra --> Contracts
+    Desktop --> Validation
     Desktop --> Core
     Desktop --> Infra
     Desktop --> Contracts
@@ -64,6 +68,14 @@ flowchart TB
 - **Log-Datei:** Unter dem App-Basisverzeichnis in `Logs/cashflow-{Date}.log` (Rolling pro Tag); Format: `{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}`. Level z. B. INF, DBG, ERR, FTL.
 - **Level-Nutzung:** `LogDebug` für detaillierte Ablauf-Infos, `LogInformation` für normale Meilensteine (z. B. „Projekt geladen“), `LogError` für erwartbare Fehler (z. B. Laden fehlgeschlagen), `LogCritical`/`Log.Fatal` für unerwartete Startup- oder App-Abstürze.
 - **App-Start:** Beim Start `Log.Information("Application starting")`; bei Fehler im Startup `Log.Fatal(ex, "Application startup failed")` und Exception durchreichen. Spätere Erweiterungen (neue Features, Services) sollen dieses Muster beibehalten: strukturierte Platzhalter, passendes Level, ILogger injizieren.
+
+## Validierung
+
+- **Nur über Validatoren:** Alle fachlichen Regeln und Grenzen werden ausschließlich über FluentValidation im Projekt **CashflowSimulator.Validation** abgebildet (Single Source of Truth). Keine Validierung im XAML.
+- **Keine Validierung im XAML:** In Views keine `Minimum`/`Maximum` zur fachlichen Regelung setzen; keine Inline-Validierung. XAML dient nur Darstellung und Eingabe-UX (z. B. Schrittweite `Increment`).
+- **Desktop:** Feature-ViewModels rufen vor Übernahme (Apply) den passenden Validator über `ValidationRunner` auf; Fehler werden über den zentralen Meldungsdienst angezeigt (statischer Bereich in der Shell, Option B).
+- **Engine:** Validiert eingehende `SimulationProjectDto` an den Einstiegspunkten (z. B. vor Simulation); bei Fehlern Result mit Validierungsfehlern zurückgeben.
+- **Partielle Validierung:** Pro DTO eigener Validator (z. B. `SimulationParametersValidator`, `MetaDtoValidator`); `SimulationProjectValidator` bündelt sie. Die Desktop-App kann gezielt nur das gerade bearbeitete Teil-DTO validieren.
 
 ## Avalonia und MVVM
 

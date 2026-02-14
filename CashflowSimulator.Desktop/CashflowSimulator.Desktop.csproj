@@ -12,6 +12,7 @@
     <ProjectReference Include="..\CashflowSimulator.Contracts\CashflowSimulator.Contracts.csproj" />
     <ProjectReference Include="..\CashflowSimulator.Engine\CashflowSimulator.Engine.csproj" />
     <ProjectReference Include="..\CashflowSimulator.Infrastructure\CashflowSimulator.Infrastructure.csproj" />
+    <ProjectReference Include="..\CashflowSimulator.Validation\CashflowSimulator.Validation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

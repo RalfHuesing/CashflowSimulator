@@ -42,7 +42,7 @@
                        Margin="{StaticResource FormLabelMargin}"/>
             <NumericUpDown Grid.Row="2" Grid.Column="1"
                            Value="{Binding RetirementAge}"
-                           Minimum="50" Maximum="75" Increment="1"
+                           Increment="1"
                            Margin="{StaticResource FormInputMargin}"
                            HorizontalAlignment="Left" MinWidth="120"/>
 
@@ -51,7 +51,7 @@
                        Margin="{StaticResource FormLabelMargin}"/>
             <NumericUpDown Grid.Row="3" Grid.Column="1"
                            Value="{Binding LifeExpectancy}"
-                           Minimum="60" Maximum="120" Increment="1"
+                           Increment="1"
                            Margin="{StaticResource FormInputMargin}"
                            HorizontalAlignment="Left" MinWidth="120"/>
 
@@ -60,7 +60,7 @@
                        Margin="{StaticResource FormLabelMarginLast}"/>
             <NumericUpDown Grid.Row="4" Grid.Column="1"
                            Value="{Binding InitialLiquidCash}"
-                           Minimum="0" Increment="1000"
+                           Increment="1000"
                            Margin="{StaticResource FormInputMarginLast}"
                            HorizontalAlignment="Left" MinWidth="160"/>
 

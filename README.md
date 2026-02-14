@@ -56,6 +56,10 @@ Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter i
 
 Ein **Szenario** ist die vollständige Sammlung aller Eingaben für eine Planungsvariante (Person, Cashflows, Portfolio, Strategie, Optionen). Es können beliebig viele Szenarien angelegt werden; jedes wird typischerweise als eine Projektdatei (z.B. `Szenario.json`) gespeichert.
 
+## Validierung
+
+Validierung läuft zentral über **FluentValidation** im Projekt **CashflowSimulator.Validation**. Desktop und Engine nutzen dieselben Regeln; Fehler werden in der Desktop-App im zentralen Meldungsbereich der Shell angezeigt. Keine Validierung im XAML. Details in **`.cursor/rules/main.md`**.
+
 ---
 
 Technische Architektur, Datenmodell (`SimulationProjectDto`) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.

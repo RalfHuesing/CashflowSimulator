@@ -1,5 +1,7 @@
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Services;
+using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -9,6 +11,7 @@ namespace CashflowSimulator.Desktop.Features.Eckdaten;
 /// ViewModel für die Eckdaten-Seite (Simulationsparameter).
 /// UI zeigt menschliche Eingaben (Geburtsdatum, Rentenalter, Lebenserwartung);
 /// Transformation in <see cref="SimulationParametersDto"/> für die Engine erfolgt hier.
+/// Validierung ausschließlich über <see cref="ValidationRunner"/>; Fehler im zentralen Meldungsbereich.
 /// </summary>
 public partial class EckdatenViewModel : ObservableObject
 {
@@ -26,10 +29,12 @@ public partial class EckdatenViewModel : ObservableObject
     private decimal _initialLiquidCash;
 
     private readonly ICurrentProjectService _currentProjectService;
+    private readonly IValidationMessageService _validationMessageService;
 
-    public EckdatenViewModel(ICurrentProjectService currentProjectService)
+    public EckdatenViewModel(ICurrentProjectService currentProjectService, IValidationMessageService validationMessageService)
     {
         _currentProjectService = currentProjectService;
+        _validationMessageService = validationMessageService;
         LoadFromProject();
     }
 
@@ -70,7 +75,10 @@ public partial class EckdatenViewModel : ObservableObject
     private void Apply()
     {
         if (!BirthDate.HasValue)
+        {
+            _validationMessageService.SetErrors("Eckdaten", [new Contracts.Common.ValidationError("DateOfBirth", "Geburtsdatum muss angegeben werden.")]);
             return;
+        }
 
         var dob = DateOnly.FromDateTime(BirthDate.Value.Date);
         var simulationStart = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -79,7 +87,7 @@ public partial class EckdatenViewModel : ObservableObject
         var retirementDate = FirstOfMonthWhenAge(dob, retirementYears);
         var simulationEnd = FirstOfMonthWhenAge(dob, lifeYears);
 
-        _currentProjectService.UpdateParameters(new SimulationParametersDto
+        var dto = new SimulationParametersDto
         {
             SimulationStart = simulationStart,
             SimulationEnd = simulationEnd,
@@ -87,7 +95,17 @@ public partial class EckdatenViewModel : ObservableObject
             RetirementDate = retirementDate,
             InitialLiquidCash = InitialLiquidCash,
             CurrencyCode = "EUR"
-        });
+        };
+
+        var validationResult = ValidationRunner.Validate(dto);
+        if (!validationResult.IsValid)
+        {
+            _validationMessageService.SetErrors("Eckdaten", validationResult.Errors);
+            return;
+        }
+
+        _validationMessageService.ClearSource("Eckdaten");
+        _currentProjectService.UpdateParameters(dto);
     }
 
     private static DateOnly FirstOfMonthWhenAge(DateOnly dateOfBirth, int age)
