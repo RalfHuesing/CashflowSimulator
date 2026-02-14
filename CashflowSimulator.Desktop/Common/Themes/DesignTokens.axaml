@@ -26,6 +26,8 @@
 
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
         <Thickness x:Key="PagePadding">24</Thickness>
+        <!-- Abstand des Feature-Inhalts zum Rand/Splitter (links/rechts gleich) -->
+        <Thickness x:Key="ContentPadding">24,0,24,0</Thickness>
         <Thickness x:Key="SidebarLogoMargin">0,0,0,40</Thickness>
         <Thickness x:Key="ContentHeaderMargin">0,0,0,24</Thickness>
         <Thickness x:Key="HeaderIconMargin">0,0,16,0</Thickness>

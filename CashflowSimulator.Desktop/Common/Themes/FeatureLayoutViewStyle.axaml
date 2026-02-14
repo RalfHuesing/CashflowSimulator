@@ -15,7 +15,17 @@
                         <ColumnDefinition Width="400" MinWidth="280"/>
                     </Grid.ColumnDefinitions>
                     <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                        <Border Padding="{StaticResource ContentPadding}">
+                            <StackPanel>
+                                <StackPanel Spacing="{StaticResource SpacingSmallValue}"
+                                            Margin="{StaticResource FormHeaderBlockMargin}"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Text="{TemplateBinding Title}" Classes="feature-page-title"/>
+                                    <TextBlock Text="{TemplateBinding Description}" Classes="feature-page-description"/>
+                                </StackPanel>
+                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            </StackPanel>
+                        </Border>
                     </ScrollViewer>
                     <GridSplitter Grid.Column="1"
                                   Width="4"

@@ -9,18 +9,9 @@
              x:Class="CashflowSimulator.Desktop.Features.Eckdaten.EckdatenView"
              x:DataType="vm:EckdatenViewModel">
 
-    <controls:FeatureLayoutView>
-        <StackPanel Margin="{StaticResource SpacingLarge}">
-            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
-                        Margin="{StaticResource FormHeaderBlockMargin}"
-                        HorizontalAlignment="Left">
-                <TextBlock Text="Eckdaten"
-                           Classes="feature-page-title"/>
-                <TextBlock Text="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation."
-                           Classes="feature-page-description"/>
-            </StackPanel>
-
-            <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+    <controls:FeatureLayoutView Title="Eckdaten"
+                               Description="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation.">
+        <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
                   VerticalAlignment="Top" HorizontalAlignment="Stretch">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
                            Classes="form-label"
@@ -76,7 +67,6 @@
                               TabIndex="4"
                               behaviors:FocusHelpBehavior.HelpKey="InitialLiquidCash"
                               behaviors:FocusHelpBehavior.ErrorPropertyName="InitialLiquidCash"/>
-            </Grid>
-        </StackPanel>
+        </Grid>
     </controls:FeatureLayoutView>
 </UserControl>

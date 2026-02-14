@@ -1,15 +1,34 @@
+using Avalonia;
 using Avalonia.Controls;
 
 namespace CashflowSimulator.Desktop.Common.Controls;
 
 /// <summary>
-/// Rahmen für Feature-Seiten: Content-Bereich links, GridSplitter, InfoPanel rechts (Fehler + Hilfetext).
-/// Erbt von ContentControl; das Layout (Grid + InfoPanel) kommt aus dem Style-Template in Default.axaml.
-/// So wird der XAML-Kind-Inhalt nur im ContentPresenter angezeigt und ersetzt nicht das gesamte Layout.
+/// Rahmen für Feature-Seiten: Content-Bereich links (mit Title/Description-Header), GridSplitter, InfoPanel rechts (Fehler + Hilfetext).
+/// Erbt von ContentControl; das Layout kommt aus dem Style-Template in FeatureLayoutViewStyle.axaml.
+/// Title und Description werden zentral im Template gerendert; Content ist nur der Body (z. B. Formular-Grid).
 /// DataContext ist das Feature-ViewModel (z. B. ValidatingViewModelBase).
 /// </summary>
 public partial class FeatureLayoutView : ContentControl
 {
+    public static readonly StyledProperty<string?> TitleProperty =
+        AvaloniaProperty.Register<FeatureLayoutView, string?>(nameof(Title));
+
+    public static readonly StyledProperty<string?> DescriptionProperty =
+        AvaloniaProperty.Register<FeatureLayoutView, string?>(nameof(Description));
+
+    public string? Title
+    {
+        get => GetValue(TitleProperty);
+        set => SetValue(TitleProperty, value);
+    }
+
+    public string? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
     public FeatureLayoutView()
     {
         InitializeComponent();

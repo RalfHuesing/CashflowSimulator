@@ -9,18 +9,9 @@
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
              x:DataType="vm:MetaEditViewModel">
 
-    <controls:FeatureLayoutView>
-        <StackPanel Margin="{StaticResource SpacingLarge}">
-            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
-                        Margin="{StaticResource FormHeaderBlockMargin}"
-                        HorizontalAlignment="Left">
-                <TextBlock Text="Szenario-Einstellungen"
-                           Classes="feature-page-title"/>
-                <TextBlock Text="Hier können Metadaten des aktuellen Szenarios bearbeitet werden."
-                           Classes="feature-page-description"/>
-            </StackPanel>
-
-            <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto"
+    <controls:FeatureLayoutView Title="Szenario-Einstellungen"
+                               Description="Hier können Metadaten des aktuellen Szenarios bearbeitet werden.">
+        <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto"
                   VerticalAlignment="Top" HorizontalAlignment="Stretch">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
                            Classes="form-label"
@@ -40,7 +31,6 @@
                            Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
                            Foreground="{StaticResource TextSecondaryBrush}"
                            Opacity="0.8" VerticalAlignment="Center"/>
-            </Grid>
-        </StackPanel>
+        </Grid>
     </controls:FeatureLayoutView>
 </UserControl>
