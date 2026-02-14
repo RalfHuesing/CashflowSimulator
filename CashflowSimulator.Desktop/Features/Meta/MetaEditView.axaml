@@ -7,31 +7,38 @@
              x:Class="CashflowSimulator.Desktop.Features.Meta.MetaEditView"
              x:DataType="vm:MetaEditViewModel">
 
-    <StackPanel Spacing="{StaticResource SpacingMediumValue}"
-                Margin="{StaticResource SpacingLarge}">
-        <TextBlock Text="Szenario-Einstellungen"
-                   Classes="feature-page-title"
-                   Foreground="{StaticResource TextPrimaryBrush}"/>
-        <TextBlock Text="Hier können Metadaten des aktuellen Szenarios bearbeitet werden."
-                   Classes="feature-page-description"
-                   Foreground="{StaticResource TextSecondaryBrush}"/>
+    <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}" Margin="0,0,0,20">
+            <TextBlock Text="Szenario-Einstellungen"
+                       Classes="feature-page-title"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Hier können Metadaten des aktuellen Szenarios bearbeitet werden."
+                       Classes="feature-page-description"
+                       Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
 
-        <StackPanel Spacing="20" MaxWidth="600" HorizontalAlignment="Left">
-            <StackPanel Spacing="5">
-                <TextBlock Text="Szenario Name" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                <TextBox Text="{Binding ScenarioName}" Watermark="Name eingeben..." />
-            </StackPanel>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto"
+              MaxWidth="600" VerticalAlignment="Top">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
+                       FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
+                       VerticalAlignment="Center" Margin="0,0,16,12"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ScenarioName}"
+                     Watermark="Name eingeben..." Margin="0,0,0,12"/>
 
-            <StackPanel Spacing="5">
-                <TextBlock Text="Erstellt am" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           Opacity="0.8"/>
-            </StackPanel>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Erstellt am"
+                       FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
+                       VerticalAlignment="Center" Margin="0,0,16,0"/>
+            <TextBlock Grid.Row="1" Grid.Column="1"
+                       Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Opacity="0.8" VerticalAlignment="Center"/>
+        </Grid>
 
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Orientation="Horizontal" Spacing="12" Margin="0,24,0,0">
             <Button Command="{Binding ApplyCommand}"
                     Content="Übernehmen"
                     Classes="accent" />
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </UserControl>
