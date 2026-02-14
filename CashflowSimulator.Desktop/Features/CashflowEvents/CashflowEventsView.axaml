@@ -56,7 +56,7 @@
                 <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
                                Value="{Binding EarliestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMargin}"
-                               Minimum="-120" Maximum="0" AllowSpin="True"
+                               AllowSpin="True"
                                behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"
                                behaviors:FocusHelpBehavior.ErrorPropertyName="EarliestMonthOffset"/>
 
@@ -65,7 +65,7 @@
                 <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
                                Value="{Binding LatestMonthOffset}" Increment="1"
                                Margin="{StaticResource FormInputMarginLast}"
-                               Minimum="0" Maximum="120" AllowSpin="True"
+                               AllowSpin="True"
                                behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
                                behaviors:FocusHelpBehavior.ErrorPropertyName="LatestMonthOffset"/>
             </Grid>
