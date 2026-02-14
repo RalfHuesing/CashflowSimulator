@@ -13,6 +13,16 @@ public partial class MainWindow : Window
     private readonly AvaloniaFileDialogService _fileDialogService;
     private readonly IThemeService _themeService;
     private readonly ICurrentProjectService _currentProjectService;
+/// <summary>
+    /// Parameterloser Konstruktor für den Avalonia XAML-Loader / Previewer.
+    /// Behebt Warnung AVLN3001. Wird zur Laufzeit NICHT verwendet (da DI genutzt wird).
+    /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+#pragma warning restore CS8618
 
     public MainWindow(
         MainShellViewModel mainShellViewModel,
