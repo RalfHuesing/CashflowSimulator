@@ -38,6 +38,7 @@
     <!-- Fluent-Theme fest; App-Styles aus Common/Themes (Design-Tokens zuerst, dann Komponenten-Styles). -->
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="/Common/Themes/DesignTokens.axaml" />
         <StyleInclude Source="/Common/Themes/ButtonStyles.axaml" />
         <StyleInclude Source="/Common/Themes/TypographyStyles.axaml" />

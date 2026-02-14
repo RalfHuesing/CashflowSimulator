@@ -11,64 +11,68 @@
 
     <controls:FeatureLayoutView Title="{Binding Title}"
                                Description="Geplante einmalige Einnahmen und Ausgaben mit optionalem Toleranzbereich.">
-        <Grid RowDefinitions="Auto, 8, Auto, 20, *" ColumnDefinitions="*" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
-                <Button Content="Neu" Command="{Binding NewCommand}" Classes="primary"/>
-                <Button Content="Speichern" Command="{Binding SaveCommand}"/>
-                <Button Content="Löschen" Command="{Binding DeleteCommand}"/>
+        <Grid RowDefinitions="*, Auto" ColumnDefinitions="*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <DataGrid Grid.Row="0" ItemsSource="{Binding Items}"
+                      SelectedItem="{Binding SelectedItem}"
+                      IsReadOnly="True"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Betrag" Width="100" Binding="{Binding Amount}"/>
+                    <DataGridTextColumn Header="Zieldatum" Width="120" Binding="{Binding TargetDate}"/>
+                    <DataGridTextColumn Header="Frühestens" Width="90" Binding="{Binding EarliestMonthOffset}"/>
+                    <DataGridTextColumn Header="Spätestens" Width="90" Binding="{Binding LatestMonthOffset}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Grid.Row="1" MinHeight="240" Spacing="12" Margin="0,12,0,0">
+                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
+                             Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
+                             behaviors:FocusHelpBehavior.HelpKey="Name"
+                             behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Betrag"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
+                                   Value="{Binding Amount}" Increment="100"
+                                   Margin="{StaticResource FormInputMargin}"
+                                   behaviors:FocusHelpBehavior.HelpKey="Amount"
+                                   behaviors:FocusHelpBehavior.ErrorPropertyName="Amount"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Zieldatum"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <DatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
+                                SelectedDate="{Binding TargetDate}"
+                                Margin="{StaticResource FormInputMargin}"
+                                behaviors:FocusHelpBehavior.HelpKey="TargetDate"
+                                behaviors:FocusHelpBehavior.ErrorPropertyName="TargetDate"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Frühestens (Monate vom Zieldatum)"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
+                                   Value="{Binding EarliestMonthOffset}" Increment="1"
+                                   Margin="{StaticResource FormInputMargin}"
+                                   AllowSpin="True"
+                                   behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"
+                                   behaviors:FocusHelpBehavior.ErrorPropertyName="EarliestMonthOffset"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Spätestens (Monate vom Zieldatum)"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
+                                   Value="{Binding LatestMonthOffset}" Increment="1"
+                                   Margin="{StaticResource FormInputMarginLast}"
+                                   AllowSpin="True"
+                                   behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
+                                   behaviors:FocusHelpBehavior.ErrorPropertyName="LatestMonthOffset"/>
+                </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                    <Button Content="Neu" Command="{Binding NewCommand}" Classes="primary"/>
+                    <Button Content="Speichern" Command="{Binding SaveCommand}"/>
+                    <Button Content="Löschen" Command="{Binding DeleteCommand}"/>
+                </StackPanel>
             </StackPanel>
-            <ListBox Grid.Row="2" ItemsSource="{Binding Items}"
-                     SelectedItem="{Binding SelectedItem}"
-                     MinHeight="120" MaxHeight="200">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <Grid Grid.Row="4" ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-                  VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
-                           Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
-                         Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
-                         behaviors:FocusHelpBehavior.HelpKey="Name"
-                         behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
-
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Betrag"
-                           Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
-                               Value="{Binding Amount}" Increment="100"
-                               Margin="{StaticResource FormInputMargin}"
-                               behaviors:FocusHelpBehavior.HelpKey="Amount"
-                               behaviors:FocusHelpBehavior.ErrorPropertyName="Amount"/>
-
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Zieldatum"
-                           Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                <DatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
-                            SelectedDate="{Binding TargetDate}"
-                            Margin="{StaticResource FormInputMargin}"
-                            behaviors:FocusHelpBehavior.HelpKey="TargetDate"
-                            behaviors:FocusHelpBehavior.ErrorPropertyName="TargetDate"/>
-
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Frühestens (Monate vom Zieldatum)"
-                           Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
-                               Value="{Binding EarliestMonthOffset}" Increment="1"
-                               Margin="{StaticResource FormInputMargin}"
-                               AllowSpin="True"
-                               behaviors:FocusHelpBehavior.HelpKey="EarliestMonthOffset"
-                               behaviors:FocusHelpBehavior.ErrorPropertyName="EarliestMonthOffset"/>
-
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Spätestens (Monate vom Zieldatum)"
-                           Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
-                               Value="{Binding LatestMonthOffset}" Increment="1"
-                               Margin="{StaticResource FormInputMarginLast}"
-                               AllowSpin="True"
-                               behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
-                               behaviors:FocusHelpBehavior.ErrorPropertyName="LatestMonthOffset"/>
-            </Grid>
         </Grid>
     </controls:FeatureLayoutView>
 </UserControl>
