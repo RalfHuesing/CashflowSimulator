@@ -70,6 +70,25 @@
         <Thickness x:Key="FormActionsMargin">0,24,0,0</Thickness>
         <sys:Double x:Key="FormActionsSpacing">12</sys:Double>
         <sys:Double x:Key="FormMaxWidth">600</sys:Double>
+
+        <!-- Status Bar & Error Tray (zentrale Definition) -->
+        <Color x:Key="ErrorTrayBackgroundColor">#FEE2E2</Color>
+        <Color x:Key="ErrorTrayTextColor">#991B1B</Color>
+        <Color x:Key="StatusBarOkBackgroundColor">#E5E7EB</Color>
+        <Color x:Key="StatusBarOkTextColor">#6B7280</Color>
+        <Color x:Key="StatusBarErrorBackgroundColor">#FEE2E2</Color>
+        <Color x:Key="StatusBarErrorTextColor">#991B1B</Color>
+        <SolidColorBrush x:Key="ErrorTrayBackgroundBrush" Color="{StaticResource ErrorTrayBackgroundColor}" />
+        <SolidColorBrush x:Key="ErrorTrayTextBrush" Color="{StaticResource ErrorTrayTextColor}" />
+        <SolidColorBrush x:Key="StatusBarOkBackgroundBrush" Color="{StaticResource StatusBarOkBackgroundColor}" />
+        <SolidColorBrush x:Key="StatusBarOkTextBrush" Color="{StaticResource StatusBarOkTextColor}" />
+        <SolidColorBrush x:Key="StatusBarErrorBackgroundBrush" Color="{StaticResource StatusBarErrorBackgroundColor}" />
+        <SolidColorBrush x:Key="StatusBarErrorTextBrush" Color="{StaticResource StatusBarErrorTextColor}" />
+        <sys:Double x:Key="StatusBarHeight">36</sys:Double>
+        <sys:Double x:Key="ErrorTrayMaxHeight">150</sys:Double>
+        <Thickness x:Key="StatusBarPadding">12,0</Thickness>
+        <Thickness x:Key="ErrorTrayPadding">12,8</Thickness>
+        <Thickness x:Key="ErrorTrayItemSpacing">0,4</Thickness>
     </Styles.Resources>
 
     <Style Selector="Button.primary">
@@ -256,6 +275,50 @@
     <Style Selector="TextBox.form-input:focus /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{StaticResource TextPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <!-- Status Bar: immer sichtbare Leiste unten -->
+    <Style Selector="Border.status-bar">
+        <Setter Property="Height" Value="{StaticResource StatusBarHeight}"/>
+        <Setter Property="Padding" Value="{StaticResource StatusBarPadding}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{StaticResource StatusBarOkBackgroundBrush}"/>
+    </Style>
+    <Style Selector="Border.status-bar-error">
+        <Setter Property="Height" Value="{StaticResource StatusBarHeight}"/>
+        <Setter Property="Padding" Value="{StaticResource StatusBarPadding}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{StaticResource StatusBarErrorBackgroundBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.status-bar-text">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{StaticResource StatusBarOkTextBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.status-bar-text-error">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{StaticResource StatusBarErrorTextBrush}"/>
+    </Style>
+
+    <!-- Error Tray: scrollbare Fehlerliste oberhalb der Statusleiste -->
+    <Style Selector="Border.error-tray">
+        <Setter Property="Background" Value="{StaticResource ErrorTrayBackgroundBrush}"/>
+        <Setter Property="Padding" Value="{StaticResource ErrorTrayPadding}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorTrayTextBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.error-tray-item">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorTrayTextBrush}"/>
+        <Setter Property="Margin" Value="{StaticResource ErrorTrayItemSpacing}"/>
+    </Style>
+    <Style Selector="TextBlock.error-tray-caption">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorTrayTextBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
     </Style>
 
 </Styles>

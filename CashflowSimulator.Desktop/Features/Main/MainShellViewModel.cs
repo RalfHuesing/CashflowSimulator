@@ -60,7 +60,7 @@ public partial class MainShellViewModel : ObservableObject
 
         _currentProjectService.ProjectChanged += OnProjectChanged;
         _themeService.ThemeApplied += OnThemeApplied;
-        _validationMessageService.Messages.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasValidationMessages));
+        _validationMessageService.Messages.CollectionChanged += (_, _) => OnValidationMessagesChanged(null, EventArgs.Empty);
         InitializeNavigation();
         // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
         SaveCommand.NotifyCanExecuteChanged();
@@ -95,10 +95,25 @@ public partial class MainShellViewModel : ObservableObject
     /// </summary>
     public bool HasValidationMessages => _validationMessageService.Messages.Count > 0;
 
+    /// <summary>
+    /// Text für die Statusleiste: bei Fehlern "{n} Fehler gefunden", sonst "Bereit" oder aktueller Dateipfad.
+    /// </summary>
+    public string StatusText => StatusBarTextProvider.GetStatusText(
+        HasValidationMessages,
+        _validationMessageService.Messages.Count,
+        CurrentFilePath);
+
+    private void OnValidationMessagesChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(HasValidationMessages));
+        OnPropertyChanged(nameof(StatusText));
+    }
+
     private void OnProjectChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(CurrentProjectTitle));
         OnPropertyChanged(nameof(CurrentFilePath));
+        OnPropertyChanged(nameof(StatusText));
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
         OpenEckdatenCommand.NotifyCanExecuteChanged();

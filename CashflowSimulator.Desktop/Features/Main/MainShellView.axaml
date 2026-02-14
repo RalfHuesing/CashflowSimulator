@@ -50,7 +50,7 @@
         <Border Grid.Column="1" 
                 Background="{DynamicResource ContentBackgroundBrush}"
                 Padding="{DynamicResource PagePadding}">
-            <Grid RowDefinitions="*, Auto">
+            <Grid RowDefinitions="*, Auto, 36">
                 <Border Grid.Row="0" Classes="card">
                     <Grid>
                         <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
@@ -72,23 +72,30 @@
                                          VerticalContentAlignment="Stretch"/>
                     </Grid>
                 </Border>
-                <Border Grid.Row="1" IsVisible="{Binding HasValidationMessages}"
-                        Background="{StaticResource BsDangerBrush}" Opacity="0.12"
-                        Padding="{StaticResource FormInputMargin}" Margin="0,12,0,0"
-                        CornerRadius="{StaticResource ControlCornerRadius}">
-                    <StackPanel Spacing="{StaticResource SpacingSmallValue}">
-                        <TextBlock Text="Validierungsfehler" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <ItemsControl ItemsSource="{Binding ValidationMessages}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimaryBrush}" FontSize="13"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                <Border Grid.Row="1" Classes="error-tray"
+                        IsVisible="{Binding HasValidationMessages}">
+                    <ScrollViewer MaxHeight="{StaticResource ErrorTrayMaxHeight}"
+                                  VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="{StaticResource SpacingSmallValue}">
+                            <TextBlock Text="Validierungsfehler" Classes="error-tray-caption"/>
+                            <ItemsControl ItemsSource="{Binding ValidationMessages}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayText}" Classes="error-tray-item"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Border>
+                <Grid Grid.Row="2">
+                    <Border Classes="status-bar" IsVisible="{Binding !HasValidationMessages}">
+                        <TextBlock Text="{Binding StatusText}" Classes="status-bar-text"/>
+                    </Border>
+                    <Border Classes="status-bar-error" IsVisible="{Binding HasValidationMessages}">
+                        <TextBlock Text="{Binding StatusText}" Classes="status-bar-text-error"/>
+                    </Border>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
