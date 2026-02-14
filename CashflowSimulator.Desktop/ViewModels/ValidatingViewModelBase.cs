@@ -9,9 +9,9 @@ namespace CashflowSimulator.Desktop.ViewModels;
 /// <summary>
 /// Basis für Edit-ViewModels mit Avalonia-Standard-Validierung (INotifyDataErrorInfo).
 /// Fehler werden ausschließlich von außen gesetzt (z. B. aus FluentValidation); keine DataAnnotations.
-/// Unterstützt Property-Mapping (DTO → VM), Objekt-Fehler (FormLevelErrors), Help-Panel und Statusleiste.
+/// Unterstützt Property-Mapping (DTO → VM), Objekt-Fehler (FormLevelErrors) und Help-Panel.
 /// </summary>
-public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErrorInfo, IStatusBarContentProvider
+public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErrorInfo
 {
     /// <summary>
     /// Synthetische Property für Fehler ohne Property (z. B. RuleFor(x => x) in FluentValidation).
@@ -95,9 +95,6 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     /// </summary>
     public bool HasActiveHelpErrors => ActiveHelpErrors.Count > 0;
 
-    /// <inheritdoc />
-    public string StatusBarText => BuildStatusBarText();
-
     /// <summary>
     /// Für Bindung in der View: Objekt-Fehler (kein einzelnes Feld zugeordnet).
     /// </summary>
@@ -152,7 +149,6 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
         OnPropertyChanged(nameof(FormLevelErrors));
         OnPropertyChanged(nameof(HasFormLevelErrors));
         OnPropertyChanged(nameof(HasErrors));
-        OnPropertyChanged(nameof(StatusBarText));
         OnPropertyChanged(nameof(ActiveHelpErrors));
         OnPropertyChanged(nameof(HasActiveHelpErrors));
     }
@@ -172,7 +168,6 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
         OnPropertyChanged(nameof(FormLevelErrors));
         OnPropertyChanged(nameof(HasFormLevelErrors));
         OnPropertyChanged(nameof(HasErrors));
-        OnPropertyChanged(nameof(StatusBarText));
         OnPropertyChanged(nameof(ActiveHelpErrors));
         OnPropertyChanged(nameof(HasActiveHelpErrors));
     }
@@ -207,18 +202,6 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
             ActiveHelpTitle = null;
             ActiveHelpDescription = null;
         }
-        OnPropertyChanged(nameof(StatusBarText));
-    }
-
-    private string BuildStatusBarText()
-    {
-        var focusPart = string.IsNullOrEmpty(ActiveHelpKey)
-            ? "—"
-            : (_helpProvider != null && _helpProvider.TryGetHelp(ActiveHelpKey, out var title, out _) ? title : ActiveHelpKey);
-        var validationPart = HasErrors
-            ? $"{_errors.Values.Sum(l => l.Count)} Fehler"
-            : "OK";
-        return $"Fokus: {focusPart} | Validierung: {validationPart}";
     }
 
     private void OnErrorsChanged(string propertyName)

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Avalonia.Threading;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
@@ -71,15 +70,8 @@ public partial class MainShellViewModel : ObservableObject
         get => _currentContentViewModel;
         set
         {
-            if (_currentContentViewModel is INotifyPropertyChanged oldNpc)
-                oldNpc.PropertyChanged -= OnContentPropertyChanged;
             if (SetProperty(ref _currentContentViewModel, value))
-            {
-                if (value is INotifyPropertyChanged newNpc)
-                    newNpc.PropertyChanged += OnContentPropertyChanged;
                 OnPropertyChanged(nameof(IsContentPlaceholderVisible));
-                OnPropertyChanged(nameof(StatusBarDisplayText));
-            }
         }
     }
 
@@ -98,30 +90,10 @@ public partial class MainShellViewModel : ObservableObject
     /// </summary>
     public bool IsContentPlaceholderVisible => CurrentContentViewModel is null;
 
-    /// <summary>
-    /// Text für die Statusleiste: bei IStatusBarContentProvider "Bereit/Pfad | Fokus | Validierung", sonst nur Bereit/Pfad.
-    /// </summary>
-    public string StatusBarDisplayText => BuildStatusBarDisplayText();
-
-    private void OnContentPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(IStatusBarContentProvider.StatusBarText))
-            OnPropertyChanged(nameof(StatusBarDisplayText));
-    }
-
-    private string BuildStatusBarDisplayText()
-    {
-        var prefix = string.IsNullOrWhiteSpace(CurrentFilePath) ? "Bereit" : CurrentFilePath;
-        if (CurrentContentViewModel is IStatusBarContentProvider provider)
-            return $"{prefix} | {provider.StatusBarText}";
-        return prefix;
-    }
-
     private void OnProjectChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(CurrentProjectTitle));
         OnPropertyChanged(nameof(CurrentFilePath));
-        OnPropertyChanged(nameof(StatusBarDisplayText));
         SaveCommand.NotifyCanExecuteChanged();
         OpenSzenarioCommand.NotifyCanExecuteChanged();
         OpenEckdatenCommand.NotifyCanExecuteChanged();

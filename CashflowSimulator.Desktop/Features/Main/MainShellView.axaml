@@ -50,29 +50,24 @@
         <Border Grid.Column="1" 
                 Background="{DynamicResource ContentBackgroundBrush}"
                 Padding="{DynamicResource PagePadding}">
-            <Grid RowDefinitions="*, 36">
-                <Grid Grid.Row="0">
-                    <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
-                                Spacing="{StaticResource SpacingMediumValue}"
-                                VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fi:SymbolIcon Symbol="ArrowTrendingLines"
-                                       FontSize="{StaticResource PlaceholderIconSize}"
-                                       Foreground="{DynamicResource PlaceholderIconBrush}"/>
-                        <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
-                                   Classes="placeholder-secondary"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <ContentControl Content="{Binding CurrentContentViewModel}"
-                                    IsVisible="{Binding !IsContentPlaceholderVisible}"
-                                    HorizontalContentAlignment="Stretch"
-                                    VerticalContentAlignment="Stretch"/>
-                </Grid>
-                <Border Grid.Row="1" Classes="status-bar">
-                    <TextBlock Text="{Binding StatusBarDisplayText}" Classes="status-bar-text"/>
-                </Border>
+            <Grid>
+                <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
+                            Spacing="{StaticResource SpacingMediumValue}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <fi:SymbolIcon Symbol="ArrowTrendingLines"
+                                   FontSize="{StaticResource PlaceholderIconSize}"
+                                   Foreground="{DynamicResource PlaceholderIconBrush}"/>
+                    <TextBlock Text="Wählen Sie eine Aktion aus der Navigation." 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentFilePath, StringFormat='Datei: {0}', TargetNullValue='(Ungespeichert)'}"
+                               Classes="placeholder-secondary"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+                <ContentControl Content="{Binding CurrentContentViewModel}"
+                                IsVisible="{Binding !IsContentPlaceholderVisible}"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"/>
             </Grid>
         </Border>
     </Grid>
