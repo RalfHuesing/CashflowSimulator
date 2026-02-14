@@ -7,8 +7,17 @@
         <Color x:Key="ContentBackgroundColor">#F3F4F6</Color>
         <Color x:Key="SurfaceColor">#FFFFFF</Color>
         
-        <Color x:Key="PrimaryActionColor">#10B981</Color>
-        <Color x:Key="PrimaryActionHoverColor">#059669</Color>
+        <!-- Bootstrap-style button colors -->
+        <Color x:Key="BsPrimaryColor">#0d6efd</Color>
+        <Color x:Key="BsPrimaryHoverColor">#0b5ed7</Color>
+        <Color x:Key="BsSecondaryColor">#6c757d</Color>
+        <Color x:Key="BsSecondaryHoverColor">#5c636a</Color>
+        <Color x:Key="BsSuccessColor">#198754</Color>
+        <Color x:Key="BsSuccessHoverColor">#157347</Color>
+        <Color x:Key="BsDangerColor">#dc3545</Color>
+        <Color x:Key="BsDangerHoverColor">#bb2d3b</Color>
+        <Color x:Key="PrimaryActionColor">#0d6efd</Color>
+        <Color x:Key="PrimaryActionHoverColor">#0b5ed7</Color>
         <Color x:Key="TextPrimaryColor">#111827</Color>
         <Color x:Key="TextSecondaryColor">#6B7280</Color>
         <Color x:Key="TextOnDarkColor">#F9FAFB</Color>
@@ -17,6 +26,14 @@
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
         <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="BsPrimaryBrush" Color="{StaticResource BsPrimaryColor}" />
+        <SolidColorBrush x:Key="BsPrimaryHoverBrush" Color="{StaticResource BsPrimaryHoverColor}" />
+        <SolidColorBrush x:Key="BsSecondaryBrush" Color="{StaticResource BsSecondaryColor}" />
+        <SolidColorBrush x:Key="BsSecondaryHoverBrush" Color="{StaticResource BsSecondaryHoverColor}" />
+        <SolidColorBrush x:Key="BsSuccessBrush" Color="{StaticResource BsSuccessColor}" />
+        <SolidColorBrush x:Key="BsSuccessHoverBrush" Color="{StaticResource BsSuccessHoverColor}" />
+        <SolidColorBrush x:Key="BsDangerBrush" Color="{StaticResource BsDangerColor}" />
+        <SolidColorBrush x:Key="BsDangerHoverBrush" Color="{StaticResource BsDangerHoverColor}" />
         <SolidColorBrush x:Key="PrimaryActionBrush" Color="{StaticResource PrimaryActionColor}" />
         <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="{StaticResource PrimaryActionHoverColor}" />
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
@@ -24,7 +41,7 @@
         <SolidColorBrush x:Key="TextOnDarkBrush" Color="{StaticResource TextOnDarkColor}" />
         <SolidColorBrush x:Key="PlaceholderIconBrush" Color="{StaticResource PlaceholderIconColor}" />
 
-        <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
+        <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
         <Thickness x:Key="PagePadding">24</Thickness>
         <Thickness x:Key="SidebarLogoMargin">0,0,0,40</Thickness>
         <Thickness x:Key="ContentHeaderMargin">0,0,0,24</Thickness>
@@ -84,9 +101,59 @@
         </Style>
     </Style>
 
+    <!-- Bootstrap-style button templates (bs-primary, bs-secondary, bs-success, bs-danger) -->
+    <Style Selector="Button.bs-primary">
+        <Setter Property="Background" Value="{StaticResource BsPrimaryBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BsPrimaryHoverBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+    <Style Selector="Button.bs-secondary">
+        <Setter Property="Background" Value="{StaticResource BsSecondaryBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BsSecondaryHoverBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+    <Style Selector="Button.bs-success">
+        <Setter Property="Background" Value="{StaticResource BsSuccessBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BsSuccessHoverBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+    <Style Selector="Button.bs-danger">
+        <Setter Property="Background" Value="{StaticResource BsDangerBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BsDangerHoverBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Style>
+
     <Style Selector="Border.card">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="2" />
         <Setter Property="BoxShadow" Value="0 4 6 0 #1A000000" /> 
         <Setter Property="Padding" Value="24" />
         <Setter Property="Margin" Value="0,0,0,0" />
@@ -139,7 +206,7 @@
 
     <Style Selector="Border.header-icon">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="2"/>
         <Setter Property="BoxShadow" Value="0 2 4 0 #10000000"/>
         <Setter Property="Width" Value="48"/>
         <Setter Property="Height" Value="48"/>

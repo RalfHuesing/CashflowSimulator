@@ -27,7 +27,18 @@ public partial class MetaEditViewModel : ObservableObject
         }
     }
 
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private set; }
+
+    [RelayCommand]
+    private void Discard()
+    {
+        var meta = _currentProjectService.Current?.Meta;
+        if (meta is not null)
+        {
+            ScenarioName = meta.ScenarioName;
+            CreatedAt = meta.CreatedAt;
+        }
+    }
 
     [RelayCommand]
     private void Apply()

@@ -8,7 +8,8 @@
              x:DataType="vm:MetaEditViewModel">
 
     <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
-        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}" Margin="0,0,0,20">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}" Margin="0,0,0,20"
+                    HorizontalAlignment="Left">
             <TextBlock Text="Szenario-Einstellungen"
                        Classes="feature-page-title"
                        Foreground="{StaticResource TextPrimaryBrush}"/>
@@ -18,7 +19,7 @@
         </StackPanel>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto"
-              MaxWidth="600" VerticalAlignment="Top">
+              MaxWidth="600" VerticalAlignment="Top" HorizontalAlignment="Left">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
                        FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
                        VerticalAlignment="Center" Margin="0,0,16,12"/>
@@ -36,9 +37,12 @@
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Orientation="Horizontal" Spacing="12" Margin="0,24,0,0">
+            <Button Command="{Binding DiscardCommand}"
+                    Content="Verwerfen"
+                    Classes="bs-secondary" />
             <Button Command="{Binding ApplyCommand}"
                     Content="Übernehmen"
-                    Classes="accent" />
+                    Classes="bs-primary" />
         </StackPanel>
     </Grid>
 </UserControl>
