@@ -8,7 +8,8 @@
              x:DataType="vm:MetaEditViewModel">
 
     <Grid RowDefinitions="Auto, Auto, *" Margin="{StaticResource SpacingLarge}">
-        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}" Margin="0,0,0,20"
+        <StackPanel Grid.Row="0" Spacing="{StaticResource SpacingSmallValue}"
+                    Margin="{StaticResource FormHeaderBlockMargin}"
                     HorizontalAlignment="Left">
             <TextBlock Text="Szenario-Einstellungen"
                        Classes="feature-page-title"
@@ -19,24 +20,27 @@
         </StackPanel>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto"
-              MaxWidth="600" VerticalAlignment="Top" HorizontalAlignment="Left">
+              MaxWidth="{StaticResource FormMaxWidth}" VerticalAlignment="Top" HorizontalAlignment="Left">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Szenario Name"
-                       FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
-                       VerticalAlignment="Center" Margin="0,0,16,12"/>
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMargin}"/>
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ScenarioName}"
-                     Watermark="Name eingeben..." Margin="0,0,0,12"/>
+                     Classes="form-input"
+                     Watermark="Name eingeben..." Margin="{StaticResource FormInputMargin}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Erstellt am"
-                       FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"
-                       VerticalAlignment="Center" Margin="0,0,16,0"/>
+                       Classes="form-label"
+                       Margin="{StaticResource FormLabelMarginLast}"/>
             <TextBlock Grid.Row="1" Grid.Column="1"
                        Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
                        Foreground="{StaticResource TextSecondaryBrush}"
                        Opacity="0.8" VerticalAlignment="Center"/>
+
         </Grid>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                    Orientation="Horizontal" Spacing="12" Margin="0,24,0,0">
+                    Orientation="Horizontal" Spacing="{StaticResource FormActionsSpacing}"
+                    Margin="{StaticResource FormActionsMargin}">
             <Button Command="{Binding DiscardCommand}"
                     Content="Verwerfen"
                     Classes="bs-secondary" />
