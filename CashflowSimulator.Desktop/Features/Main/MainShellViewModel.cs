@@ -31,57 +31,21 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
-    private readonly Func<MetaEditViewModel> _createMetaEditViewModel;
-    private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
-    private readonly Func<CashflowType, CashflowStreamsViewModel> _createStreamsViewModel;
-    private readonly Func<CashflowType, CashflowEventsViewModel> _createEventsViewModel;
-    private readonly Func<MarktdatenViewModel> _createMarktdatenViewModel;
-    private readonly Func<KorrelationenViewModel> _createKorrelationenViewModel;
-    private readonly Func<AssetClassesViewModel> _createAssetClassesViewModel;
-    private readonly Func<PortfolioViewModel> _createPortfolioViewModel;
-    private readonly Func<TransactionsViewModel> _createTransactionsViewModel;
-    private readonly Func<TaxProfilesViewModel> _createTaxProfilesViewModel;
-    private readonly Func<StrategyProfilesViewModel> _createStrategyProfilesViewModel;
-    private readonly Func<LifecyclePhasesViewModel> _createLifecyclePhasesViewModel;
-    private readonly Func<SettingsViewModel> _createSettingsViewModel;
+    private readonly INavigationService _navigationService;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
         IFileDialogService fileDialogService,
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
-        Func<MetaEditViewModel> createMetaEditViewModel,
-        Func<EckdatenViewModel> createEckdatenViewModel,
-        Func<CashflowType, CashflowStreamsViewModel> createStreamsViewModel,
-        Func<CashflowType, CashflowEventsViewModel> createEventsViewModel,
-        Func<MarktdatenViewModel> createMarktdatenViewModel,
-        Func<KorrelationenViewModel> createKorrelationenViewModel,
-        Func<AssetClassesViewModel> createAssetClassesViewModel,
-        Func<PortfolioViewModel> createPortfolioViewModel,
-        Func<TransactionsViewModel> createTransactionsViewModel,
-        Func<TaxProfilesViewModel> createTaxProfilesViewModel,
-        Func<StrategyProfilesViewModel> createStrategyProfilesViewModel,
-        Func<LifecyclePhasesViewModel> createLifecyclePhasesViewModel,
-        Func<SettingsViewModel> createSettingsViewModel,
+        INavigationService navigationService,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
         _fileDialogService = fileDialogService;
         _storageService = storageService;
         _currentProjectService = currentProjectService;
-        _createMetaEditViewModel = createMetaEditViewModel;
-        _createEckdatenViewModel = createEckdatenViewModel;
-        _createStreamsViewModel = createStreamsViewModel;
-        _createEventsViewModel = createEventsViewModel;
-        _createMarktdatenViewModel = createMarktdatenViewModel;
-        _createKorrelationenViewModel = createKorrelationenViewModel;
-        _createAssetClassesViewModel = createAssetClassesViewModel;
-        _createPortfolioViewModel = createPortfolioViewModel;
-        _createTransactionsViewModel = createTransactionsViewModel;
-        _createTaxProfilesViewModel = createTaxProfilesViewModel;
-        _createStrategyProfilesViewModel = createStrategyProfilesViewModel;
-        _createLifecyclePhasesViewModel = createLifecyclePhasesViewModel;
-        _createSettingsViewModel = createSettingsViewModel;
+        _navigationService = navigationService;
         _logger = logger;
         Navigation = navigationViewModel;
 
@@ -362,7 +326,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenSzenario()
     {
         _logger.LogDebug("Szenario-Bereich geöffnet.");
-        CurrentContentViewModel = _createMetaEditViewModel();
+        CurrentContentViewModel = _navigationService.Create<MetaEditViewModel>();
         SetActiveNavigationItem(0);
     }
 
@@ -372,7 +336,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenEckdaten()
     {
         _logger.LogDebug("Eckdaten geöffnet.");
-        CurrentContentViewModel = _createEckdatenViewModel();
+        CurrentContentViewModel = _navigationService.Create<EckdatenViewModel>();
         SetActiveNavigationItem(1);
     }
 
@@ -382,7 +346,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenMarktdaten()
     {
         _logger.LogDebug("Marktdaten geöffnet.");
-        CurrentContentViewModel = _createMarktdatenViewModel();
+        CurrentContentViewModel = _navigationService.Create<MarktdatenViewModel>();
         SetActiveNavigationItem(2);
     }
 
@@ -392,7 +356,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenKorrelationen()
     {
         _logger.LogDebug("Korrelationen geöffnet.");
-        CurrentContentViewModel = _createKorrelationenViewModel();
+        CurrentContentViewModel = _navigationService.Create<KorrelationenViewModel>();
         SetActiveNavigationItem(3);
     }
 
@@ -402,7 +366,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenAnlageklassen()
     {
         _logger.LogDebug("Anlageklassen geöffnet.");
-        CurrentContentViewModel = _createAssetClassesViewModel();
+        CurrentContentViewModel = _navigationService.Create<AssetClassesViewModel>();
         SetActiveNavigationItem(4);
     }
 
@@ -412,7 +376,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenVermoegenswerte()
     {
         _logger.LogDebug("Vermögenswerte geöffnet.");
-        CurrentContentViewModel = _createPortfolioViewModel();
+        CurrentContentViewModel = _navigationService.Create<PortfolioViewModel>();
         SetActiveNavigationItem(5);
     }
 
@@ -422,7 +386,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenTransaktionen()
     {
         _logger.LogDebug("Transaktionen geöffnet.");
-        CurrentContentViewModel = _createTransactionsViewModel();
+        CurrentContentViewModel = _navigationService.Create<TransactionsViewModel>();
         SetActiveNavigationItem(6);
     }
 
@@ -431,28 +395,28 @@ public partial class MainShellViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenLaufendeEinnahmen()
     {
-        CurrentContentViewModel = _createStreamsViewModel(CashflowType.Income);
+        CurrentContentViewModel = _navigationService.Create<CashflowStreamsViewModel>(CashflowType.Income);
         SetActiveNavigationItem(7);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenLaufendeAusgaben()
     {
-        CurrentContentViewModel = _createStreamsViewModel(CashflowType.Expense);
+        CurrentContentViewModel = _navigationService.Create<CashflowStreamsViewModel>(CashflowType.Expense);
         SetActiveNavigationItem(8);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenGeplanteEinnahmen()
     {
-        CurrentContentViewModel = _createEventsViewModel(CashflowType.Income);
+        CurrentContentViewModel = _navigationService.Create<CashflowEventsViewModel>(CashflowType.Income);
         SetActiveNavigationItem(9);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenGeplanteAusgaben()
     {
-        CurrentContentViewModel = _createEventsViewModel(CashflowType.Expense);
+        CurrentContentViewModel = _navigationService.Create<CashflowEventsViewModel>(CashflowType.Expense);
         SetActiveNavigationItem(10);
     }
 
@@ -462,7 +426,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenSteuerprofile()
     {
         _logger.LogDebug("Steuerprofile geöffnet.");
-        CurrentContentViewModel = _createTaxProfilesViewModel();
+        CurrentContentViewModel = _navigationService.Create<TaxProfilesViewModel>();
         SetActiveNavigationItem(11);
     }
 
@@ -470,7 +434,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenStrategieprofile()
     {
         _logger.LogDebug("Strategieprofile geöffnet.");
-        CurrentContentViewModel = _createStrategyProfilesViewModel();
+        CurrentContentViewModel = _navigationService.Create<StrategyProfilesViewModel>();
         SetActiveNavigationItem(12);
     }
 
@@ -478,7 +442,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenLebensphasen()
     {
         _logger.LogDebug("Lebensphasen geöffnet.");
-        CurrentContentViewModel = _createLifecyclePhasesViewModel();
+        CurrentContentViewModel = _navigationService.Create<LifecyclePhasesViewModel>();
         SetActiveNavigationItem(13);
     }
 
@@ -488,7 +452,7 @@ public partial class MainShellViewModel : ObservableObject
     private void OpenSettings()
     {
         _logger.LogDebug("Einstellungen geöffnet.");
-        CurrentContentViewModel = _createSettingsViewModel();
+        CurrentContentViewModel = _navigationService.Create<SettingsViewModel>();
         SetActiveNavigationItem(14);
     }
 

@@ -67,34 +67,24 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
                 services.AddSingleton<IHelpProvider, HelpProvider>();
 
-                // Shell / Main-Feature (Func<T> wird von MS.DI nicht automatisch bereitgestellt)
+                // Navigation Service
+                services.AddSingleton<INavigationService, NavigationService>();
+
+                // ViewModels (als Transient registriert, werden über NavigationService aufgelöst)
                 services.AddTransient<NavigationViewModel>();
                 services.AddTransient<MetaEditViewModel>();
-                services.AddSingleton<Func<MetaEditViewModel>>(sp => () => sp.GetRequiredService<MetaEditViewModel>());
                 services.AddTransient<EckdatenViewModel>();
-                services.AddSingleton<Func<EckdatenViewModel>>(sp => () => sp.GetRequiredService<EckdatenViewModel>());
                 services.AddTransient<MarktdatenViewModel>();
-                services.AddSingleton<Func<MarktdatenViewModel>>(sp => () => sp.GetRequiredService<MarktdatenViewModel>());
                 services.AddTransient<KorrelationenViewModel>();
-                services.AddSingleton<Func<KorrelationenViewModel>>(sp => () => sp.GetRequiredService<KorrelationenViewModel>());
                 services.AddTransient<AssetClassesViewModel>();
-                services.AddSingleton<Func<AssetClassesViewModel>>(sp => () => sp.GetRequiredService<AssetClassesViewModel>());
                 services.AddTransient<PortfolioViewModel>();
-                services.AddSingleton<Func<PortfolioViewModel>>(sp => () => sp.GetRequiredService<PortfolioViewModel>());
                 services.AddTransient<TransactionsViewModel>();
-                services.AddSingleton<Func<TransactionsViewModel>>(sp => () => sp.GetRequiredService<TransactionsViewModel>());
                 services.AddTransient<TaxProfilesViewModel>();
-                services.AddSingleton<Func<TaxProfilesViewModel>>(sp => () => sp.GetRequiredService<TaxProfilesViewModel>());
                 services.AddTransient<StrategyProfilesViewModel>();
-                services.AddSingleton<Func<StrategyProfilesViewModel>>(sp => () => sp.GetRequiredService<StrategyProfilesViewModel>());
                 services.AddTransient<LifecyclePhasesViewModel>();
-                services.AddSingleton<Func<LifecyclePhasesViewModel>>(sp => () => sp.GetRequiredService<LifecyclePhasesViewModel>());
                 services.AddTransient<SettingsViewModel>();
-                services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
-                services.AddSingleton<Func<CashflowType, CashflowStreamsViewModel>>(sp => type =>
-                    new CashflowStreamsViewModel(sp.GetRequiredService<ICurrentProjectService>(), sp.GetRequiredService<IHelpProvider>(), type));
-                services.AddSingleton<Func<CashflowType, CashflowEventsViewModel>>(sp => type =>
-                    new CashflowEventsViewModel(sp.GetRequiredService<ICurrentProjectService>(), sp.GetRequiredService<IHelpProvider>(), type));
+                
+                // Shell & Main Window
                 services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MainWindow>();
 
