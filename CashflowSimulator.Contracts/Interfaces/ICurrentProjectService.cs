@@ -67,6 +67,12 @@ public interface ICurrentProjectService
     void UpdateCorrelations(IReadOnlyList<CorrelationEntryDto> correlations);
 
     /// <summary>
+    /// Aktualisiert das Portfolio (alle Vermögenswerte) des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdatePortfolio(PortfolioDto portfolio);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

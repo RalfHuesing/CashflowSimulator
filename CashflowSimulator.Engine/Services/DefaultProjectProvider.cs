@@ -39,7 +39,10 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
         // 5. Standard-Korrelationen zwischen Faktoren
         List<CorrelationEntryDto> correlations = GetDefaultCorrelations(economicFactors);
 
-        // 6. Projekt zusammenbauen
+        // 6. Portfolio mit Vermögenswerten und Beispieldaten
+        PortfolioDto portfolio = GetDefaultPortfolio(simulationStart);
+
+        // 7. Projekt zusammenbauen
         return new SimulationProjectDto
         {
             Meta = new MetaDto
@@ -60,6 +63,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
             Events = events,
             EconomicFactors = economicFactors,
             Correlations = correlations,
+            Portfolio = portfolio,
             UiSettings = new UiSettingsDto()
         };
     }
@@ -100,8 +104,159 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Volatility = 0.03,
                 MeanReversionSpeed = 0.2,
                 InitialValue = 100
+            },
+            new EconomicFactorDto
+            {
+                Id = "Schwellenlaender",
+                Name = "Schwellenländer (Aktien)",
+                ModelType = StochasticModelType.GeometricBrownianMotion,
+                ExpectedReturn = 0.065,
+                Volatility = 0.18,
+                MeanReversionSpeed = 0,
+                InitialValue = 100
             }
         ];
+    }
+
+    /// <summary>
+    /// Standard-Portfolio: 3x MSCI-World-ETFs (ein aktives Sparinstrument, zwei Altbestände),
+    /// 1x Schwellenländer-ETF, 1x Anleihen-ETF, 1x Tagesgeld. Mit exemplarischen Transaktionen.
+    /// </summary>
+    private static PortfolioDto GetDefaultPortfolio(DateOnly simulationStart)
+    {
+        const string factorAktienWelt = "Aktien_Welt";
+        const string factorSchwellenlaender = "Schwellenlaender";
+        const string factorGeldmarkt = "Geldmarkt_Anleihen";
+
+        // 1. Vanguard FTSE All-World – aktives Sparinstrument
+        var vanguardId = Guid.NewGuid().ToString();
+        var vanguardTransactions = new List<TransactionDto>
+        {
+            new() { Date = simulationStart.AddMonths(-24), Type = TransactionType.Buy, Quantity = 50, PricePerUnit = 98.50m, TotalAmount = 4925m, TaxAmount = 0 },
+            new() { Date = simulationStart.AddMonths(-12), Type = TransactionType.Buy, Quantity = 30, PricePerUnit = 102.20m, TotalAmount = 3066m, TaxAmount = 0 }
+        };
+        var vanguard = new AssetDto
+        {
+            Id = vanguardId,
+            Name = "Vanguard FTSE All-World UCITS ETF",
+            Isin = "IE00B3RBWM25",
+            AssetType = AssetType.Etf,
+            EconomicFactorId = factorAktienWelt,
+            IsActiveSavingsInstrument = true,
+            TaxType = TaxType.EquityFund,
+            CurrentQuantity = 80,
+            CurrentValue = 80 * 105m,
+            Transactions = vanguardTransactions
+        };
+
+        // 2. iShares MSCI World – Altbestand (nicht mehr bespart)
+        var isharesId = Guid.NewGuid().ToString();
+        var isharesTransactions = new List<TransactionDto>
+        {
+            new() { Date = simulationStart.AddMonths(-60), Type = TransactionType.Buy, Quantity = 25, PricePerUnit = 72.00m, TotalAmount = 1800m, TaxAmount = 0 }
+        };
+        var ishares = new AssetDto
+        {
+            Id = isharesId,
+            Name = "iShares MSCI World UCITS ETF",
+            Isin = "IE00B0M62Q72",
+            AssetType = AssetType.Etf,
+            EconomicFactorId = factorAktienWelt,
+            IsActiveSavingsInstrument = false,
+            TaxType = TaxType.EquityFund,
+            CurrentQuantity = 25,
+            CurrentValue = 25 * 105m,
+            Transactions = isharesTransactions
+        };
+
+        // 3. HSBC MSCI World – Altbestand
+        var hsbcId = Guid.NewGuid().ToString();
+        var hsbcTransactions = new List<TransactionDto>
+        {
+            new() { Date = simulationStart.AddMonths(-36), Type = TransactionType.Buy, Quantity = 15, PricePerUnit = 85.00m, TotalAmount = 1275m, TaxAmount = 0 }
+        };
+        var hsbc = new AssetDto
+        {
+            Id = hsbcId,
+            Name = "HSBC MSCI World UCITS ETF",
+            Isin = "IE00B4X9L533",
+            AssetType = AssetType.Etf,
+            EconomicFactorId = factorAktienWelt,
+            IsActiveSavingsInstrument = false,
+            TaxType = TaxType.EquityFund,
+            CurrentQuantity = 15,
+            CurrentValue = 15 * 105m,
+            Transactions = hsbcTransactions
+        };
+
+        // 4. Schwellenländer-ETF
+        var emId = Guid.NewGuid().ToString();
+        var emTransactions = new List<TransactionDto>
+        {
+            new() { Date = simulationStart.AddMonths(-18), Type = TransactionType.Buy, Quantity = 40, PricePerUnit = 22.50m, TotalAmount = 900m, TaxAmount = 0 }
+        };
+        var em = new AssetDto
+        {
+            Id = emId,
+            Name = "iShares Core MSCI EM IMI UCITS ETF",
+            Isin = "IE00BKM4GZ66",
+            AssetType = AssetType.Etf,
+            EconomicFactorId = factorSchwellenlaender,
+            IsActiveSavingsInstrument = false,
+            TaxType = TaxType.EquityFund,
+            CurrentQuantity = 40,
+            CurrentValue = 40 * 24m,
+            Transactions = emTransactions
+        };
+
+        // 5. Anleihen-ETF
+        var bondId = Guid.NewGuid().ToString();
+        var bondTransactions = new List<TransactionDto>
+        {
+            new() { Date = simulationStart.AddMonths(-12), Type = TransactionType.Buy, Quantity = 100, PricePerUnit = 98.00m, TotalAmount = 9800m, TaxAmount = 0 }
+        };
+        var bond = new AssetDto
+        {
+            Id = bondId,
+            Name = "iShares Core Global Aggregate Bond UCITS ETF",
+            Isin = "IE00BDBRDM35",
+            AssetType = AssetType.Etf,
+            EconomicFactorId = factorGeldmarkt,
+            IsActiveSavingsInstrument = false,
+            TaxType = TaxType.BondFund,
+            CurrentQuantity = 100,
+            CurrentValue = 100 * 99m,
+            Transactions = bondTransactions
+        };
+
+        // 6. Tagesgeld (Geldmarkt-Faktor)
+        var cashId = Guid.NewGuid().ToString();
+        var cash = new AssetDto
+        {
+            Id = cashId,
+            Name = "Tagesgeld (Notgroschen)",
+            Isin = "",
+            AssetType = AssetType.Cash,
+            EconomicFactorId = factorGeldmarkt,
+            IsActiveSavingsInstrument = false,
+            TaxType = TaxType.None,
+            CurrentQuantity = 1,
+            CurrentValue = 15000m,
+            Transactions = []
+        };
+
+        return new PortfolioDto
+        {
+            Assets =
+            [
+                vanguard,
+                ishares,
+                hsbc,
+                em,
+                bond,
+                cash
+            ]
+        };
     }
 
     /// <summary>
@@ -120,6 +275,9 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
         // Aktien vs. Anleihen: leicht negativ
         if (idToIndex.TryGetValue("Aktien_Welt", out var iA) && idToIndex.TryGetValue("Geldmarkt_Anleihen", out var iB))
             list.Add(new CorrelationEntryDto { FactorIdA = factors[iA].Id, FactorIdB = factors[iB].Id, Correlation = -0.15 });
+        // Aktien Welt vs. Schwellenländer: positiv
+        if (idToIndex.TryGetValue("Aktien_Welt", out var iAw) && idToIndex.TryGetValue("Schwellenlaender", out var iEm))
+            list.Add(new CorrelationEntryDto { FactorIdA = factors[iAw].Id, FactorIdB = factors[iEm].Id, Correlation = 0.75 });
         return list;
     }
 

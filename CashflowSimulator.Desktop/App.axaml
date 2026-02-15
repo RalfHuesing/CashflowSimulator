@@ -8,6 +8,7 @@
              xmlns:cashflowEvents="clr-namespace:CashflowSimulator.Desktop.Features.CashflowEvents;assembly=CashflowSimulator.Desktop"
              xmlns:marktdaten="clr-namespace:CashflowSimulator.Desktop.Features.Marktdaten;assembly=CashflowSimulator.Desktop"
              xmlns:korrelationen="clr-namespace:CashflowSimulator.Desktop.Features.Korrelationen;assembly=CashflowSimulator.Desktop"
+             xmlns:portfolio="clr-namespace:CashflowSimulator.Desktop.Features.Portfolio;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
     <Application.Resources>
@@ -49,6 +50,11 @@
             <korrelationen:KorrelationenView DataContext="{Binding}"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="portfolio:PortfolioViewModel">
+            <portfolio:PortfolioView DataContext="{Binding}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"/>
         </DataTemplate>
     </Application.DataTemplates>
 
