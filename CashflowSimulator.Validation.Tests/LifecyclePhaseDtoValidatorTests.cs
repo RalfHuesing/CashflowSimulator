@@ -93,4 +93,66 @@ public sealed class LifecyclePhaseDtoValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName.Contains("TargetWeight") || e.PropertyName.Contains("AssetAllocationOverrides"));
     }
+
+    [Fact]
+    public void Validate_AssetAllocationOverrideEmptyAssetClassId_ReturnsError()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = "", TargetWeight = 0.5m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("AssetClassId") || e.Message.Contains("Anlageklassen-ID"));
+    }
+
+    [Fact]
+    public void Validate_AssetAllocationOverrideTargetWeightZero_ReturnsIsValid()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 0m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_AssetAllocationOverrideTargetWeightOne_ReturnsIsValid()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 1m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_AssetAllocationOverrideNegativeWeight_ReturnsError()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = -0.1m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("TargetWeight") || e.PropertyName.Contains("AssetAllocationOverrides"));
+    }
 }

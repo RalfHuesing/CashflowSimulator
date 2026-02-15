@@ -45,17 +45,7 @@ public sealed class ValidationRunnerTests
     [Fact]
     public void ValidateProject_ReturnsContractsValidationResultType()
     {
-        var taxId = Guid.NewGuid().ToString();
-        var strategyId = Guid.NewGuid().ToString();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = [new TaxProfileDto { Id = taxId, Name = "Standard", CapitalGainsTaxRate = 0.26m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.35m }],
-            StrategyProfiles = [new StrategyProfileDto { Id = strategyId, Name = "Aufbau", CashReserveMonths = 3, RebalancingThreshold = 0.05m, LookaheadMonths = 24 }],
-            LifecyclePhases = [new LifecyclePhaseDto { StartAge = 0, TaxProfileId = taxId, StrategyProfileId = strategyId }],
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.True(result.IsValid);
@@ -142,5 +132,21 @@ public sealed class ValidationRunnerTests
         var first = result.Errors[0];
         Assert.IsType<ValidationError>(first);
         Assert.False(string.IsNullOrEmpty(first.Message));
+    }
+
+    [Fact]
+    public void Validate_SimulationParametersDto_Null_ThrowsArgumentNullException()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => ValidationRunner.Validate((SimulationParametersDto)null!));
+
+        Assert.Equal("dto", ex.ParamName);
+    }
+
+    [Fact]
+    public void Validate_SimulationProjectDto_Null_ThrowsArgumentNullException()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => ValidationRunner.Validate((SimulationProjectDto)null!));
+
+        Assert.Equal("dto", ex.ParamName);
     }
 }

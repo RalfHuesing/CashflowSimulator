@@ -83,4 +83,12 @@ public sealed class CorrelationMatrixValidationTests
 
         Assert.Null(error);
     }
+
+    [Fact]
+    public void GetPositiveDefinitenessError_NullProject_ReturnsNull()
+    {
+        string? error = CorrelationMatrixValidation.GetPositiveDefinitenessError(null);
+
+        Assert.Null(error);
+    }
 }

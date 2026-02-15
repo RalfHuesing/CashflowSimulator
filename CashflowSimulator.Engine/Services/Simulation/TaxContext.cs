@@ -20,6 +20,7 @@ public sealed class TaxContext
     /// </summary>
     public TaxContext(SimulationParametersDto parameters)
     {
+        ArgumentNullException.ThrowIfNull(parameters);
         LossCarryforwardGeneral = parameters.InitialLossCarryforwardGeneral;
         LossCarryforwardStocks = parameters.InitialLossCarryforwardStocks;
     }

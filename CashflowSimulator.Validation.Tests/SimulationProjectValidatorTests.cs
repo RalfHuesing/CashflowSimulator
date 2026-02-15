@@ -7,41 +7,10 @@ namespace CashflowSimulator.Validation.Tests;
 
 public sealed class SimulationProjectValidatorTests
 {
-    /// <summary>
-    /// Liefert minimale gültige Lifecycle-Daten (eine Phase mit StartAge 0, die immer zum Simulationsstart passt).
-    /// </summary>
-    private static (List<TaxProfileDto> TaxProfiles, List<StrategyProfileDto> StrategyProfiles, List<LifecyclePhaseDto> LifecyclePhases) ValidLifecycleData()
-    {
-        var taxId = Guid.NewGuid().ToString();
-        var strategyId = Guid.NewGuid().ToString();
-        var taxProfiles = new List<TaxProfileDto>
-        {
-            new() { Id = taxId, Name = "Standard", CapitalGainsTaxRate = 0.26375m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.35m }
-        };
-        var strategyProfiles = new List<StrategyProfileDto>
-        {
-            new() { Id = strategyId, Name = "Aufbau", CashReserveMonths = 3, RebalancingThreshold = 0.05m, LookaheadMonths = 24 }
-        };
-        var lifecyclePhases = new List<LifecyclePhaseDto>
-        {
-            new() { StartAge = 0, TaxProfileId = taxId, StrategyProfileId = strategyId, AssetAllocationOverrides = [] }
-        };
-        return (taxProfiles, strategyProfiles, lifecyclePhases);
-    }
-
     [Fact]
     public void Validate_ValidProject_ReturnsIsValid()
     {
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.True(result.IsValid);
@@ -51,16 +20,9 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_InvalidMeta_ReturnsErrors()
     {
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().WithScenarioName("").Build(),
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder()
+            .WithMeta(new MetaDtoBuilder().WithScenarioName("").Build())
+            .Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -70,16 +32,9 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_InvalidParameters_ReturnsErrors()
     {
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().WithSimulationEndBeforeBirth().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder()
+            .WithParameters(new SimulationParametersDtoBuilder().WithSimulationEndBeforeBirth().Build())
+            .Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -89,16 +44,8 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_NullMeta_ReturnsErrors()
     {
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = null!,
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().Build();
+        dto = dto with { Meta = null! };
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -107,16 +54,8 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_NullParameters_ReturnsErrors()
     {
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = null!,
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().Build();
+        dto = dto with { Parameters = null! };
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -125,16 +64,7 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_EmptyLifecyclePhases_ReturnsError()
     {
-        var (taxProfiles, strategyProfiles, _) = ValidLifecycleData();
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = [],
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().WithEmptyLifecyclePhases().Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -144,28 +74,9 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_PhaseReferencesNonExistentTaxProfileId_ReturnsError()
     {
-        var strategyId = Guid.NewGuid().ToString();
-        var taxProfiles = new List<TaxProfileDto>
-        {
-            new() { Id = Guid.NewGuid().ToString(), Name = "Standard", CapitalGainsTaxRate = 0.26m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.35m }
-        };
-        var strategyProfiles = new List<StrategyProfileDto>
-        {
-            new() { Id = strategyId, Name = "Aufbau", CashReserveMonths = 3, RebalancingThreshold = 0.05m, LookaheadMonths = 24 }
-        };
-        var lifecyclePhases = new List<LifecyclePhaseDto>
-        {
-            new() { StartAge = 0, TaxProfileId = "non-existent-id", StrategyProfileId = strategyId, AssetAllocationOverrides = [] }
-        };
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().Build(),
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder()
+            .WithPhaseReferencingNonExistentTaxProfile("non-existent-id")
+            .Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
@@ -175,38 +86,115 @@ public sealed class SimulationProjectValidatorTests
     [Fact]
     public void Validate_NoPhaseCoversSimulationStart_ReturnsError()
     {
-        var taxId = Guid.NewGuid().ToString();
-        var strategyId = Guid.NewGuid().ToString();
-        // Alter zum Start = 30 (1990 → 2020). Nur Phase ab 67 = keine Phase deckt Start ab.
-        var parameters = new SimulationParametersDtoBuilder()
-            .WithDateOfBirth(new DateOnly(1990, 1, 1))
-            .WithSimulationEnd(new DateOnly(2085, 1, 1))
-            .Build();
-        parameters = parameters with { SimulationStart = new DateOnly(2020, 1, 1) };
-        var taxProfiles = new List<TaxProfileDto>
-        {
-            new() { Id = taxId, Name = "Rente", CapitalGainsTaxRate = 0.26m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.18m }
-        };
-        var strategyProfiles = new List<StrategyProfileDto>
-        {
-            new() { Id = strategyId, Name = "Entnahme", CashReserveMonths = 12, RebalancingThreshold = 0.05m, LookaheadMonths = 6 }
-        };
-        var lifecyclePhases = new List<LifecyclePhaseDto>
-        {
-            new() { StartAge = 67, TaxProfileId = taxId, StrategyProfileId = strategyId, AssetAllocationOverrides = [] }
-        };
-        var dto = new SimulationProjectDto
-        {
-            Meta = new MetaDtoBuilder().Build(),
-            Parameters = parameters,
-            TaxProfiles = taxProfiles,
-            StrategyProfiles = strategyProfiles,
-            LifecyclePhases = lifecyclePhases,
-            UiSettings = new UiSettingsDto()
-        };
+        var dto = new SimulationProjectDtoBuilder().WithNoPhaseCoveringSimulationStart().Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.Message.Contains("Simulationsstart") || e.Message.Contains("StartAge"));
+    }
+
+    [Fact]
+    public void Validate_NullUiSettings_ReturnsError()
+    {
+        var dto = new SimulationProjectDtoBuilder().Build();
+        dto = dto with { UiSettings = null! };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "UiSettings");
+    }
+
+    [Fact]
+    public void Validate_CorrelationsReferenceNonExistentFactor_ReturnsError()
+    {
+        var dto = new SimulationProjectDtoBuilder()
+            .WithEconomicFactors(
+                [new EconomicFactorDto { Id = "A", Name = "Faktor A", ExpectedReturn = 0.05, Volatility = 0.1, InitialValue = 100 }],
+                [new CorrelationEntryDto { FactorIdA = "A", FactorIdB = "NonExistent", Correlation = 0.5 }])
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("existierende Marktfaktoren") || e.Message.Contains("Faktor"));
+    }
+
+    [Fact]
+    public void Validate_AssetWithNonExistentEconomicFactorId_ReturnsError()
+    {
+        var dto = new SimulationProjectDtoBuilder()
+            .WithPortfolio(new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ETF",
+                        EconomicFactorId = "NonExistentFactor",
+                        AssetClassId = "ac1",
+                        CurrentPrice = 100,
+                        CurrentQuantity = 10
+                    }
+                ]
+            })
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("existierenden Marktfaktor") || e.Message.Contains("EconomicFactorId"));
+    }
+
+    [Fact]
+    public void Validate_AssetWithValidEconomicFactorId_ReturnsIsValid()
+    {
+        var dto = new SimulationProjectDtoBuilder()
+            .WithEconomicFactors(
+                [new EconomicFactorDto { Id = "MSCI", Name = "MSCI World", ExpectedReturn = 0.07, Volatility = 0.15, InitialValue = 100 }],
+                null)
+            .WithPortfolio(new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ETF",
+                        EconomicFactorId = "MSCI",
+                        AssetClassId = "ac1",
+                        CurrentPrice = 100,
+                        CurrentQuantity = 10
+                    }
+                ]
+            })
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_AssetWithEmptyEconomicFactorId_ReturnsError()
+    {
+        var dto = new SimulationProjectDtoBuilder()
+            .WithPortfolio(new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ETF",
+                        EconomicFactorId = "",
+                        AssetClassId = "ac1",
+                        CurrentPrice = 100,
+                        CurrentQuantity = 10
+                    }
+                ]
+            })
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("existierenden Marktfaktor") || e.Message.Contains("EconomicFactorId"));
     }
 }

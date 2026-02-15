@@ -18,8 +18,11 @@ public static class CorrelationMatrixValidation
     /// Baut die Korrelationsmatrix aus Faktoren und Korrelationen und prüft positive Definitheit.
     /// </summary>
     /// <returns>null wenn die Matrix positiv definit ist; sonst eine Fehlermeldung.</returns>
-    public static string? GetPositiveDefinitenessError(SimulationProjectDto project)
+    public static string? GetPositiveDefinitenessError(SimulationProjectDto? project)
     {
+        if (project is null)
+            return null;
+
         var factors = project.EconomicFactors;
         var correlations = project.Correlations;
 

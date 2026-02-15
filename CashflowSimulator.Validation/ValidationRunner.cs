@@ -27,6 +27,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(SimulationParametersDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = ParametersValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -36,6 +37,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(MetaDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = MetaValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -45,6 +47,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(SimulationProjectDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = ProjectValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -54,6 +57,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(CashflowStreamDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = StreamValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -63,6 +67,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(CashflowEventDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = EventValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -72,6 +77,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(EconomicFactorDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = EconomicFactorValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -81,6 +87,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(CorrelationEntryDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = CorrelationEntryValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -90,6 +97,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(TaxProfileDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = TaxProfileValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -99,6 +107,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(StrategyProfileDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = StrategyProfileValidator.Validate(dto);
         return ToValidationResult(result);
     }
@@ -108,6 +117,7 @@ public static class ValidationRunner
     /// </summary>
     public static ValidationResult Validate(LifecyclePhaseDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var result = LifecyclePhaseValidator.Validate(dto);
         return ToValidationResult(result);
     }

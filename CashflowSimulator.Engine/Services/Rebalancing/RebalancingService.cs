@@ -10,6 +10,7 @@ public sealed class RebalancingService : IRebalancingService
     /// <inheritdoc />
     public bool ShouldGenerateOrder(decimal targetMinusCurrent, StrategyProfileDto strategy)
     {
+        ArgumentNullException.ThrowIfNull(strategy);
         return Math.Abs(targetMinusCurrent) >= strategy.MinimumTransactionAmount;
     }
 }
