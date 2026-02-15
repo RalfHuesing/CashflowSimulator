@@ -65,13 +65,14 @@
         <sys:Double x:Key="FormMaxWidth">600</sys:Double>
 
         <!-- InfoPanel & GridSplitter (Sand/Creme, begleitend) -->
-        <Color x:Key="InfoPanelBackgroundColor">#FBF6F0</Color>
-        <Color x:Key="InfoPanelBorderColor">#EDE4DA</Color>
-        <Color x:Key="GridSplitterBackgroundColor">#EDE4DA</Color>
+        <Color x:Key="InfoPanelBackgroundColor">#F7EFE2</Color> 
+        <Color x:Key="InfoPanelBorderColor">#D9C5A3</Color>     
+        <Color x:Key="GridSplitterBackgroundColor">#D9C5A3</Color>
+        <Color x:Key="InfoPanelTitleColor">#4A4542</Color>
         <SolidColorBrush x:Key="InfoPanelBackgroundBrush" Color="{StaticResource InfoPanelBackgroundColor}" />
         <SolidColorBrush x:Key="InfoPanelBorderBrush" Color="{StaticResource InfoPanelBorderColor}" />
         <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource GridSplitterBackgroundColor}" />
-        <Color x:Key="InfoPanelTitleColor">#4A4542</Color>
+        
         <SolidColorBrush x:Key="InfoPanelTitleBrush" Color="{StaticResource InfoPanelTitleColor}" />
         <sys:Double x:Key="InfoPanelDefaultWidth">400</sys:Double>
         <sys:Double x:Key="InfoPanelMinWidth">280</sys:Double>

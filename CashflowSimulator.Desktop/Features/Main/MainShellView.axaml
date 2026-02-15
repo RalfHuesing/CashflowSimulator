@@ -49,7 +49,7 @@
 
         <Border Grid.Column="1" 
                 Background="{DynamicResource ContentBackgroundBrush}"
-                Padding="{DynamicResource PagePadding}">
+                Padding="0" Margin="0">
             <Grid>
                 <StackPanel IsVisible="{Binding IsContentPlaceholderVisible}"
                             Spacing="{StaticResource SpacingMediumValue}"

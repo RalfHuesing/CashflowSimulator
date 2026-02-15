@@ -41,6 +41,8 @@
 
     <!-- Feature-Header-Toolbar: einheitliche Größe, weißer Text/Icon auf dunklem Grund -->
     <Style Selector="Button.toolbar-button">
+        <Setter Property="BorderBrush" Value="#44FFFFFF" /> 
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Width" Value="{StaticResource ToolbarButtonWidth}" />
         <Setter Property="Height" Value="{StaticResource ToolbarButtonHeight}" />
         <Setter Property="Background" Value="Transparent" />
