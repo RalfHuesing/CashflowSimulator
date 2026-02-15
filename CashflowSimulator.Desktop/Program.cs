@@ -16,6 +16,7 @@ using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
+using CashflowSimulator.Engine.Services.Defaults;
 using CashflowSimulator.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -55,6 +56,10 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<AvaloniaFileDialogService>();
                 services.AddSingleton<IFileDialogService>(sp => sp.GetRequiredService<AvaloniaFileDialogService>());
                 services.AddSingleton<IStorageService<SimulationProjectDto>, JsonFileStorageService<SimulationProjectDto>>();
+                services.AddSingleton<ISimulationTimeService, SimulationTimeService>();
+                services.AddSingleton<IMarketDataService, MarketDataService>();
+                services.AddSingleton<ICashflowDefaultService, CashflowDefaultService>();
+                services.AddSingleton<IPortfolioDefaultService, PortfolioDefaultService>();
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
                 services.AddSingleton<IHelpProvider, HelpProvider>();
