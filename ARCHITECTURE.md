@@ -62,4 +62,4 @@ Validierung läuft zentral über **FluentValidation** im Projekt **CashflowSimulat
 
 ---
 
-Technische Architektur, Datenmodell (`SimulationProjectDto`) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.
+Technische Architektur, Datenmodell (`SimulationProjectDto`, inkl. `UiSettings` für UI-Optionen pro Szenario) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.

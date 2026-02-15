@@ -16,31 +16,31 @@ Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Archite
 | --- | --- |
 | **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. IPriceProvider), ValidationError/ValidationResult. |
 | **CashflowSimulator.Validation** | FluentValidation-Validatoren für DTOs (SimulationParametersDto, MetaDto, SimulationProjectDto); Single Source of Truth für fachliche Regeln. |
-| **CashflowSimulator.Core** | Stateless Mathematik – SimulationEngine, Wachstumsmodelle, Steuerlogik; keine UI, keine I/O. |
+| **CashflowSimulator.Engine** | Stateless Mathematik – SimulationEngine, Wachstumsmodelle, Steuerlogik; keine UI, keine I/O. |
 | **CashflowSimulator.Infrastructure** | Außenwelt – Persistenz (Laden/Speichern Szenarien), Kursdaten (z. B. StockPriceEngine/Cache), Implementierungen für Contracts-Interfaces. |
-| **CashflowSimulator.Desktop** | Avalonia-UI; Einstiegspunkt, Composition Root; ViewModels wrappen DTOs aus Contracts; keine Business-Logik in Core/Engine nachbauen. |
+| **CashflowSimulator.Desktop** | Avalonia-UI; Einstiegspunkt, Composition Root; ViewModels wrappen DTOs aus Contracts; keine Business-Logik in Engine nachbauen. |
 
-Keine separaten „Feature“-Projekte; klare Schichtentrennung reicht.
+Keine separaten „Feature“-Projekte; klare Schichtentrennung reicht. **CashflowSimulator.Shared** ist in der Solution enthalten (derzeit Placeholder für spätere gemeinsame Hilfen).
 
 ```mermaid
 flowchart TB
     Contracts[CashflowSimulator.Contracts]
     Validation[CashflowSimulator.Validation]
-    Core[CashflowSimulator.Core]
+    Engine[CashflowSimulator.Engine]
     Infra[CashflowSimulator.Infrastructure]
     Desktop[CashflowSimulator.Desktop]
     Validation --> Contracts
-    Core --> Contracts
+    Engine --> Contracts
     Infra --> Contracts
     Desktop --> Validation
-    Desktop --> Core
+    Desktop --> Engine
     Desktop --> Infra
     Desktop --> Contracts
 ```
 
 ## Architektur und Datenfluss
 
-- **Contracts** sind das Bindeglied: Core und Infrastructure hängen nur von Contracts ab; Desktop hängt von allen Schichten ab.
+- **Contracts** sind das Bindeglied: Engine und Infrastructure hängen nur von Contracts ab; Desktop hängt von allen Schichten ab.
 - **Datenfluss:** JSON → SimulationProjectDto → UI (ViewModels mit Backing Fields auf DTOs) → Simulation (DTO an Engine) → SimulationResultDto; Speichern = DTO 1:1 als JSON.
 - **Externe APIs:** Über Interfaces (z. B. in Contracts), Implementierungen in Infrastructure; austauschbar und testbar.
 
@@ -49,13 +49,13 @@ flowchart TB
 - **C#:** Moderne Features nutzen – Primary Constructors, Collection Expressions, Pattern Matching.
 - **Async durchgängig:** CPU-intensive Arbeit (z. B. Simulation) in Libraries mit `Task.Run`/Parallelisierung; öffentliche Engine-API async (z. B. `RunSimulationAsync`); in allen Non-UI-Libraries `ConfigureAwait(false)`.
 - **SimulationEngine:** Alle Kerne nutzen (z. B. `Parallel.ForEach` über Monte-Carlo-Iterationen), API trotzdem async, damit die UI nicht blockiert.
-- **Result-Pattern:** Für erwartbare Fehler (Validierung, Laden/Speichern, fehlgeschlagene Services) `Result`/`Result<T>` verwenden; Exceptions für unerwartete Programmfehler. Implementierung in Core oder kleine Hilfsklasse.
+- **Result-Pattern:** Für erwartbare Fehler (Validierung, Laden/Speichern, fehlgeschlagene Services) `Result`/`Result<T>` verwenden; Exceptions für unerwartete Programmfehler. Implementierung in Engine oder kleine Hilfsklasse.
 - Boilerplate vermeiden: zentrale Extension Methods, keine Duplikate.
 
 ## Dependency Injection
 
 - **Container:** Microsoft.Extensions.DependencyInjection.
-- **Composition Root:** Im Desktop-Projekt (bei App-Start); Registrierung der Services aus Core und Infrastructure.
+- **Composition Root:** Im Desktop-Projekt (bei App-Start); Registrierung der Services aus Engine und Infrastructure.
 - Constructor Injection; keine Service-Locator oder nicht über DI verwaltete Singletons.
 
 ## Logging
@@ -129,16 +129,16 @@ Für Feature-ViewModels mit CRUD-Funktionalität (Create, Read, Update, Delete) 
 ## Kommentierung und Dokumentation
 
 - Kommentieren: „Warum“, nicht „Wie“; nur bei komplexen fachlichen Entscheidungen oder Domain-Wissen (z. B. Steuer-FIFO, Lookahead).
-- **XML-Docs:** Für öffentliche APIs in Contracts und Core (IntelliSense).
+- **XML-Docs:** Für öffentliche APIs in Contracts und Engine (IntelliSense).
 
 ## Testing (xUnit)
 
 - **Framework:** xUnit; `[Fact]` für Einzeltests, `[Theory]` für datengetriebene Tests.
 - **Naming:** Testnamen folgen dem Muster `MethodName_StateUnderTest_ExpectedBehavior`.
 - **Mocking:** Interfaces aus Contracts mocken (z. B. IPriceProvider, IStorage); handgeschriebene Mocks oder NSubstitute/Moq.
-- Unit-Tests für Core (SimulationEngine, Steuerlogik) und sinnvolle Infrastruktur-Szenarien; UI-Tests optional später.
+- Unit-Tests für Engine (SimulationEngine, Steuerlogik) und sinnvolle Infrastruktur-Szenarien; UI-Tests optional später.
 
 ## Clean Code und SOLID
 
 - Pragmatisch: robust und wartbar, kein Over-Engineering.
-- SOLID und getrennte Verantwortlichkeiten: Contracts = Daten/Verträge; Core = reine Rechenlogik; Infrastructure = I/O und externe Dienste; Desktop = Präsentation und Orchestrierung.
+- SOLID und getrennte Verantwortlichkeiten: Contracts = Daten/Verträge; Engine = reine Rechenlogik; Infrastructure = I/O und externe Dienste; Desktop = Präsentation und Orchestrierung.

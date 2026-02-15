@@ -75,9 +75,9 @@ Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Cl
 * **Core:** C# / .NET 9
 * **UI Framework:** [Avalonia UI](https://avaloniaui.net/) (für Cross-Platform Desktop Support)
 * **Architektur:**
-    * `Focus.Engine`: Die reine Rechenlogik (Steuern, Simulation).
-    * `Focus.Contracts`: Datendefinitionen und Schnittstellen.
-    * `Focus.Desktop`: Die MVVM-basierte Benutzeroberfläche.
+    * `CashflowSimulator.Engine`: Die reine Rechenlogik (Steuern, Simulation).
+    * `CashflowSimulator.Contracts`: Datendefinitionen und Schnittstellen.
+    * `CashflowSimulator.Desktop`: Die MVVM-basierte Benutzeroberfläche.
 * **Testing:** xUnit
 
 ---
@@ -91,7 +91,7 @@ Wir arbeiten aktuell an folgenden Meilensteinen:
 - [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale)
 - [x] Validierungslogik für Eingaben
 - [ ] Aufbau der Benutzeroberfläche (Avalonia XAML)
-- [ ] Persistierung (Speichern/Laden von Projekten)
+- [x] Persistierung (Speichern/Laden von Projekten)
 - [ ] Erste lauffähige Beta-Version
 
 ---

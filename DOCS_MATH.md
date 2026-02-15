@@ -1,6 +1,6 @@
 # Stochastische Marktmodelle und Monte-Carlo-Engine
 
-Diese Dokumentation beschreibt die **geplanten** mathematischen und technischen Konzepte für die generischen Marktdefinitionen (Stochastic Factors) und die Monte-Carlo-Simulation. Sie dient als Spezifikation für die spätere Engine-Implementierung in CashflowSimulator.Core bzw. einer dedizierten Engine.
+Diese Dokumentation beschreibt die **geplanten** mathematischen und technischen Konzepte für die generischen Marktdefinitionen (Stochastic Factors) und die Monte-Carlo-Simulation. Sie dient als Spezifikation für die Engine-Implementierung in **CashflowSimulator.Engine**.
 
 ---
 

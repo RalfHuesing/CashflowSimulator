@@ -21,7 +21,7 @@ Ein Faktor hat **keine** Stückzahl, keine Transaktionen und keine steuerlichen 
 Ein **Asset** ist ein **konkreter Vermögenswert**, den der Nutzer hält (z. B. "Vanguard FTSE All-World", "iShares MSCI World"):
 
 - **Verknüpfung zum Markt:** Über `EconomicFactorId` wird genau ein EconomicFactor referenziert. Die Wertentwicklung dieses Assets folgt dem simulierten Pfad dieses Faktors.
-- **Eigene Bestandsdaten:** Stückzahl (`CurrentQuantity`), Transaktionshistorie (`Transactions`), steuerliche Einordnung (`TaxType`), ISIN, Name.
+- **Eigene Bestandsdaten:** Art des Vermögenswerts (`AssetType`), Zuordnung zur Anlageklasse (`AssetClassId`), aktueller Kurs (`CurrentPrice`), Stückzahl (`CurrentQuantity`), Transaktionshistorie (`Transactions`), steuerliche Einordnung (`TaxType`), ISIN, Name.
 - **Status:** `IsActiveSavingsInstrument` kennzeichnet, ob neue Sparraten in dieses Asset fließen (siehe Abschnitt 2).
 
 **Wichtig:** Mehrere Assets können **dieselbe** `EconomicFactorId` haben. Dann entwickeln sie sich alle nach dem **gleichen** Marktpfad, haben aber getrennte Bestände und Historie.
@@ -66,7 +66,7 @@ Assets tragen Attribute für die **deutsche Besteuerung**:
 - **Transaktionshistorie:** Für eine exakte **FIFO-Steuerberechnung** bei Verkäufen müssen Kaufdaten und -mengen vorliegen (`TransactionDto` mit Typ `Buy`/`Sell`). Jede Transaktion hat eine eindeutige **Id**; die Desktop-App nutzt diese für robustes Bearbeiten und Löschen (unabhängig von Listenreihenfolge/Sortierung). Die Engine kann anhand der Id bzw. der Historie realisierte Gewinne/Verluste und Kapitalertragsteuer ableiten.
 - **Vorabpauschale / Ausschüttung:** Transaktionstypen `TaxPrepayment` und `Dividend` in der Historie unterstützen die Nachbildung von Besteuerung und Cashflows.
 
-Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der Engine (Core); die Contracts liefern die dafür notwendigen Daten.
+Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der Engine; die Contracts liefern die dafür notwendigen Daten.
 
 ---
 
@@ -75,8 +75,9 @@ Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der 
 | DTO | Rolle |
 |-----|--------|
 | **EconomicFactorDto** | Markt: Id, Name, Modell, Drift, Volatilität, Startwert. Keine Stückzahl, keine Transaktionen. |
-| **AssetDto** | Besitz: Id, Name, ISIN, **EconomicFactorId**, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue, Transactions. |
+| **AssetClassDto** | Anlageklasse (Bucket): Id, Name, TargetWeight (Zielgewichtung 0–1), optional Color. Die Zielallokation wird über diese Liste gesteuert; Assets referenzieren eine Klasse über `AssetClassId`. |
+| **AssetDto** | Besitz: Id, Name, ISIN, **AssetType**, **AssetClassId**, **CurrentPrice**, EconomicFactorId, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue?, Transactions. |
 | **TransactionDto** | Einzelne Buchung: **Id** (eindeutig, Guid-String), Datum, Typ (Buy/Sell/Dividend/TaxPrepayment), Menge, Preis, Gesamtbetrag, Steueranteil. Die Id ermöglicht robustes Update/Löschen in der UI und eine eindeutige Zuordnung für die Engine (z. B. FIFO). |
 | **PortfolioDto** | Container: Liste aller Assets, optional Strategy (Rebalancing etc., später). |
 
-`SimulationProjectDto` enthält sowohl `EconomicFactors` als auch `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen (Validierung in CashflowSimulator.Validation).
+`SimulationProjectDto` enthält `EconomicFactors`, **AssetClasses** (Anlageklassen mit Zielgewichtung `TargetWeight`; Assets werden über `AssetClassId` einer Klasse zugeordnet), sowie `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen (Validierung in CashflowSimulator.Validation).

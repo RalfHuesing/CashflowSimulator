@@ -25,6 +25,7 @@ CashflowSimulator.Desktop/
     ├── Eckdaten/                                          # Eckdaten (EckdatenView*, EckdatenViewModel)
     ├── Marktdaten/                                        # Stochastische Marktfaktoren (GBM, Mean Reversion); MasterDetailView
     ├── Korrelationen/                                     # Paarweise Korrelationen zwischen Faktoren; Matrix-Validierung (positiv definit)
+    ├── Portfolio/                                         # Anlageklassen (AssetClassesViewModel), Vermögenswerte (PortfolioViewModel), Transaktionen (TransactionsViewModel); MasterDetailView
     ├── CashflowStreams/                                   # Laufende Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
     ├── CashflowEvents/                                    # Geplante Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
     ├── TaxProfiles/                                       # Steuer-Profile (MasterDetailView); KapESt, Freibetrag, ESt-Satz
@@ -44,6 +45,7 @@ CashflowSimulator.Desktop/
 - `CashflowSimulator.Desktop.Features.Settings` – Einstellungen
 - `CashflowSimulator.Desktop.Features.Marktdaten` – Stochastische Faktoren (Marktdaten)
 - `CashflowSimulator.Desktop.Features.Korrelationen` – Korrelationen zwischen Faktoren
+- `CashflowSimulator.Desktop.Features.Portfolio` – Anlageklassen, Vermögenswerte (Assets), Transaktionen
 - `CashflowSimulator.Desktop.Features.CashflowStreams` – Laufende Cashflows
 - `CashflowSimulator.Desktop.Features.CashflowEvents` – Geplante Cashflow-Events
 - `CashflowSimulator.Desktop.Features.TaxProfiles` – Steuer-Profile
@@ -78,12 +80,12 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 
 - **Lifecycle-Phasen:** Das Projekt enthält Lebensphasen (`LifecyclePhases`), die durch das Alter getriggert werden (z. B. Ansparphase ab aktuellem Alter, Rentenphase ab 67). Jede Phase hat eine eindeutige **Id** (`IIdentifiable`) für robustes CRUD in der UI. Jede Phase verweist auf ein **Steuer-Profil** (`TaxProfiles`) und ein **Strategie-Profil** (`StrategyProfiles`).
 - **Steuer-Profile (UI:** `Features/TaxProfiles/`): Master-Detail-View für CRUD. Pro Profil: Kapitalertragsteuer-Satz, Freibetrag, Einkommensteuer-Satz (nachgelagerte Besteuerung). Beim Löschen eines Profils werden Referenzen in Lebensphasen auf leer gesetzt.
-- **Strategie-Profile (UI:** `Features/StrategyProfiles/`): Master-Detail-View für CRUD. Pro Profil: Liquiditätsreserve (Monate), Rebalancing-Schwelle, Lookahead (Monate). Beim Löschen werden Referenzen in Lebensphasen auf leer gesetzt.
+- **Strategie-Profile (UI:** `Features/StrategyProfiles/`): Master-Detail-View für CRUD. Pro Profil: Liquiditätsreserve (Monate), Rebalancing-Schwelle, Mindest-Transaktionsgröße (MinimumTransactionAmount), Lookahead (Monate). Beim Löschen werden Referenzen in Lebensphasen auf leer gesetzt.
 - **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil und Strategie-Profil (ComboBoxen), optionale **Asset-Allokation-Overrides** (Anlageklasse + Zielgewicht in bearbeitbarer Tabelle).
 - **Asset-Allokation pro Phase:** In der Lebensphasen-View können pro Phase Zielgewichtungen von Anlageklassen überschrieben werden (`AssetAllocationOverrides`); Hinzufügen/Entfernen über Toolbar.
 - Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer- und Strategie-Profil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“.
 
 ## Erweiterung
 
-- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
+- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen, Portfolio/Anlageklassen/Assets) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
 - Gemeinsam genutzte Dialoge/Services bleiben in `Services/` oder werden bei Bedarf in ein gemeinsames Feature (z. B. `Features/Shared/`) ausgelagert.

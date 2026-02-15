@@ -4,8 +4,8 @@ Avalonia-Desktop-Client (.NET 9) des **Cashflow Simulators**. Einstiegspunkt und
 
 ## Lösungskontext
 
-- **Abhängigkeiten:** Dieses Projekt referenziert **CashflowSimulator.Contracts** (DTOs, Result, Interfaces). Optional später: Engine, Infrastructure.
-- **Keine umgekehrten Abhängigkeiten:** Core/Infrastructure kennen die Desktop-App nicht. Siehe Solution-README bzw. `.cursor/rules/main.md` für die Gesamtarchitektur.
+- **Abhängigkeiten:** Dieses Projekt referenziert **CashflowSimulator.Contracts**, **CashflowSimulator.Engine**, **CashflowSimulator.Infrastructure** und **CashflowSimulator.Validation** (DTOs, Result, Interfaces, Default-Projekt, Persistenz, Validatoren).
+- **Keine umgekehrten Abhängigkeiten:** Engine und Infrastructure kennen die Desktop-App nicht. Siehe Solution-README bzw. `.cursor/rules/main.md` für die Gesamtarchitektur.
 
 ## Ordner- und Namespacestruktur (Feature-basiert)
 
@@ -27,8 +27,11 @@ CashflowSimulator.Desktop/
     │   └── Navigation/NavigationView*, NavigationViewModel
     ├── Meta/                                            # Szenario-Stammdaten
     ├── Eckdaten/                                        # Eckdaten
+    ├── Marktdaten/, Korrelationen/, Portfolio/           # Marktfaktoren, Korrelationen, Anlageklassen/Assets/Transaktionen
+    ├── CashflowStreams/, CashflowEvents/                # Laufende und geplante Cashflows
+    ├── TaxProfiles/, StrategyProfiles/, LifecyclePhases/ # Steuer-, Strategie-Profile, Lebensphasen
     ├── Settings/                                        # Einstellungen
-    └── Cashflow/                                        # (später) Liste, Dialoge
+    └── Cashflow/                                        # (später) ggf. weitere Cashflow-Themen
 ```
 
 - **Root-Namespace:** `CashflowSimulator.Desktop` für App, Program, MainWindow, CompositionRoot.
