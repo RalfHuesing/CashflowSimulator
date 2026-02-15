@@ -9,20 +9,20 @@ namespace CashflowSimulator.Engine.Services.Defaults;
 public sealed class CashflowDefaultService : ICashflowDefaultService
 {
     /// <inheritdoc />
-    public List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly retirementDate)
+    public List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd)
     {
         List<CashflowStreamDto> streams =
         [
-            .. GetIncomeStreams(simulationStart, retirementDate),
+            .. GetIncomeStreams(simulationStart, simulationEnd),
             .. GetLivingExpenses(simulationStart),
             .. GetMobilityAndSubscriptions(simulationStart),
-            .. GetYearlyExpenses(simulationStart, retirementDate)
+            .. GetYearlyExpenses(simulationStart, simulationEnd)
         ];
         return streams;
     }
 
     /// <inheritdoc />
-    public List<CashflowEventDto> GetEvents(DateOnly simulationStart, DateOnly retirementDate)
+    public List<CashflowEventDto> GetEvents(DateOnly simulationStart, DateOnly simulationEnd)
     {
         return
         [
@@ -72,7 +72,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Name = "Zahnersatz / Gesundheit im Alter",
                 Type = CashflowType.Expense,
                 Amount = 5000m,
-                TargetDate = retirementDate.AddYears(5),
+                TargetDate = simulationEnd.AddMonths(-60),
                 EarliestMonthOffset = 0,
                 LatestMonthOffset = 60
             },
@@ -89,7 +89,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
         ];
     }
 
-    private IEnumerable<CashflowStreamDto> GetIncomeStreams(DateOnly start, DateOnly retirement)
+    private IEnumerable<CashflowStreamDto> GetIncomeStreams(DateOnly start, DateOnly simulationEnd)
     {
         return
         [
@@ -101,7 +101,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Amount = 2850m,
                 Interval = CashflowInterval.Monthly,
                 StartDate = start,
-                EndDate = retirement
+                EndDate = simulationEnd
             },
             new()
             {
@@ -110,7 +110,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Type = CashflowType.Income,
                 Amount = 1950m,
                 Interval = CashflowInterval.Monthly,
-                StartDate = retirement,
+                StartDate = start,
                 EndDate = null
             }
         ];
@@ -180,7 +180,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
         ];
     }
 
-    private IEnumerable<CashflowStreamDto> GetYearlyExpenses(DateOnly start, DateOnly retirement)
+    private IEnumerable<CashflowStreamDto> GetYearlyExpenses(DateOnly start, DateOnly simulationEnd)
     {
         return
         [
@@ -202,7 +202,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Amount = 2000m,
                 Interval = CashflowInterval.Yearly,
                 StartDate = new DateOnly(start.Year, 6, 1),
-                EndDate = retirement
+                EndDate = simulationEnd
             },
             new()
             {

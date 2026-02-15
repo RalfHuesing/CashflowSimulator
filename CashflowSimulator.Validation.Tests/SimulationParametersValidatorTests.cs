@@ -30,51 +30,15 @@ public sealed class SimulationParametersValidatorTests
     }
 
     [Fact]
-    public void Validate_RetirementBeforeBirth_ReturnsError()
+    public void Validate_SimulationEndBeforeBirth_ReturnsError()
     {
         var dto = new SimulationParametersDtoBuilder()
-            .WithRetirementBeforeBirth()
+            .WithSimulationEndBeforeBirth()
             .Build();
         var result = ValidationRunner.Validate(dto);
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.Message.Contains("Renteneintritt") && e.Message.Contains("Geburtsdatum"));
-    }
-
-    [Fact]
-    public void Validate_SimulationEndBeforeRetirement_ReturnsError()
-    {
-        var dto = new SimulationParametersDtoBuilder()
-            .WithLifeExpectancyBeforeRetirement()
-            .Build();
-        var result = ValidationRunner.Validate(dto);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.Message.Contains("Lebenserwartung") && e.Message.Contains("Renteneintritt"));
-    }
-
-    [Fact]
-    public void Validate_RetirementAgeBelow50_ReturnsError()
-    {
-        var dto = new SimulationParametersDtoBuilder()
-            .WithRetirementAgeTooLow()
-            .Build();
-        var result = ValidationRunner.Validate(dto);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.Message.Contains("50") && e.Message.Contains("75"));
-    }
-
-    [Fact]
-    public void Validate_RetirementAgeAbove75_ReturnsError()
-    {
-        var dto = new SimulationParametersDtoBuilder()
-            .WithRetirementAgeTooHigh()
-            .Build();
-        var result = ValidationRunner.Validate(dto);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.Message.Contains("50") && e.Message.Contains("75"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("Lebenserwartung") || e.Message.Contains("Geburtsdatum"));
     }
 
     [Fact]
@@ -99,6 +63,30 @@ public sealed class SimulationParametersValidatorTests
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.Message.Contains("60") && e.Message.Contains("120"));
+    }
+
+    [Fact]
+    public void Validate_NegativeInitialLossCarryforwardGeneral_ReturnsError()
+    {
+        var dto = new SimulationParametersDtoBuilder()
+            .WithInitialLossCarryforwardGeneral(-100)
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "InitialLossCarryforwardGeneral" && e.Message.Contains("negativ"));
+    }
+
+    [Fact]
+    public void Validate_NegativeInitialLossCarryforwardStocks_ReturnsError()
+    {
+        var dto = new SimulationParametersDtoBuilder()
+            .WithInitialLossCarryforwardStocks(-50)
+            .Build();
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "InitialLossCarryforwardStocks" && e.Message.Contains("negativ"));
     }
 
     [Fact]

@@ -15,8 +15,11 @@ public record SimulationParametersDto
     /// <summary>Geburtsdatum (Basis für Altersberechnungen).</summary>
     public DateOnly DateOfBirth { get; init; }
 
-    /// <summary>Renteneintritt: 1. des Monats, in dem das Rentenalter (z. B. 67) erreicht wird.</summary>
-    public DateOnly RetirementDate { get; init; }
+    /// <summary>Steuerlicher Verlustvortrag (allgemeiner Verlusttopf) zum Simulationsstart. Wird mit sonstigen Gewinnen verrechnet.</summary>
+    public decimal InitialLossCarryforwardGeneral { get; init; }
+
+    /// <summary>Steuerlicher Verlustvortrag (Aktienverlusttopf) zum Simulationsstart. Nur mit Aktiengewinnen verrechenbar.</summary>
+    public decimal InitialLossCarryforwardStocks { get; init; }
 
     public decimal InitialLiquidCash { get; init; }
     public string CurrencyCode { get; init; } = "EUR";

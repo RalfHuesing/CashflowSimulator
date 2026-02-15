@@ -10,8 +10,8 @@
              x:DataType="vm:EckdatenViewModel">
 
     <controls:FeatureLayoutView Title="Eckdaten"
-                               Description="Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation.">
-        <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+                               Description="Geburtsdatum, Lebenserwartung und Verlustvorträge – Basis für die Simulation.">
+        <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
                   VerticalAlignment="Top" HorizontalAlignment="Stretch">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
                            Classes="form-label"
@@ -35,39 +35,53 @@
                           Foreground="{StaticResource TextSecondaryBrush}"
                           VerticalAlignment="Center"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Renteneintritt (Alter)"
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Lebenserwartung (Alter)"
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="2" Grid.Column="1"
                               Classes="form-input"
-                              Value="{Binding RetirementAge}"
+                              Value="{Binding LifeExpectancy}"
                               Increment="1"
                               Margin="{StaticResource FormInputMargin}"
                               TabIndex="2"
-                              behaviors:FocusHelpBehavior.HelpKey="RetirementAge"
-                              behaviors:FocusHelpBehavior.ErrorPropertyName="RetirementAge"/>
+                              behaviors:FocusHelpBehavior.HelpKey="LifeExpectancy"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="LifeExpectancy"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Lebenserwartung (Alter)"
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Verlustvortrag allgemein (Start)"
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>
                 <NumericUpDown Grid.Row="3" Grid.Column="1"
                               Classes="form-input"
-                              Value="{Binding LifeExpectancy}"
-                              Increment="1"
+                              Value="{Binding InitialLossCarryforwardGeneral}"
+                              Increment="100"
+                              Minimum="0"
                               Margin="{StaticResource FormInputMargin}"
                               TabIndex="3"
-                              behaviors:FocusHelpBehavior.HelpKey="LifeExpectancy"
-                              behaviors:FocusHelpBehavior.ErrorPropertyName="LifeExpectancy"/>
+                              behaviors:FocusHelpBehavior.HelpKey="InitialLossCarryforwardGeneral"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="InitialLossCarryforwardGeneral"/>
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Start-Kapital (flüssig)"
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Verlustvortrag Aktien (Start)"
+                           Classes="form-label"
+                           Margin="{StaticResource FormLabelMargin}"/>
+                <NumericUpDown Grid.Row="4" Grid.Column="1"
+                              Classes="form-input"
+                              Value="{Binding InitialLossCarryforwardStocks}"
+                              Increment="100"
+                              Minimum="0"
+                              Margin="{StaticResource FormInputMargin}"
+                              TabIndex="4"
+                              behaviors:FocusHelpBehavior.HelpKey="InitialLossCarryforwardStocks"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="InitialLossCarryforwardStocks"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Start-Kapital (flüssig)"
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMarginLast}"/>
-                <NumericUpDown Grid.Row="4" Grid.Column="1"
+                <NumericUpDown Grid.Row="5" Grid.Column="1"
                               Classes="form-input"
                               Value="{Binding InitialLiquidCash}"
                               Increment="1000"
                               Margin="{StaticResource FormInputMarginLast}"
-                              TabIndex="4"
+                              TabIndex="5"
                               behaviors:FocusHelpBehavior.HelpKey="InitialLiquidCash"
                               behaviors:FocusHelpBehavior.ErrorPropertyName="InitialLiquidCash"/>
         </Grid>

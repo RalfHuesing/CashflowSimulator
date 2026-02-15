@@ -29,6 +29,11 @@ public record StrategyProfileDto : IIdentifiable
     public decimal RebalancingThreshold { get; init; }
 
     /// <summary>
+    /// Mindest-Transaktionsgröße (in Währungseinheiten). Orders unter diesem Betrag werden beim Rebalancing nicht ausgeführt (Gebühren-Schutz).
+    /// </summary>
+    public decimal MinimumTransactionAmount { get; init; } = 50.0m;
+
+    /// <summary>
     /// Wie viele Monate voraus auf geplante Events gespart wird (Liquiditätsplanung).
     /// </summary>
     public int LookaheadMonths { get; init; }

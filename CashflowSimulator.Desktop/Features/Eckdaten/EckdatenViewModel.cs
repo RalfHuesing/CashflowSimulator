@@ -21,8 +21,9 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
     private static readonly IReadOnlyDictionary<string, string> DtoToVmPropertyMap = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         { nameof(SimulationParametersDto.DateOfBirth), nameof(DateOfBirth) },
-        { nameof(SimulationParametersDto.RetirementDate), nameof(RetirementAge) },
         { nameof(SimulationParametersDto.SimulationEnd), nameof(LifeExpectancy) },
+        { nameof(SimulationParametersDto.InitialLossCarryforwardGeneral), nameof(InitialLossCarryforwardGeneral) },
+        { nameof(SimulationParametersDto.InitialLossCarryforwardStocks), nameof(InitialLossCarryforwardStocks) },
         { nameof(SimulationParametersDto.InitialLiquidCash), nameof(InitialLiquidCash) },
         { nameof(SimulationParametersDto.CurrencyCode), nameof(InitialLiquidCash) }
     };
@@ -35,10 +36,13 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
     private DateOnly? _dateOfBirth;
 
     [ObservableProperty]
-    private decimal _retirementAge = 67;
+    private decimal _lifeExpectancy = 95;
 
     [ObservableProperty]
-    private decimal _lifeExpectancy = 95;
+    private decimal _initialLossCarryforwardGeneral;
+
+    [ObservableProperty]
+    private decimal _initialLossCarryforwardStocks;
 
     [ObservableProperty]
     private decimal _initialLiquidCash;
@@ -61,8 +65,9 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         : "—";
 
     partial void OnDateOfBirthChanged(DateOnly? value) => ScheduleValidateAndSave();
-    partial void OnRetirementAgeChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnLifeExpectancyChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnInitialLossCarryforwardGeneralChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnInitialLossCarryforwardStocksChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnInitialLiquidCashChanged(decimal value) => ScheduleValidateAndSave();
 
     private void ScheduleValidateAndSave()
@@ -82,8 +87,9 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         try
         {
             DateOfBirth = p.DateOfBirth;
-            RetirementAge = p.RetirementDate.Year - p.DateOfBirth.Year;
             LifeExpectancy = p.SimulationEnd.Year - p.DateOfBirth.Year;
+            InitialLossCarryforwardGeneral = p.InitialLossCarryforwardGeneral;
+            InitialLossCarryforwardStocks = p.InitialLossCarryforwardStocks;
             InitialLiquidCash = p.InitialLiquidCash;
         }
         finally
@@ -122,9 +128,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
 
         var dob = DateOfBirth.Value;
         var simulationStart = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
-        var retirementYears = (int)Math.Round(RetirementAge);
         var lifeYears = (int)Math.Round(LifeExpectancy);
-        var retirementDate = FirstOfMonthWhenAge(dob, retirementYears);
         var simulationEnd = FirstOfMonthWhenAge(dob, lifeYears);
 
         return new SimulationParametersDto
@@ -132,7 +136,8 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
             SimulationStart = simulationStart,
             SimulationEnd = simulationEnd,
             DateOfBirth = dob,
-            RetirementDate = retirementDate,
+            InitialLossCarryforwardGeneral = InitialLossCarryforwardGeneral,
+            InitialLossCarryforwardStocks = InitialLossCarryforwardStocks,
             InitialLiquidCash = InitialLiquidCash,
             CurrencyCode = "EUR"
         };

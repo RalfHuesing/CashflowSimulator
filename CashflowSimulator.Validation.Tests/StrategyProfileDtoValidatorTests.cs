@@ -65,6 +65,16 @@ public sealed class StrategyProfileDtoValidatorTests
     }
 
     [Fact]
+    public void Validate_NegativeMinimumTransactionAmount_ReturnsError()
+    {
+        var dto = ValidDto() with { MinimumTransactionAmount = -10m };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "MinimumTransactionAmount");
+    }
+
+    [Fact]
     public void Validate_NegativeLookaheadMonths_ReturnsError()
     {
         var dto = ValidDto() with { LookaheadMonths = -1 };

@@ -6,7 +6,7 @@ namespace CashflowSimulator.Desktop.Tests;
 public sealed class SimulationTimeServiceTests
 {
     [Fact]
-    public void GetDefaultTimeContext_ReturnsParametersWithRetirementAt67()
+    public void GetDefaultTimeContext_ReturnsParametersWithExpectedStructure()
     {
         var service = new SimulationTimeService();
         var context = service.GetDefaultTimeContext();
@@ -14,7 +14,9 @@ public sealed class SimulationTimeServiceTests
         Assert.NotEqual(default, context.Now);
         Assert.NotNull(context.Parameters);
         var p = context.Parameters;
-        Assert.Equal(67, p.RetirementDate.Year - p.DateOfBirth.Year);
+        Assert.NotEqual(default, p.SimulationStart);
+        Assert.NotEqual(default, p.SimulationEnd);
+        Assert.NotEqual(default, p.DateOfBirth);
     }
 
     [Fact]

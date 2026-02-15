@@ -41,6 +41,10 @@ public sealed class StrategyProfileDtoValidator : AbstractValidator<StrategyProf
             .InclusiveBetween(ThresholdMin, ThresholdMax)
             .WithMessage($"Rebalancing-Schwelle muss zwischen {ThresholdMin} und {ThresholdMax} liegen (z. B. 0,05).");
 
+        RuleFor(x => x.MinimumTransactionAmount)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Mindest-Transaktionsgröße darf nicht negativ sein.");
+
         RuleFor(x => x.LookaheadMonths)
             .GreaterThanOrEqualTo(0)
             .WithMessage("Lookahead (Monate) darf nicht negativ sein.")

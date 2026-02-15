@@ -45,12 +45,12 @@ public sealed class ValidatingViewModelBaseTests
         var vm = new TestableValidatingViewModel();
         var map = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            { nameof(SimulationParametersDto.RetirementDate), "RetirementAge" }
+            { nameof(SimulationParametersDto.SimulationEnd), "LifeExpectancy" }
         };
-        vm.SetErrorsPublic([new ValidationError(nameof(SimulationParametersDto.RetirementDate), "Ungültig.")], map);
+        vm.SetErrorsPublic([new ValidationError(nameof(SimulationParametersDto.SimulationEnd), "Ungültig.")], map);
 
-        Assert.Empty(vm.GetErrors(nameof(SimulationParametersDto.RetirementDate)).Cast<string>().ToList());
-        var vmErrors = vm.GetErrors("RetirementAge").Cast<string>().ToList();
+        Assert.Empty(vm.GetErrors(nameof(SimulationParametersDto.SimulationEnd)).Cast<string>().ToList());
+        var vmErrors = vm.GetErrors("LifeExpectancy").Cast<string>().ToList();
         Assert.Single(vmErrors);
         Assert.Equal("Ungültig.", vmErrors[0]);
     }

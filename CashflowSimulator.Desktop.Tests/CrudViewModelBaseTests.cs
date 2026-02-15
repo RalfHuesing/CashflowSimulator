@@ -83,7 +83,6 @@ public sealed class CrudViewModelBaseTests
             SimulationStart = DateOnly.FromDateTime(DateTime.Today),
             SimulationEnd = DateOnly.FromDateTime(DateTime.Today.AddYears(30)),
             DateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-40)),
-            RetirementDate = DateOnly.FromDateTime(DateTime.Today.AddYears(27)),
             InitialLiquidCash = 0,
             CurrencyCode = "EUR"
         },

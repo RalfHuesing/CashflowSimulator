@@ -36,6 +36,9 @@ public partial class StrategyProfilesViewModel : ValidatingViewModelBase
     private decimal _rebalancingThreshold;
 
     [ObservableProperty]
+    private decimal _minimumTransactionAmount = 50m;
+
+    [ObservableProperty]
     private int _lookaheadMonths;
 
     [ObservableProperty]
@@ -69,6 +72,7 @@ public partial class StrategyProfilesViewModel : ValidatingViewModelBase
             Name = value.Name;
             CashReserveMonths = value.CashReserveMonths;
             RebalancingThreshold = value.RebalancingThreshold;
+            MinimumTransactionAmount = value.MinimumTransactionAmount;
             LookaheadMonths = value.LookaheadMonths;
         }
         finally
@@ -81,6 +85,7 @@ public partial class StrategyProfilesViewModel : ValidatingViewModelBase
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();
     partial void OnCashReserveMonthsChanged(int value) => ScheduleValidateAndSave();
     partial void OnRebalancingThresholdChanged(decimal value) => ScheduleValidateAndSave();
+    partial void OnMinimumTransactionAmountChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnLookaheadMonthsChanged(int value) => ScheduleValidateAndSave();
 
     private void ScheduleValidateAndSave()
@@ -116,6 +121,7 @@ public partial class StrategyProfilesViewModel : ValidatingViewModelBase
         Name = string.Empty;
         CashReserveMonths = 3;
         RebalancingThreshold = 0.05m;
+        MinimumTransactionAmount = 50m;
         LookaheadMonths = 24;
         ClearValidationErrors();
     }
@@ -128,6 +134,7 @@ public partial class StrategyProfilesViewModel : ValidatingViewModelBase
             Name = Name?.Trim() ?? string.Empty,
             CashReserveMonths = CashReserveMonths,
             RebalancingThreshold = RebalancingThreshold,
+            MinimumTransactionAmount = MinimumTransactionAmount,
             LookaheadMonths = LookaheadMonths
         };
     }

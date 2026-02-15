@@ -10,8 +10,9 @@ public sealed class SimulationParametersDtoBuilder
 {
     private DateOnly _simulationStart = new(DateTime.Now.Year, DateTime.Now.Month, 1);
     private DateOnly _dateOfBirth = new(1980, 1, 1);
-    private DateOnly _retirementDate = new(2047, 1, 1);  // Alter 67
     private DateOnly _simulationEnd = new(2075, 1, 1);    // Alter 95
+    private decimal _initialLossCarryforwardGeneral = 0;
+    private decimal _initialLossCarryforwardStocks = 0;
     private decimal _initialLiquidCash = 0;
     private string _currencyCode = "EUR";
 
@@ -21,15 +22,21 @@ public sealed class SimulationParametersDtoBuilder
         return this;
     }
 
-    public SimulationParametersDtoBuilder WithRetirementDate(DateOnly value)
-    {
-        _retirementDate = value;
-        return this;
-    }
-
     public SimulationParametersDtoBuilder WithSimulationEnd(DateOnly value)
     {
         _simulationEnd = value;
+        return this;
+    }
+
+    public SimulationParametersDtoBuilder WithInitialLossCarryforwardGeneral(decimal value)
+    {
+        _initialLossCarryforwardGeneral = value;
+        return this;
+    }
+
+    public SimulationParametersDtoBuilder WithInitialLossCarryforwardStocks(decimal value)
+    {
+        _initialLossCarryforwardStocks = value;
         return this;
     }
 
@@ -46,38 +53,11 @@ public sealed class SimulationParametersDtoBuilder
     }
 
     /// <summary>
-    /// Setzt Renteneintritt vor Geburt (ungültig).
+    /// Setzt Simulationsende vor Geburt (ungültig).
     /// </summary>
-    public SimulationParametersDtoBuilder WithRetirementBeforeBirth()
+    public SimulationParametersDtoBuilder WithSimulationEndBeforeBirth()
     {
-        _retirementDate = _dateOfBirth.AddYears(-1);
-        return this;
-    }
-
-    /// <summary>
-    /// Setzt Lebenserwartung vor Renteneintritt (ungültig).
-    /// </summary>
-    public SimulationParametersDtoBuilder WithLifeExpectancyBeforeRetirement()
-    {
-        _simulationEnd = _retirementDate.AddYears(-1);
-        return this;
-    }
-
-    /// <summary>
-    /// Renteneintrittsalter unter 50 (ungültig).
-    /// </summary>
-    public SimulationParametersDtoBuilder WithRetirementAgeTooLow()
-    {
-        _retirementDate = _dateOfBirth.AddYears(40);
-        return this;
-    }
-
-    /// <summary>
-    /// Renteneintrittsalter über 75 (ungültig).
-    /// </summary>
-    public SimulationParametersDtoBuilder WithRetirementAgeTooHigh()
-    {
-        _retirementDate = _dateOfBirth.AddYears(80);
+        _simulationEnd = _dateOfBirth.AddYears(-1);
         return this;
     }
 
@@ -104,7 +84,8 @@ public sealed class SimulationParametersDtoBuilder
         SimulationStart = _simulationStart,
         SimulationEnd = _simulationEnd,
         DateOfBirth = _dateOfBirth,
-        RetirementDate = _retirementDate,
+        InitialLossCarryforwardGeneral = _initialLossCarryforwardGeneral,
+        InitialLossCarryforwardStocks = _initialLossCarryforwardStocks,
         InitialLiquidCash = _initialLiquidCash,
         CurrencyCode = _currencyCode
     };

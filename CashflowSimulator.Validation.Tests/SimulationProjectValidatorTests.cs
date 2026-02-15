@@ -74,7 +74,7 @@ public sealed class SimulationProjectValidatorTests
         var dto = new SimulationProjectDto
         {
             Meta = new MetaDtoBuilder().Build(),
-            Parameters = new SimulationParametersDtoBuilder().WithRetirementBeforeBirth().Build(),
+            Parameters = new SimulationParametersDtoBuilder().WithSimulationEndBeforeBirth().Build(),
             TaxProfiles = taxProfiles,
             StrategyProfiles = strategyProfiles,
             LifecyclePhases = lifecyclePhases,
@@ -180,7 +180,6 @@ public sealed class SimulationProjectValidatorTests
         // Alter zum Start = 30 (1990 → 2020). Nur Phase ab 67 = keine Phase deckt Start ab.
         var parameters = new SimulationParametersDtoBuilder()
             .WithDateOfBirth(new DateOnly(1990, 1, 1))
-            .WithRetirementDate(new DateOnly(2057, 1, 1))
             .WithSimulationEnd(new DateOnly(2085, 1, 1))
             .Build();
         parameters = parameters with { SimulationStart = new DateOnly(2020, 1, 1) };

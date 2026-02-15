@@ -23,10 +23,10 @@ public sealed class DefaultProjectProvider(
         var timeContext = simulationTimeService.GetDefaultTimeContext();
         var parameters = timeContext.Parameters;
         var simulationStart = parameters.SimulationStart;
-        var retirementDate = parameters.RetirementDate;
+        var simulationEnd = parameters.SimulationEnd;
 
-        List<CashflowStreamDto> streams = cashflowDefaultService.GetStreams(simulationStart, retirementDate);
-        List<CashflowEventDto> events = cashflowDefaultService.GetEvents(simulationStart, retirementDate);
+        List<CashflowStreamDto> streams = cashflowDefaultService.GetStreams(simulationStart, simulationEnd);
+        List<CashflowEventDto> events = cashflowDefaultService.GetEvents(simulationStart, simulationEnd);
         List<EconomicFactorDto> economicFactors = marketDataService.GetEconomicFactors();
         List<CorrelationEntryDto> correlations = marketDataService.GetCorrelations(economicFactors);
         List<AssetClassDto> assetClasses = portfolioDefaultService.GetAssetClasses();
@@ -94,6 +94,7 @@ public sealed class DefaultProjectProvider(
                 Name = "Aufbau",
                 CashReserveMonths = 3,
                 RebalancingThreshold = 0.05m,
+                MinimumTransactionAmount = 50m,
                 LookaheadMonths = 24
             },
             new()
@@ -102,6 +103,7 @@ public sealed class DefaultProjectProvider(
                 Name = "Entnahme",
                 CashReserveMonths = 12,
                 RebalancingThreshold = 0.05m,
+                MinimumTransactionAmount = 50m,
                 LookaheadMonths = 6
             }
         };

@@ -42,7 +42,6 @@ public sealed class DefaultProjectProviderTests
         Assert.NotNull(project.Portfolio.Assets);
         Assert.NotEqual(default, project.Parameters.SimulationStart);
         Assert.NotEqual(default, project.Parameters.SimulationEnd);
-        Assert.NotEqual(default, project.Parameters.RetirementDate);
     }
 
     [Fact]

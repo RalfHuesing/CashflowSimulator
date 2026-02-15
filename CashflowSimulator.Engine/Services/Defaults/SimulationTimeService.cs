@@ -4,12 +4,11 @@ namespace CashflowSimulator.Engine.Services.Defaults;
 
 /// <summary>
 /// Standard-Implementierung: Berechnet Stichtage und Parameter für einen durchschnittlichen
-/// deutschen Single-Haushalt (Alter 30, Rente 67, Lebenserwartung 90).
+/// deutschen Single-Haushalt (Alter 30, Lebenserwartung 90). Lebensphasen (z. B. Rente) kommen über LifeStages.
 /// </summary>
 public sealed class SimulationTimeService : ISimulationTimeService
 {
     private const int CurrentAge = 30;
-    private const int RetirementAge = 67;
     private const int LifeExpectancy = 90;
     private const string Currency = "EUR";
 
@@ -22,7 +21,6 @@ public sealed class SimulationTimeService : ISimulationTimeService
 
         var birthYear = today.Year - CurrentAge;
         var dateOfBirth = new DateOnly(birthYear, 5, 15);
-        var retirementDate = new DateOnly(birthYear + RetirementAge, 6, 1);
         var simulationEnd = new DateOnly(birthYear + LifeExpectancy, 5, 1);
 
         var parameters = new SimulationParametersDto
@@ -30,7 +28,8 @@ public sealed class SimulationTimeService : ISimulationTimeService
             SimulationStart = simulationStart,
             SimulationEnd = simulationEnd,
             DateOfBirth = dateOfBirth,
-            RetirementDate = retirementDate,
+            InitialLossCarryforwardGeneral = 0,
+            InitialLossCarryforwardStocks = 0,
             InitialLiquidCash = 15_000m,
             CurrencyCode = Currency
         };

@@ -11,10 +11,11 @@ public sealed class HelpProvider : IHelpProvider
     private static readonly FrozenDictionary<string, (string Title, string Description)> Entries = new Dictionary<string, (string, string)>(StringComparer.Ordinal)
     {
         // Eckdaten (HelpKeyPrefix = "Eckdaten")
-        ["Eckdaten"] = ("Eckdaten der Simulation", "Geburtsdatum, Renteneintritt und Lebenserwartung – Basis für die Simulation. Hier legen Sie die zeitlichen Eckdaten und das anfängliche liquide Kapital fest."),
-        ["Eckdaten.DateOfBirth"] = ("Geburtsdatum", "Das Geburtsdatum wird für die Berechnung des aktuellen Alters sowie des Renteneintritts- und Enddatums der Simulation verwendet."),
-        ["Eckdaten.RetirementAge"] = ("Renteneintritt (Alter)", "Alter in Jahren, in dem die Rente beginnt. Üblich sind 67 Jahre (Regelaltersrente)."),
+        ["Eckdaten"] = ("Eckdaten der Simulation", "Geburtsdatum, Lebenserwartung, Verlustvorträge und Start-Kapital – Basis für die Simulation."),
+        ["Eckdaten.DateOfBirth"] = ("Geburtsdatum", "Das Geburtsdatum wird für die Berechnung des aktuellen Alters und des Enddatums der Simulation verwendet."),
         ["Eckdaten.LifeExpectancy"] = ("Lebenserwartung (Alter)", "Annahme für das Ende der Simulation in Lebensjahren. Die Simulation endet am Ersten des Monats, in dem dieses Alter erreicht wird."),
+        ["Eckdaten.InitialLossCarryforwardGeneral"] = ("Verlustvortrag allgemein", "Bestehender steuerlicher Verlustvortrag (allgemeiner Verlusttopf) zum Simulationsstart. Wird mit sonstigen Gewinnen verrechnet; Gewinne im ersten Jahr mindern zuerst diesen Topf."),
+        ["Eckdaten.InitialLossCarryforwardStocks"] = ("Verlustvortrag Aktien", "Bestehender steuerlicher Verlustvortrag (Aktienverlusttopf) zum Simulationsstart. Nur mit Aktiengewinnen verrechenbar."),
         ["Eckdaten.InitialLiquidCash"] = ("Start-Kapital (flüssig)", "Das Start-Kapital beschreibt das liquide Vermögen, das zum Beginn der Simulation (T0) zur Verfügung steht. Typischerweise sind dies Guthaben auf Tagesgeld- oder Girokonten, die noch nicht investiert sind. Hinweis: Schulden oder Kredite werden hier nicht negativ eingetragen, sondern in einem eigenen Bereich (Verbindlichkeiten) erfasst."),
         // Szenario (HelpKeyPrefix = "Szenario")
         ["Szenario"] = ("Szenario-Einstellungen", "Hier können Metadaten des aktuellen Szenarios bearbeitet werden."),
@@ -89,6 +90,7 @@ public sealed class HelpProvider : IHelpProvider
         ["StrategyProfiles.Name"] = ("Name", "Anzeigename des Profils (z. B. „Aufbau“ oder „Entnahme“)."),
         ["StrategyProfiles.CashReserveMonths"] = ("Liquiditätsreserve (Monate)", "Anzahl Monatsausgaben als liquide Reserve (Notgroschen). Typisch 3–12 Monate."),
         ["StrategyProfiles.RebalancingThreshold"] = ("Rebalancing-Schwelle", "Abweichungsschwelle (z. B. 0,05 = 5 %), ab der umgeschichtet wird. Größere Werte = selteneres Rebalancing."),
+        ["StrategyProfiles.MinimumTransactionAmount"] = ("Mindest-Transaktionsgröße", "Orders unter diesem Betrag werden beim Rebalancing nicht ausgeführt (Schutz vor Gebühren durch Mikro-Transaktionen)."),
         ["StrategyProfiles.LookaheadMonths"] = ("Lookahead (Monate)", "Wie viele Monate voraus auf geplante Events (Cashflow-Events) gespart wird. Relevant für Liquiditätsplanung."),
         // Lebensphasen (HelpKeyPrefix = "LifecyclePhases")
         ["LifecyclePhases"] = ("Lebensphasen", "Phasen ab Alter (z. B. Ansparphase ab Start, Rentenphase ab 67). Pro Phase: Steuer-Profil, Strategie-Profil und optionale Zielallokation."),
