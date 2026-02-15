@@ -67,19 +67,21 @@
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Von (Datum)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <DatePicker Grid.Row="3" Grid.Column="1" Classes="form-input"
-                                SelectedDate="{Binding StartDate}"
-                                Margin="{StaticResource FormInputMargin}"
-                                behaviors:FocusHelpBehavior.HelpKey="StartDate"
-                                behaviors:FocusHelpBehavior.ErrorPropertyName="StartDate"/>
+                    <CalendarDatePicker Grid.Row="3" Grid.Column="1" Classes="form-input"
+                                        SelectedDate="{Binding StartDate}"
+                                        Watermark="TT.MM.JJJJ"
+                                        Margin="{StaticResource FormInputMargin}"
+                                        behaviors:FocusHelpBehavior.HelpKey="StartDate"
+                                        behaviors:FocusHelpBehavior.ErrorPropertyName="StartDate"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Bis (Datum, leer = unbegrenzt)"
                                Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                    <DatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
-                                SelectedDate="{Binding EndDate}"
-                                Margin="{StaticResource FormInputMarginLast}"
-                                behaviors:FocusHelpBehavior.HelpKey="EndDate"
-                                behaviors:FocusHelpBehavior.ErrorPropertyName="EndDate"/>
+                    <CalendarDatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
+                                        SelectedDate="{Binding EndDate}"
+                                        Watermark="TT.MM.JJJJ (leer = unbegrenzt)"
+                                        Margin="{StaticResource FormInputMarginLast}"
+                                        behaviors:FocusHelpBehavior.HelpKey="EndDate"
+                                        behaviors:FocusHelpBehavior.ErrorPropertyName="EndDate"/>
                 </Grid>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>

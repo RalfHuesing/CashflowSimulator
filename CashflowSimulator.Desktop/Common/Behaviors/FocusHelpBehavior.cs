@@ -45,7 +45,7 @@ public static class FocusHelpBehavior
 
     /// <summary>
     /// Findet das erste Control in der visuellen Hierarchie (self oder Ancestor), an dem HelpKey gesetzt ist.
-    /// Ermöglicht Fokus-Hilfe auch bei Composite-Controls (DatePicker, NumericUpDown), wo e.Source ein inneres Control ist.
+    /// Ermöglicht Fokus-Hilfe auch bei Composite-Controls (CalendarDatePicker, NumericUpDown), wo e.Source ein inneres Control ist.
     /// </summary>
     private static bool TryGetFocusHost(Control focusSource, out Control? host)
     {

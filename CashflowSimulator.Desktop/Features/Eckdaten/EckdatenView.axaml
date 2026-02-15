@@ -16,13 +16,14 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Geburtsdatum"
                            Classes="form-label"
                            Margin="{StaticResource FormLabelMargin}"/>
-                <DatePicker Grid.Row="0" Grid.Column="1"
-                            Classes="form-input"
-                            SelectedDate="{Binding DateOfBirth}"
-                            Margin="{StaticResource FormInputMargin}"
-                            TabIndex="1"
-                            behaviors:FocusHelpBehavior.HelpKey="DateOfBirth"
-                            behaviors:FocusHelpBehavior.ErrorPropertyName="DateOfBirth"/>
+                <CalendarDatePicker Grid.Row="0" Grid.Column="1"
+                                    Classes="form-input"
+                                    SelectedDate="{Binding DateOfBirth}"
+                                    Watermark="TT.MM.JJJJ"
+                                    Margin="{StaticResource FormInputMargin}"
+                                    TabIndex="1"
+                                    behaviors:FocusHelpBehavior.HelpKey="DateOfBirth"
+                                    behaviors:FocusHelpBehavior.ErrorPropertyName="DateOfBirth"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Aktuelles Alter"
                            Classes="form-label"
