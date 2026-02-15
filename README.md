@@ -1,6 +1,6 @@
 # CashflowSimulator
 
-![License](https://img.shields.io/github/license/DEIN_USERNAME/CashflowSimulator)
+![License](https://img.shields.io/github/license/RalfHuesing/CashflowSimulator)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
 ![Status](https://img.shields.io/badge/status-pre--alpha-red)
 
@@ -38,7 +38,7 @@ Das Ziel ist eine detaillierte **Vorsorge- und Finanzplanung**, die echte steuer
 ## 🚀 Installation & Nutzung
 
 ### Für Anwender
-Aktuell gibt es noch keine fertige Version zum Herunterladen. Sobald eine stabile Version verfügbar ist, wirst du sie hier unter [Releases](https://github.com/DEIN_USERNAME/CashflowSimulator/releases) finden.
+Aktuell gibt es noch keine fertige Version zum Herunterladen. Sobald eine stabile Version verfügbar ist, wirst du sie hier unter [Releases](https://github.com/RalfHuesing/CashflowSimulator/releases) finden.
 
 Die Anwendung wird plattformübergreifend für **Windows, macOS und Linux** verfügbar sein.
 
@@ -51,7 +51,7 @@ Wenn du dir den Code ansehen oder beim Aufbau helfen möchtest:
 
 2.  **Repository klonen:**
     ```bash
-    git clone [https://github.com/DEIN_USERNAME/CashflowSimulator.git](https://github.com/DEIN_USERNAME/CashflowSimulator.git)
+    git clone [https://github.com/RalfHuesing/CashflowSimulator.git](https://github.com/RalfHuesing/CashflowSimulator.git)
     cd CashflowSimulator
     ```
 
