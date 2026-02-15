@@ -6,13 +6,13 @@
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              xmlns:fi="using:FluentIcons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="400"
              x:Class="CashflowSimulator.Desktop.Features.LifecyclePhases.LifecyclePhasesView"
              x:DataType="vm:LifecyclePhasesViewModel"
              x:Name="ThisView">
 
     <controls:FeatureLayoutView Title="Lebensphasen"
-                                Description="Phasen ab Alter (z. B. Anspar ab Start, Rente ab 67). Pro Phase: Steuer- und Strategie-Profil sowie optionale Zielallokation.">
+                                Description="Phasen ab Alter (z. B. Anspar ab Start, Rente ab 67). Pro Phase: Steuer- und Strategie-Profil.">
         <controls:FeatureLayoutView.ActionContent>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
                 <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
@@ -45,110 +45,78 @@
                           HorizontalAlignment="Stretch">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Startalter" Width="100" Binding="{Binding StartAge}"/>
-                        <DataGridTextColumn Header="Steuer-Profil" Width="*"
-                                            Binding="{Binding TaxProfileId}"/>
-                        <DataGridTextColumn Header="Strategie-Profil" Width="*"
-                                            Binding="{Binding StrategyProfileId}"/>
+                        <DataGridTemplateColumn Header="Steuer-Profil" Width="*" SortMemberPath="TaxProfileId">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource IdToNameConverter}">
+                                                <Binding Path="TaxProfileId"/>
+                                                <Binding Path="DataContext.TaxProfileOptions" ElementName="ThisView"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Strategie-Profil" Width="*" SortMemberPath="StrategyProfileId">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource IdToNameConverter}">
+                                                <Binding Path="StrategyProfileId"/>
+                                                <Binding Path="DataContext.StrategyProfileOptions" ElementName="ThisView"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <StackPanel Spacing="16">
-                    <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Startalter (Jahre)"
-                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                        <NumericUpDown Grid.Row="0" Grid.Column="1" Classes="form-input"
-                                      Value="{Binding StartAge}" Increment="1"
-                                      Minimum="0" Maximum="120"
-                                      Margin="{StaticResource FormInputMargin}"
-                                      behaviors:FocusHelpBehavior.HelpKey="StartAge"
-                                      behaviors:FocusHelpBehavior.ErrorPropertyName="StartAge"/>
+                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Startalter (Jahre)"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <NumericUpDown Grid.Row="0" Grid.Column="1" Classes="form-input"
+                                  Value="{Binding StartAge}" Increment="1"
+                                  Minimum="0" Maximum="120"
+                                  Margin="{StaticResource FormInputMargin}"
+                                  behaviors:FocusHelpBehavior.HelpKey="StartAge"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="StartAge"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Steuer-Profil"
-                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                        <ComboBox Grid.Row="1" Grid.Column="1" Classes="form-input"
-                                 ItemsSource="{Binding TaxProfileOptions}"
-                                 SelectedItem="{Binding SelectedTaxProfile}"
-                                 Margin="{StaticResource FormInputMargin}"
-                                 behaviors:FocusHelpBehavior.HelpKey="TaxProfileId"
-                                 behaviors:FocusHelpBehavior.ErrorPropertyName="TaxProfileId">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:ProfileOption">
-                                    <TextBlock Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Steuer-Profil"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" Classes="form-input"
+                             ItemsSource="{Binding TaxProfileOptions}"
+                             SelectedItem="{Binding SelectedTaxProfile}"
+                             Margin="{StaticResource FormInputMargin}"
+                             behaviors:FocusHelpBehavior.HelpKey="TaxProfileId"
+                             behaviors:FocusHelpBehavior.ErrorPropertyName="TaxProfileId">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:ProfileOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Strategie-Profil"
-                                   Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                        <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
-                                 ItemsSource="{Binding StrategyProfileOptions}"
-                                 SelectedItem="{Binding SelectedStrategyProfile}"
-                                 Margin="{StaticResource FormInputMarginLast}"
-                                 behaviors:FocusHelpBehavior.HelpKey="StrategyProfileId"
-                                 behaviors:FocusHelpBehavior.ErrorPropertyName="StrategyProfileId">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:ProfileOption">
-                                    <TextBlock Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </Grid>
-
-                    <Border Padding="8" Background="{DynamicResource SurfaceBrush}" CornerRadius="4">
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="Zielallokation (Overrides)" Classes="form-label" VerticalAlignment="Center"/>
-                                <Button Classes="toolbar-button" Command="{Binding AddOverrideCommand}">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <fi:SymbolIcon Symbol="Add" FontSize="14"/>
-                                        <TextBlock Text="Hinzufügen" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button Classes="toolbar-button" Command="{Binding RemoveOverrideCommand}">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <fi:SymbolIcon Symbol="Delete" FontSize="14"/>
-                                        <TextBlock Text="Entfernen" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                            <DataGrid ItemsSource="{Binding OverrideRows}"
-                                      SelectedItem="{Binding SelectedOverrideRow}"
-                                      SelectionMode="Single"
-                                      IsReadOnly="False"
-                                      MinHeight="120"
-                                      MaxHeight="200">
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="Anlageklasse" Width="*">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate DataType="vm:LifecycleOverrideRowViewModel">
-                                                <ComboBox ItemsSource="{Binding DataContext.AssetClassOptions, ElementName=ThisView}"
-                                                          SelectedItem="{Binding SelectedAssetClass}"
-                                                          HorizontalAlignment="Stretch">
-                                                    <ComboBox.ItemTemplate>
-                                                        <DataTemplate DataType="vm:ProfileOption">
-                                                            <TextBlock Text="{Binding Name}"/>
-                                                        </DataTemplate>
-                                                    </ComboBox.ItemTemplate>
-                                                </ComboBox>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="Zielgewicht (0–100 %)" Width="140">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate DataType="vm:LifecycleOverrideRowViewModel">
-                                                <NumericUpDown Value="{Binding TargetWeight}"
-                                                               Minimum="0" Maximum="1"
-                                                               Increment="0.05"
-                                                               HorizontalAlignment="Stretch"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Strategie-Profil"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
+                             ItemsSource="{Binding StrategyProfileOptions}"
+                             SelectedItem="{Binding SelectedStrategyProfile}"
+                             Margin="{StaticResource FormInputMarginLast}"
+                             behaviors:FocusHelpBehavior.HelpKey="StrategyProfileId"
+                             behaviors:FocusHelpBehavior.ErrorPropertyName="StrategyProfileId">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:ProfileOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>
     </controls:FeatureLayoutView>

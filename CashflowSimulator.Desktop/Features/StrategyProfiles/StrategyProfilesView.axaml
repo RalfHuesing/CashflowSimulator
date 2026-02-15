@@ -63,51 +63,44 @@
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <Grid ColumnDefinitions="220, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="ID (eindeutig)"
+                <Grid ColumnDefinitions="220, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
-                             Text="{Binding Id}" Margin="{StaticResource FormInputMargin}"
-                             behaviors:FocusHelpBehavior.HelpKey="Id"
-                             behaviors:FocusHelpBehavior.ErrorPropertyName="Id"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name"
-                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Classes="form-input"
                              Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
                              behaviors:FocusHelpBehavior.HelpKey="Name"
                              behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Liquiditätsreserve (Monatsausgaben)"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Liquiditätsreserve (Monatsausgaben)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="2" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
                                   Value="{Binding CashReserveMonths}" Increment="1"
                                   Minimum="0"
                                   Margin="{StaticResource FormInputMargin}"
                                   behaviors:FocusHelpBehavior.HelpKey="CashReserveMonths"
                                   behaviors:FocusHelpBehavior.ErrorPropertyName="CashReserveMonths"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Rebalancing-Schwelle (z. B. 0,05 = 5 %)"
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Rebalancing-Schwelle (z. B. 0,05 = 5 %)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Classes="form-input"
                                   Value="{Binding RebalancingThreshold}" Increment="0.01"
                                   Minimum="0" Maximum="1"
                                   Margin="{StaticResource FormInputMargin}"
                                   behaviors:FocusHelpBehavior.HelpKey="RebalancingThreshold"
                                   behaviors:FocusHelpBehavior.ErrorPropertyName="RebalancingThreshold"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Mindest-Transaktionsgröße"
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Mindest-Transaktionsgröße"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
                                   Value="{Binding MinimumTransactionAmount}" Increment="10"
                                   Minimum="0"
                                   Margin="{StaticResource FormInputMargin}"
                                   behaviors:FocusHelpBehavior.HelpKey="MinimumTransactionAmount"
                                   behaviors:FocusHelpBehavior.ErrorPropertyName="MinimumTransactionAmount"/>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Lookahead (Monate)"
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Lookahead (Monate)"
                                Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                    <NumericUpDown Grid.Row="5" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
                                   Value="{Binding LookaheadMonths}" Increment="1"
                                   Minimum="0"
                                   Margin="{StaticResource FormInputMarginLast}"

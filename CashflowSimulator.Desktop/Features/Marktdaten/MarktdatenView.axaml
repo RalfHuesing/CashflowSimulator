@@ -89,24 +89,17 @@
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="ID (eindeutig)"
+                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
-                             Text="{Binding Id}" Margin="{StaticResource FormInputMargin}"
-                             behaviors:FocusHelpBehavior.HelpKey="Id"
-                             behaviors:FocusHelpBehavior.ErrorPropertyName="Id"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name"
-                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Classes="form-input"
                              Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
                              behaviors:FocusHelpBehavior.HelpKey="Name"
                              behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Modelltyp"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Modelltyp"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
+                    <ComboBox Grid.Row="1" Grid.Column="1" Classes="form-input"
                               ItemsSource="{Binding ModelTypeOptions}"
                               SelectedItem="{Binding SelectedModelTypeOption}"
                               Margin="{StaticResource FormInputMargin}"
@@ -119,33 +112,33 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Erwartete Rendite / Drift (μ)"
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Erwartete Rendite / Drift (μ)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Classes="form-input"
                                    Value="{Binding ExpectedReturn}" Increment="0.01"
                                    Margin="{StaticResource FormInputMargin}"
                                    behaviors:FocusHelpBehavior.HelpKey="ExpectedReturn"
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="ExpectedReturn"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Volatilität (σ)"
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Volatilität (σ)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
                                    Value="{Binding Volatility}" Increment="0.01"
                                    Margin="{StaticResource FormInputMargin}"
                                    behaviors:FocusHelpBehavior.HelpKey="Volatility"
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="Volatility"/>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Mean-Reversion-Speed (θ)"
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Mean-Reversion-Speed (θ)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
-                    <NumericUpDown Grid.Row="5" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
                                    Value="{Binding MeanReversionSpeed}" Increment="0.1"
                                    Margin="{StaticResource FormInputMargin}"
                                    behaviors:FocusHelpBehavior.HelpKey="MeanReversionSpeed"
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="MeanReversionSpeed"/>
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Initialwert"
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Initialwert"
                                Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                    <NumericUpDown Grid.Row="6" Grid.Column="1" Classes="form-input"
+                    <NumericUpDown Grid.Row="5" Grid.Column="1" Classes="form-input"
                                    Value="{Binding InitialValue}" Increment="1"
                                    Margin="{StaticResource FormInputMarginLast}"
                                    behaviors:FocusHelpBehavior.HelpKey="InitialValue"

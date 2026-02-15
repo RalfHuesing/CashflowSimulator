@@ -17,6 +17,7 @@
     <Application.Resources>
         <converters:DateOnlyConverter x:Key="DateOnlyConverter" />
         <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <converters:IdToNameConverter x:Key="IdToNameConverter" />
     </Application.Resources>
     <Application.DataTemplates>
         <DataTemplate DataType="meta:MetaEditViewModel">

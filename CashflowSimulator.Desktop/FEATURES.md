@@ -30,7 +30,7 @@ CashflowSimulator.Desktop/
     ├── CashflowEvents/                                    # Geplante Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
     ├── TaxProfiles/                                       # Steuer-Profile (MasterDetailView); KapESt, Freibetrag, ESt-Satz
     ├── StrategyProfiles/                                  # Strategie-Profile (MasterDetailView); Liquidität, Rebalancing, Lookahead
-    ├── LifecyclePhases/                                   # Lebensphasen (MasterDetailView); Startalter, Steuer-/Strategie-Profil, Asset-Overrides
+    ├── LifecyclePhases/                                   # Lebensphasen (MasterDetailView); Startalter, Steuer-/Strategie-Profil
     ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
     └── Cashflow/                                          # (später) ggf. weitere Cashflow-Themen
 ```
@@ -81,8 +81,7 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 - **Lifecycle-Phasen:** Das Projekt enthält Lebensphasen (`LifecyclePhases`), die durch das Alter getriggert werden (z. B. Ansparphase ab aktuellem Alter, Rentenphase ab 67). Jede Phase hat eine eindeutige **Id** (`IIdentifiable`) für robustes CRUD in der UI. Jede Phase verweist auf ein **Steuer-Profil** (`TaxProfiles`) und ein **Strategie-Profil** (`StrategyProfiles`).
 - **Steuer-Profile (UI:** `Features/TaxProfiles/`): Master-Detail-View für CRUD. Pro Profil: Kapitalertragsteuer-Satz, Freibetrag, Einkommensteuer-Satz (nachgelagerte Besteuerung). Beim Löschen eines Profils werden Referenzen in Lebensphasen auf leer gesetzt.
 - **Strategie-Profile (UI:** `Features/StrategyProfiles/`): Master-Detail-View für CRUD. Pro Profil: Liquiditätsreserve (Monate), Rebalancing-Schwelle, Mindest-Transaktionsgröße (MinimumTransactionAmount), Lookahead (Monate). Beim Löschen werden Referenzen in Lebensphasen auf leer gesetzt.
-- **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil und Strategie-Profil (ComboBoxen), optionale **Asset-Allokation-Overrides** (Anlageklasse + Zielgewicht in bearbeitbarer Tabelle).
-- **Asset-Allokation pro Phase:** In der Lebensphasen-View können pro Phase Zielgewichtungen von Anlageklassen überschrieben werden (`AssetAllocationOverrides`); Hinzufügen/Entfernen über Toolbar.
+- **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil und Strategie-Profil (ComboBoxen).
 - Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer- und Strategie-Profil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“.
 
 ## Erweiterung

@@ -15,19 +15,7 @@ namespace CashflowSimulator.Desktop.Features.LifecyclePhases;
 public record ProfileOption(string Id, string Name);
 
 /// <summary>
-/// Zeile für die Asset-Allokation-Override-Tabelle (Anlageklasse + Zielgewicht).
-/// </summary>
-public partial class LifecycleOverrideRowViewModel : ObservableObject
-{
-    [ObservableProperty]
-    private ProfileOption? _selectedAssetClass;
-
-    [ObservableProperty]
-    private decimal _targetWeight;
-}
-
-/// <summary>
-/// ViewModel für Lebensphasen (Master-Detail). Startalter, Steuer- und Strategie-Profil, optionale Asset-Overrides.
+/// ViewModel für Lebensphasen (Master-Detail). Startalter, Steuer- und Strategie-Profil.
 /// Nutzt <see cref="CrudViewModelBase{TDto}"/> für CRUD; ID-basierte Identifikation.
 /// </summary>
 public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhaseDto>
@@ -61,14 +49,8 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         ScheduleValidateAndSave();
     }
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RemoveOverrideCommand))]
-    private LifecycleOverrideRowViewModel? _selectedOverrideRow;
-
     public ObservableCollection<ProfileOption> TaxProfileOptions { get; } = [];
     public ObservableCollection<ProfileOption> StrategyProfileOptions { get; } = [];
-    public ObservableCollection<ProfileOption> AssetClassOptions { get; } = [];
-    public ObservableCollection<LifecycleOverrideRowViewModel> OverrideRows { get; } = [];
 
     protected override string HelpKeyPrefix => "LifecyclePhases";
 
@@ -100,21 +82,13 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
     /// <inheritdoc />
     protected override LifecyclePhaseDto BuildDtoFromForm()
     {
-        var overrides = OverrideRows
-            .Where(r => !string.IsNullOrEmpty(r.SelectedAssetClass?.Id))
-            .Select(r => new AssetAllocationOverrideDto
-            {
-                AssetClassId = r.SelectedAssetClass!.Id,
-                TargetWeight = r.TargetWeight
-            })
-            .ToList();
         return new LifecyclePhaseDto
         {
             Id = EditingId ?? Guid.NewGuid().ToString(),
             StartAge = StartAge,
             TaxProfileId = TaxProfileId?.Trim() ?? string.Empty,
             StrategyProfileId = StrategyProfileId?.Trim() ?? string.Empty,
-            AssetAllocationOverrides = overrides
+            AssetAllocationOverrides = []
         };
     }
 
@@ -126,15 +100,6 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         StrategyProfileId = dto.StrategyProfileId;
         SelectedTaxProfile = TaxProfileOptions.FirstOrDefault(o => o.Id == dto.TaxProfileId);
         SelectedStrategyProfile = StrategyProfileOptions.FirstOrDefault(o => o.Id == dto.StrategyProfileId);
-        OverrideRows.Clear();
-        foreach (var ov in dto.AssetAllocationOverrides ?? [])
-        {
-            OverrideRows.Add(new LifecycleOverrideRowViewModel
-            {
-                SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == ov.AssetClassId),
-                TargetWeight = ov.TargetWeight
-            });
-        }
     }
 
     /// <inheritdoc />
@@ -145,7 +110,6 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         StrategyProfileId = string.Empty;
         SelectedTaxProfile = null;
         SelectedStrategyProfile = null;
-        OverrideRows.Clear();
         ClearValidationErrors();
     }
 
@@ -170,36 +134,11 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         var current = CurrentProjectService.Current;
         TaxProfileOptions.Clear();
         StrategyProfileOptions.Clear();
-        AssetClassOptions.Clear();
         if (current is null)
             return;
         foreach (var t in current.TaxProfiles ?? [])
             TaxProfileOptions.Add(new ProfileOption(t.Id, t.Name));
         foreach (var s in current.StrategyProfiles ?? [])
             StrategyProfileOptions.Add(new ProfileOption(s.Id, s.Name));
-        foreach (var c in current.AssetClasses ?? [])
-            AssetClassOptions.Add(new ProfileOption(c.Id, c.Name));
     }
-
-    [RelayCommand(CanExecute = nameof(HasCurrentProject))]
-    private void AddOverride()
-    {
-        OverrideRows.Add(new LifecycleOverrideRowViewModel
-        {
-            SelectedAssetClass = AssetClassOptions.FirstOrDefault(),
-            TargetWeight = 0
-        });
-    }
-
-    [RelayCommand(CanExecute = nameof(CanRemoveOverride))]
-    private void RemoveOverride()
-    {
-        if (SelectedOverrideRow is null)
-            return;
-        OverrideRows.Remove(SelectedOverrideRow);
-        SelectedOverrideRow = null;
-    }
-
-    private bool HasCurrentProject() => CurrentProjectService.Current is not null;
-    private bool CanRemoveOverride() => SelectedOverrideRow is not null;
 }
