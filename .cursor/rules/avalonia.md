@@ -37,3 +37,8 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 
 - **FeatureLayoutView** (Common/Controls): Wrapper für Feature-Seiten mit zweigeteiltem Layout – links scrollbarer Content, rechts festes Info-Panel (Hilfetext + Validierungsfehler). Neue Feature-Views wie Eckdaten/Einstellungen nutzen dieses Control als Wurzel.
 - **FocusHelpBehavior** + **HelpKey:** Attached Property `FocusHelpBehavior.HelpKey` (und optional `ErrorPropertyName`) an Eingabe-Controls setzen (kurzer Property-Name). Bei GotFocus wird das ViewModel (ValidatingViewModelBase) mit dem HelpKey aktualisiert; Lookup im IHelpProvider erfolgt als **HelpKeyPrefix.PropertyName** (jedes Feature implementiert HelpKeyPrefix). Einmalige Initialisierung z. B. in MainWindow: `FocusHelpBehavior.Initialize(this)`.
+
+## Master-Detail und Listen-Ansichten
+
+- **Listen-Ansichten mit Bearbeitungsmaske** (Liste oben, Formular unten): Es **muss** das **MasterDetailView** (Common/Controls) verwendet werden. Es wird **innerhalb** von FeatureLayoutView als Content eingesetzt; **MasterContent** = Liste/Tabelle (z. B. DataGrid), **DetailContent** = Formular; **NewCommand**, **SaveCommand**, **DeleteCommand** werden explizit an das Control gebunden. Der Detail-Bereich bleibt immer sichtbar (kein Ausblenden bei leerer Auswahl).
+- **DataGrids:** Alle DataGrids in der App folgen den zentralen **DataGridStyles** (Common/Themes/DataGridStyles.axaml). Keine lokalen Overrides für Selection-, Header- oder Zeilen-Styles; Spaltenbreiten und spaltenspezifische Formatierung (z. B. rechtsbündige Beträge) bleiben in der Feature-View. Name/Bezeichnung-Spalte typisch `Width="*"` (responsive).

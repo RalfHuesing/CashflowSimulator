@@ -10,28 +10,36 @@
              x:DataType="vm:CashflowEventsViewModel">
 
     <controls:FeatureLayoutView Title="{Binding Title}"
-                               Description="Geplante einmalige Einnahmen und Ausgaben mit optionalem Toleranzbereich.">
-        <Grid RowDefinitions="*, Auto" ColumnDefinitions="*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <DataGrid Grid.Row="0" ItemsSource="{Binding Items}"
-                      SelectedItem="{Binding SelectedItem}"
-                      IsReadOnly="True"
-                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding Name}"/>
-                    <DataGridTemplateColumn Header="Betrag" Width="100" SortMemberPath="Amount">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Amount, StringFormat='{}{0:C}'}"
-                                           TextAlignment="Right" HorizontalAlignment="Right"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Zieldatum" Width="120" Binding="{Binding TargetDate}"/>
-                    <DataGridTextColumn Header="Frühestens" Width="90" Binding="{Binding EarliestMonthOffset}"/>
-                    <DataGridTextColumn Header="Spätestens" Width="90" Binding="{Binding LatestMonthOffset}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-            <StackPanel Grid.Row="1" MinHeight="240" Spacing="12" Margin="0,12,0,0">
+                                Description="Geplante einmalige Einnahmen und Ausgaben mit optionalem Toleranzbereich.">
+        <controls:MasterDetailView NewCommand="{Binding NewCommand}"
+                                   SaveCommand="{Binding SaveCommand}"
+                                   DeleteCommand="{Binding DeleteCommand}">
+            <controls:MasterDetailView.MasterContent>
+                <DataGrid ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem}"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                        <DataGridTemplateColumn Header="Betrag" Width="100" SortMemberPath="Amount">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Amount, StringFormat='{}{0:C}'}"
+                                               TextAlignment="Right"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Zieldatum" Width="120" Binding="{Binding TargetDate}"/>
+                        <DataGridTextColumn Header="Frühestens" Width="90" Binding="{Binding EarliestMonthOffset}"/>
+                        <DataGridTextColumn Header="Spätestens" Width="90" Binding="{Binding LatestMonthOffset}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </controls:MasterDetailView.MasterContent>
+            <controls:MasterDetailView.DetailContent>
                 <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
@@ -74,12 +82,7 @@
                                    behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="LatestMonthOffset"/>
                 </Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                    <Button Content="Neu" Command="{Binding NewCommand}" Classes="primary"/>
-                    <Button Content="Speichern" Command="{Binding SaveCommand}"/>
-                    <Button Content="Löschen" Command="{Binding DeleteCommand}"/>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
+            </controls:MasterDetailView.DetailContent>
+        </controls:MasterDetailView>
     </controls:FeatureLayoutView>
 </UserControl>

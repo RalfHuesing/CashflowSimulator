@@ -6,7 +6,7 @@ Die Desktop-App ist **nach Domänen-Features** organisiert, nicht nach technisch
 
 - **Features/** = eine Ordnerhierarchie pro fachlichem Bereich.
 - **Services/** = app-weite UI-Dienste (z. B. Dateidialog, HelpProvider), die von mehreren Features genutzt werden.
-- **Common/** = Themes (mehrere AXAML-Dateien: DesignTokens, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle), wiederverwendbare Controls (z. B. FeatureLayoutView, FocusHelpBehavior).
+- **Common/** = Themes (DesignTokens, DataGridStyles, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle), wiederverwendbare Controls (FeatureLayoutView, MasterDetailView, FocusHelpBehavior).
 
 So findest du alles zu „Eckdaten“ unter `Features/Eckdaten/`, alles zu „Meta“ unter `Features/Meta/`, alles zu „Cashflow“ später unter `Features/Cashflow/`.
 
@@ -15,7 +15,7 @@ So findest du alles zu „Eckdaten“ unter `Features/Eckdaten/`, alles zu „Me
 ```
 CashflowSimulator.Desktop/
 ├── App.*, Program.cs, CompositionRoot.cs, MainWindow.*   # Root, Host
-├── Common/Themes/*.axaml, Common/Controls/, Common/Behaviors/   # Styles (DesignTokens, ButtonStyles, …), FeatureLayoutView, FocusHelpBehavior
+├── Common/Themes/*.axaml, Common/Controls/, Common/Behaviors/   # Styles (DesignTokens, DataGridStyles, ButtonStyles, …), FeatureLayoutView, MasterDetailView, FocusHelpBehavior
 ├── Services/                                              # App-weit (Dateidialog, HelpProvider, …)
 └── Features/
     ├── Main/                                              # Shell: Sidebar (Logo, Navigation, Laden/Speichern), Content-Bereich (volle Höhe, keine Statusleiste)
@@ -56,5 +56,5 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 
 ## Erweiterung
 
-- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey).
+- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
 - Gemeinsam genutzte Dialoge/Services bleiben in `Services/` oder werden bei Bedarf in ein gemeinsames Feature (z. B. `Features/Shared/`) ausgelagert.

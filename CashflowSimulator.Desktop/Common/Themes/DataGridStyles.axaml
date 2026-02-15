@@ -1,0 +1,30 @@
+<Styles xmlns="https://github.com/avaloniaui">
+    <!-- DataGrid: Einheitliches Look aus DesignTokens; keine Standard-Farben (z. B. Fluent-Grün/Blau). -->
+
+    <!-- Zeilen-Selection: PrimaryActionBrush / TextOnDarkBrush (Row selbst) -->
+    <Style Selector="DataGridRow:selected">
+        <Setter Property="Background" Value="{StaticResource PrimaryActionBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+    </Style>
+    <Style Selector="DataGridRow:selected:focus">
+        <Setter Property="Background" Value="{StaticResource PrimaryActionHoverBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+    </Style>
+
+    <!-- Zeilen-Hintergrund: SurfaceBrush; abwechselnde Zeilen dezent -->
+    <Style Selector="DataGridRow">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="DataGridRow:nth-child(even)">
+        <Setter Property="Background" Value="{StaticResource ContentBackgroundBrush}" />
+    </Style>
+
+    <!-- Header: dunkel, fett, aus DesignTokens -->
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{StaticResource SidebarBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="{StaticResource NavItemMargin}" />
+    </Style>
+</Styles>

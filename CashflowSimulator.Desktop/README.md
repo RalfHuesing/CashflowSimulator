@@ -16,8 +16,8 @@ CashflowSimulator.Desktop/
 ├── App.axaml, App.axaml.cs, Program.cs, MainWindow.*   # Root – Einstieg, Hauptfenster (hostet Shell)
 ├── CompositionRoot.cs                                  # Zugriff auf ServiceProvider (gesetzt in Program.Main)
 ├── Common/
-│   ├── Themes/*.axaml                                  # DesignTokens, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle – keine Hardcodes in Views
-│   └── Controls/                                       # Wiederverwendbare UserControls
+│   ├── Themes/*.axaml                                  # DesignTokens, DataGridStyles, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle – keine Hardcodes in Views
+│   └── Controls/                                       # Wiederverwendbare UserControls (FeatureLayoutView, MasterDetailView)
 ├── Services/                                            # App-weite UI-Dienste (plattformunabhängig)
 │   ├── IFileDialogService.cs                           # Öffnen/Speichern (Avalonia StorageProvider)
 │   └── AvaloniaFileDialogService.cs

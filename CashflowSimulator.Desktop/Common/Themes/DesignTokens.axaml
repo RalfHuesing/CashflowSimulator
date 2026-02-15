@@ -76,6 +76,11 @@
         <sys:Double x:Key="InfoPanelMinWidth">280</sys:Double>
         <sys:Double x:Key="GridSplitterWidth">4</sys:Double>
 
+        <!-- MasterDetailView: Detail-Bereich (Formular + Buttons) -->
+        <Thickness x:Key="MasterDetailDetailMargin">0,12,0,0</Thickness>
+        <sys:Double x:Key="MasterDetailDetailMinHeight">240</sys:Double>
+        <sys:Double x:Key="MasterDetailButtonSpacing">8</sys:Double>
+
         <!-- Error Tray (Info-Panel): Weinrot, Reinweiß, dunkler Rahmen -->
         <Color x:Key="ErrorTrayBackgroundColor">#6B2D3A</Color>
         <Color x:Key="ErrorTrayTextColor">#FFFFFF</Color>
