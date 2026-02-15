@@ -3,28 +3,30 @@ name: Release erstellen (Win, Linux, Mac)
 on:
   push:
     tags:
-      - 'v*' # Startet nur, wenn das Tag mit 'v' beginnt (z.B. v1.0.0)
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   build-and-release:
     strategy:
       matrix:
-        # Hier definieren wir die 3 Ziel-Plattformen
         include:
           - os: windows-latest
             rid: win-x64
             output_name: CashflowSimulator_Windows_x64
-            file_ext: .exe
+            archive_ext: zip  # Windows kriegt zip
             
           - os: ubuntu-latest
             rid: linux-x64
             output_name: CashflowSimulator_Linux_x64
-            file_ext: "" # Linux hat keine Dateiendung für Binaries
+            archive_ext: tar.gz # Linux kriegt tar.gz
             
           - os: macos-latest
             rid: osx-x64
             output_name: CashflowSimulator_macOS_x64
-            file_ext: "" # Mac auch nicht zwingend
+            archive_ext: tar.gz # Mac kriegt tar.gz
 
     runs-on: ${{ matrix.os }}
 
@@ -35,37 +37,33 @@ jobs:
     - name: .NET installieren
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '8.0.x'
 
     - name: Abhängigkeiten laden
       run: dotnet restore
 
     - name: App bauen (Publish)
-      # Baut die App in einen einzelnen Ordner "publish"
       run: |
         dotnet publish CashflowSimulator.Desktop/CashflowSimulator.Desktop.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -o ./publish
 
-    # --- ZIPPEN (Unterschiedlich je nach Betriebssystem) ---
-    
-    - name: Zippen (Windows)
-      if: runner.os == 'Windows'
-      run: Compress-Archive -Path ./publish/* -DestinationPath ./${{ matrix.output_name }}.zip
+    # --- ZIPPEN (Windows) ---
+    - name: Archivieren (Windows)
+      if: matrix.os == 'windows-latest'
+      run: Compress-Archive -Path ./publish/* -DestinationPath ./${{ matrix.output_name }}.${{ matrix.archive_ext }}
 
-    - name: Zippen (Linux/Mac)
-      if: runner.os != 'Windows'
+    # --- ZIPPEN (Linux/Mac) ---
+    - name: Archivieren (Linux/Mac)
+      if: matrix.os != 'windows-latest'
       run: |
         cd publish
-        tar -czvf ../${{ matrix.output_name }}.tar.gz *
+        tar -czvf ../${{ matrix.output_name }}.${{ matrix.archive_ext }} *
         cd ..
 
     # --- RELEASE ERSTELLEN ---
-
     - name: Auf GitHub hochladen
       uses: softprops/action-gh-release@v2
       with:
-        # Wir laden je nach OS entweder die .zip oder die .tar.gz hoch
-        files: |
-          ${{ matrix.output_name }}.zip
-          ${{ matrix.output_name }}.tar.gz
+        # Er lädt jetzt nur genau die Datei hoch, die wir gerade gebaut haben
+        files: ${{ matrix.output_name }}.${{ matrix.archive_ext }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
