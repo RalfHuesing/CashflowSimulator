@@ -23,8 +23,12 @@ CashflowSimulator.Desktop/
     │   └── Navigation/NavigationView*, NavigationViewModel
     ├── Meta/                                              # Szenario-Stammdaten (MetaEditView*, MetaEditViewModel)
     ├── Eckdaten/                                          # Eckdaten (EckdatenView*, EckdatenViewModel)
-    ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel; weitere Optionen folgen)
-    └── Cashflow/                                          # (später) Liste, Dialoge, …
+    ├── Marktdaten/                                        # Stochastische Marktfaktoren (GBM, Mean Reversion); MasterDetailView
+    ├── Korrelationen/                                     # Paarweise Korrelationen zwischen Faktoren; Matrix-Validierung (positiv definit)
+    ├── CashflowStreams/                                   # Laufende Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
+    ├── CashflowEvents/                                    # Geplante Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
+    ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
+    └── Cashflow/                                          # (später) ggf. weitere Cashflow-Themen
 ```
 
 ## Namespaces
@@ -35,6 +39,10 @@ CashflowSimulator.Desktop/
 - `CashflowSimulator.Desktop.Features.Meta` – Szenario-Metadaten
 - `CashflowSimulator.Desktop.Features.Eckdaten` – Eckdaten
 - `CashflowSimulator.Desktop.Features.Settings` – Einstellungen
+- `CashflowSimulator.Desktop.Features.Marktdaten` – Stochastische Faktoren (Marktdaten)
+- `CashflowSimulator.Desktop.Features.Korrelationen` – Korrelationen zwischen Faktoren
+- `CashflowSimulator.Desktop.Features.CashflowStreams` – Laufende Cashflows
+- `CashflowSimulator.Desktop.Features.CashflowEvents` – Geplante Cashflow-Events
 - `CashflowSimulator.Desktop.Features.Cashflow` – (später)
 
 ## Pattern für neue Feature-Bereiche (wie Eckdaten, Einstellungen)
@@ -54,7 +62,13 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 - VM-Properties, die 1:1 DTO-Daten repräsentieren, müssen denselben Namen wie im DTO tragen (Ausnahme: andere Semantik, z. B. Alter vs. Datum).
 - Validierungs-Mapping DTO → VM nur mit `nameof(DtoType.Property)` und `nameof(VmProperty)` – keine String-Literale. Siehe `.cursor/rules/main.md` (Validierung).
 
+## Marktdaten und Korrelationen
+
+- **Marktdaten:** Stochastische Faktoren (z. B. Inflation VPI, Aktien Welt, Geldmarkt) mit Modelltyp (GBM oder Ornstein-Uhlenbeck) und Parametern (Drift, Volatilität, Mean-Reversion-Speed, Initialwert). Beim Löschen eines Faktors werden Referenzen in Streams/Events auf „Keine“ gesetzt.
+- **Korrelationen:** Flache Liste der Korrelationseinträge (Faktor A ↔ Faktor B, Korrelation −1 bis 1). Die Gesamt-Korrelationsmatrix wird auf positive Definitheit (Cholesky) geprüft; bei Inkonsistenz erscheint ein Fehler im Info-Panel.
+- **Dynamisierung:** In CashflowStreams und CashflowEvents kann pro Eintrag optional ein Marktfaktor zur Dynamisierung (z. B. Inflation) ausgewählt werden; „Keine“ = nominal.
+
 ## Erweiterung
 
-- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
+- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
 - Gemeinsam genutzte Dialoge/Services bleiben in `Services/` oder werden bei Bedarf in ein gemeinsames Feature (z. B. `Features/Shared/`) ausgelagert.

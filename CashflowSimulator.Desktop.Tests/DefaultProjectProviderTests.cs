@@ -14,8 +14,12 @@ public sealed class DefaultProjectProviderTests
 
         Assert.NotNull(project.Streams);
         Assert.NotNull(project.Events);
-        Assert.Equal(3, project.Streams.Count);
-        Assert.Equal(2, project.Events.Count);
+        Assert.NotNull(project.EconomicFactors);
+        Assert.NotNull(project.Correlations);
+        Assert.Equal(10, project.Streams.Count);
+        Assert.Equal(6, project.Events.Count);
+        Assert.Equal(3, project.EconomicFactors.Count);
+        Assert.True(project.Correlations.Count >= 1);
     }
 
     [Fact]
@@ -27,9 +31,10 @@ public sealed class DefaultProjectProviderTests
         var incomeStreams = project.Streams.Where(s => s.Type == CashflowType.Income).ToList();
         var expenseStreams = project.Streams.Where(s => s.Type == CashflowType.Expense).ToList();
 
-        Assert.Single(incomeStreams);
-        Assert.Equal(2, expenseStreams.Count);
+        Assert.Equal(2, incomeStreams.Count);
+        Assert.Equal(8, expenseStreams.Count);
         Assert.Contains(incomeStreams, s => s.Name.Contains("Gehalt"));
+        Assert.Contains(incomeStreams, s => s.Name.Contains("Rente"));
     }
 
     [Fact]
@@ -42,6 +47,6 @@ public sealed class DefaultProjectProviderTests
         var expenseEvents = project.Events.Where(e => e.Type == CashflowType.Expense).ToList();
 
         Assert.Single(incomeEvents);
-        Assert.Single(expenseEvents);
+        Assert.Equal(5, expenseEvents.Count);
     }
 }

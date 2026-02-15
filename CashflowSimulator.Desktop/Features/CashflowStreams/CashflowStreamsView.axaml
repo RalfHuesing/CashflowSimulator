@@ -40,7 +40,7 @@
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
@@ -77,15 +77,30 @@
                                         behaviors:FocusHelpBehavior.ErrorPropertyName="StartDate"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Bis (Datum, leer = unbegrenzt)"
-                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <CalendarDatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
                                         SelectedDate="{Binding EndDate, Converter={StaticResource DateOnlyConverter}}"
                                         SelectedDateFormat="Custom"
                                         CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ (leer = unbegrenzt)"
-                                        Margin="{StaticResource FormInputMarginLast}"
+                                        Margin="{StaticResource FormInputMargin}"
                                         behaviors:FocusHelpBehavior.HelpKey="EndDate"
                                         behaviors:FocusHelpBehavior.ErrorPropertyName="EndDate"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Dynamisierung / Marktfaktor"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <ComboBox Grid.Row="5" Grid.Column="1" Classes="form-input"
+                              ItemsSource="{Binding DynamicFactorOptions}"
+                              SelectedItem="{Binding SelectedDynamicFactor}"
+                              Margin="{StaticResource FormInputMarginLast}"
+                              behaviors:FocusHelpBehavior.HelpKey="EconomicFactorId"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="EconomicFactorId">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:DynamicFactorOption">
+                                <TextBlock Text="{Binding Display}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </Grid>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>

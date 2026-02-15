@@ -4,6 +4,8 @@ using CashflowSimulator.Desktop.Features.CashflowEvents;
 using CashflowSimulator.Desktop.Features.CashflowStreams;
 using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
+using CashflowSimulator.Desktop.Features.Marktdaten;
+using CashflowSimulator.Desktop.Features.Korrelationen;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Services;
@@ -29,6 +31,8 @@ public partial class MainShellViewModel : ObservableObject
     private readonly Func<EckdatenViewModel> _createEckdatenViewModel;
     private readonly Func<CashflowType, CashflowStreamsViewModel> _createStreamsViewModel;
     private readonly Func<CashflowType, CashflowEventsViewModel> _createEventsViewModel;
+    private readonly Func<MarktdatenViewModel> _createMarktdatenViewModel;
+    private readonly Func<KorrelationenViewModel> _createKorrelationenViewModel;
     private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
@@ -40,6 +44,8 @@ public partial class MainShellViewModel : ObservableObject
         Func<EckdatenViewModel> createEckdatenViewModel,
         Func<CashflowType, CashflowStreamsViewModel> createStreamsViewModel,
         Func<CashflowType, CashflowEventsViewModel> createEventsViewModel,
+        Func<MarktdatenViewModel> createMarktdatenViewModel,
+        Func<KorrelationenViewModel> createKorrelationenViewModel,
         Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
@@ -51,6 +57,8 @@ public partial class MainShellViewModel : ObservableObject
         _createEckdatenViewModel = createEckdatenViewModel;
         _createStreamsViewModel = createStreamsViewModel;
         _createEventsViewModel = createEventsViewModel;
+        _createMarktdatenViewModel = createMarktdatenViewModel;
+        _createKorrelationenViewModel = createKorrelationenViewModel;
         _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
@@ -65,6 +73,8 @@ public partial class MainShellViewModel : ObservableObject
         OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
         OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
         OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
+        OpenMarktdatenCommand.NotifyCanExecuteChanged();
+        OpenKorrelationenCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
@@ -108,6 +118,8 @@ public partial class MainShellViewModel : ObservableObject
         OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
         OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
         OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
+        OpenMarktdatenCommand.NotifyCanExecuteChanged();
+        OpenKorrelationenCommand.NotifyCanExecuteChanged();
     }
 
     private string GetCurrentProjectTitle()
@@ -134,6 +146,20 @@ public partial class MainShellViewModel : ObservableObject
             DisplayName = "Eckdaten",
             Icon = Symbol.Calendar,
             Command = OpenEckdatenCommand,
+            IsActive = false
+        };
+        var marktdatenItem = new NavItemViewModel
+        {
+            DisplayName = "Marktdaten",
+            Icon = Symbol.ChartMultiple,
+            Command = OpenMarktdatenCommand,
+            IsActive = false
+        };
+        var korrelationenItem = new NavItemViewModel
+        {
+            DisplayName = "Korrelationen",
+            Icon = Symbol.Link,
+            Command = OpenKorrelationenCommand,
             IsActive = false
         };
         var laufendeEinnahmenItem = new NavItemViewModel
@@ -174,6 +200,8 @@ public partial class MainShellViewModel : ObservableObject
 
         Navigation.Items.Add(szenarioItem);
         Navigation.Items.Add(eckdatenItem);
+        Navigation.Items.Add(marktdatenItem);
+        Navigation.Items.Add(korrelationenItem);
         Navigation.Items.Add(laufendeEinnahmenItem);
         Navigation.Items.Add(laufendeAusgabenItem);
         Navigation.Items.Add(geplanteEinnahmenItem);
@@ -268,32 +296,52 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanOpenEckdaten() => _currentProjectService.Current is not null;
 
+    [RelayCommand(CanExecute = nameof(CanOpenMarktdaten))]
+    private void OpenMarktdaten()
+    {
+        _logger.LogDebug("Marktdaten geöffnet.");
+        CurrentContentViewModel = _createMarktdatenViewModel();
+        SetActiveNavigationItem(2);
+    }
+
+    private bool CanOpenMarktdaten() => _currentProjectService.Current is not null;
+
+    [RelayCommand(CanExecute = nameof(CanOpenKorrelationen))]
+    private void OpenKorrelationen()
+    {
+        _logger.LogDebug("Korrelationen geöffnet.");
+        CurrentContentViewModel = _createKorrelationenViewModel();
+        SetActiveNavigationItem(3);
+    }
+
+    private bool CanOpenKorrelationen() => _currentProjectService.Current is not null;
+
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenLaufendeEinnahmen()
     {
         CurrentContentViewModel = _createStreamsViewModel(CashflowType.Income);
-        SetActiveNavigationItem(2);
+        SetActiveNavigationItem(4);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenLaufendeAusgaben()
     {
         CurrentContentViewModel = _createStreamsViewModel(CashflowType.Expense);
-        SetActiveNavigationItem(3);
+        SetActiveNavigationItem(5);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenGeplanteEinnahmen()
     {
         CurrentContentViewModel = _createEventsViewModel(CashflowType.Income);
-        SetActiveNavigationItem(4);
+        SetActiveNavigationItem(6);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
     private void OpenGeplanteAusgaben()
     {
         CurrentContentViewModel = _createEventsViewModel(CashflowType.Expense);
-        SetActiveNavigationItem(5);
+        SetActiveNavigationItem(7);
     }
 
     private bool CanOpenCashflow() => _currentProjectService.Current is not null;
@@ -303,7 +351,7 @@ public partial class MainShellViewModel : ObservableObject
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _createSettingsViewModel();
-        SetActiveNavigationItem(6);
+        SetActiveNavigationItem(8);
     }
 
     private void SetActiveNavigationItem(int index)

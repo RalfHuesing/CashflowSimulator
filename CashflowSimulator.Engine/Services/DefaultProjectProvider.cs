@@ -33,7 +33,13 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
         // 3. Einzelereignisse (Events) abrufen
         List<CashflowEventDto> events = GetLifeEvents(simulationStart, retirementDate);
 
-        // 4. Projekt zusammenbauen
+        // 4. Marktfaktoren (stochastische Faktoren) aus deutscher Sicht
+        List<EconomicFactorDto> economicFactors = GetDefaultEconomicFactors();
+
+        // 5. Standard-Korrelationen zwischen Faktoren
+        List<CorrelationEntryDto> correlations = GetDefaultCorrelations(economicFactors);
+
+        // 6. Projekt zusammenbauen
         return new SimulationProjectDto
         {
             Meta = new MetaDto
@@ -52,8 +58,69 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
             },
             Streams = streams,
             Events = events,
+            EconomicFactors = economicFactors,
+            Correlations = correlations,
             UiSettings = new UiSettingsDto()
         };
+    }
+
+    /// <summary>
+    /// Standard-Marktfaktoren aus deutscher Sicht: Inflation (VPI), Aktien Welt (ETF), Geldmarkt/Anleihen.
+    /// </summary>
+    private static List<EconomicFactorDto> GetDefaultEconomicFactors()
+    {
+        return
+        [
+            new EconomicFactorDto
+            {
+                Id = "Inflation_VPI",
+                Name = "Inflation (VPI)",
+                ModelType = StochasticModelType.OrnsteinUhlenbeck,
+                ExpectedReturn = 0.02,       // Langfristiger Mittelwert ca. 2 %
+                Volatility = 0.01,
+                MeanReversionSpeed = 0.3,
+                InitialValue = 0.02
+            },
+            new EconomicFactorDto
+            {
+                Id = "Aktien_Welt",
+                Name = "Aktien Welt (ETF)",
+                ModelType = StochasticModelType.GeometricBrownianMotion,
+                ExpectedReturn = 0.07,       // Drift ca. 7 % p.a.
+                Volatility = 0.15,          // Vola ca. 15 %
+                MeanReversionSpeed = 0,
+                InitialValue = 100
+            },
+            new EconomicFactorDto
+            {
+                Id = "Geldmarkt_Anleihen",
+                Name = "Geldmarkt / Anleihen",
+                ModelType = StochasticModelType.OrnsteinUhlenbeck,
+                ExpectedReturn = 0.02,
+                Volatility = 0.03,
+                MeanReversionSpeed = 0.2,
+                InitialValue = 100
+            }
+        ];
+    }
+
+    /// <summary>
+    /// Plausible Standard-Korrelationen (z. B. Aktien vs. Anleihen leicht negativ).
+    /// </summary>
+    private static List<CorrelationEntryDto> GetDefaultCorrelations(List<EconomicFactorDto> factors)
+    {
+        var idToIndex = factors.Select((f, i) => (f.Id, i)).ToDictionary(x => x.Id, x => x.i);
+        if (idToIndex.Count < 2)
+            return [];
+
+        var list = new List<CorrelationEntryDto>();
+        // Inflation vs. Aktien: leicht positiv
+        if (idToIndex.TryGetValue("Inflation_VPI", out var iInf) && idToIndex.TryGetValue("Aktien_Welt", out var iAkt))
+            list.Add(new CorrelationEntryDto { FactorIdA = factors[iInf].Id, FactorIdB = factors[iAkt].Id, Correlation = 0.2 });
+        // Aktien vs. Anleihen: leicht negativ
+        if (idToIndex.TryGetValue("Aktien_Welt", out var iA) && idToIndex.TryGetValue("Geldmarkt_Anleihen", out var iB))
+            list.Add(new CorrelationEntryDto { FactorIdA = factors[iA].Id, FactorIdB = factors[iB].Id, Correlation = -0.15 });
+        return list;
     }
 
     /// <summary>

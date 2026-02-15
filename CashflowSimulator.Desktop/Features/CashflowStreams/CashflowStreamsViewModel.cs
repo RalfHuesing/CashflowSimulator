@@ -40,11 +40,27 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     [ObservableProperty]
     private DateOnly? _endDate;
 
+    /// <summary>Optional: Marktfaktor zur Dynamisierung (null = Keine).</summary>
+    [ObservableProperty]
+    private string? _economicFactorId;
+
+    /// <summary>Für ComboBox: „Keine“ + alle Marktfaktoren.</summary>
+    [ObservableProperty]
+    private DynamicFactorOption? _selectedDynamicFactor;
+
+    partial void OnSelectedDynamicFactorChanged(DynamicFactorOption? value)
+    {
+        _economicFactorId = value?.Id;
+        ScheduleValidateAndSave();
+    }
+
     /// <summary>Id des Eintrags im Bearbeitungsformular (null = Neu).</summary>
     [ObservableProperty]
     private string? _editingId;
 
     public ObservableCollection<CashflowStreamDto> Items { get; } = [];
+
+    public ObservableCollection<DynamicFactorOption> DynamicFactorOptions { get; } = [];
 
     public string Title => _cashflowType == CashflowType.Income ? "Laufende Einnahmen" : "Laufende Ausgaben";
 
@@ -63,6 +79,7 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         _cashflowType = cashflowType;
         PageHelpKey = "CashflowStreams";
         _currentProjectService.ProjectChanged += OnProjectChanged;
+        RefreshDynamicFactorOptions();
         RefreshItems();
     }
 
@@ -82,6 +99,8 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
             Interval = value.Interval;
             StartDate = value.StartDate;
             EndDate = value.EndDate;
+            EconomicFactorId = value.EconomicFactorId;
+            SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id == value.EconomicFactorId);
         }
         finally
         {
@@ -119,11 +138,28 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
             Amount = Amount,
             Interval = Interval,
             StartDate = StartDate.GetValueOrDefault(),
-            EndDate = EndDate
+            EndDate = EndDate,
+            EconomicFactorId = EconomicFactorId
         };
     }
 
-    private void OnProjectChanged(object? sender, EventArgs e) => RefreshItems();
+    private void OnProjectChanged(object? sender, EventArgs e)
+    {
+        RefreshDynamicFactorOptions();
+        RefreshItems();
+    }
+
+    private void RefreshDynamicFactorOptions()
+    {
+        DynamicFactorOptions.Clear();
+        DynamicFactorOptions.Add(new DynamicFactorOption(null, "Keine"));
+        var factors = _currentProjectService.Current?.EconomicFactors;
+        if (factors is not null)
+        {
+            foreach (var f in factors)
+                DynamicFactorOptions.Add(new DynamicFactorOption(f.Id, f.Name));
+        }
+    }
 
     private void RefreshItems()
     {
@@ -144,6 +180,8 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
         StartDate = start;
         EndDate = null;
+        EconomicFactorId = null;
+        SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id is null);
         ClearValidationErrors();
     }
 
@@ -180,7 +218,8 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
                 Amount = Amount,
                 Interval = Interval,
                 StartDate = StartDate!.Value,
-                EndDate = EndDate
+                EndDate = EndDate,
+                EconomicFactorId = EconomicFactorId
             };
             list.Add(newItem);
             _currentProjectService.UpdateStreams(list);
@@ -199,7 +238,8 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
                 Amount = Amount,
                 Interval = Interval,
                 StartDate = StartDate!.Value,
-                EndDate = EndDate
+                EndDate = EndDate,
+                EconomicFactorId = EconomicFactorId
             };
             _currentProjectService.UpdateStreams(list);
             RefreshItems();
@@ -225,3 +265,6 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     private bool HasCurrentProject() => _currentProjectService.Current is not null;
     private bool CanDelete() => SelectedItem is not null && _currentProjectService.Current is not null;
 }
+
+/// <summary>Eintrag für Dynamisierung-ComboBox (Id null = „Keine“).</summary>
+public record DynamicFactorOption(string? Id, string Display);

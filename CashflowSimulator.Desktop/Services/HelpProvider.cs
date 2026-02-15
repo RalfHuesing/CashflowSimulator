@@ -35,6 +35,23 @@ public sealed class HelpProvider : IHelpProvider
         ["CashflowEvents.TargetDate"] = ("Zieldatum", "Planmonat, in dem das Event stattfinden soll. Dient als Referenz für den optionalen Toleranzbereich."),
         ["CashflowEvents.EarliestMonthOffset"] = ("Frühestens (Monate vom Zieldatum)", "Negative Zahl: Wie viele Monate vor dem Zieldatum das Event frühestens eintreten kann. 0 = nur im Zieldatum."),
         ["CashflowEvents.LatestMonthOffset"] = ("Spätestens (Monate vom Zieldatum)", "Positive Zahl: Wie viele Monate nach dem Zieldatum das Event spätestens eintreten kann. 0 = nur im Zieldatum."),
+        // Marktdaten (HelpKeyPrefix = "Marktdaten")
+        ["Marktdaten"] = ("Marktdaten", "Stochastische Marktfaktoren (z. B. Inflation, Aktienindex) steuern die Zufallspfade der Simulation. Hier legen Sie Faktoren mit Modelltyp (GBM oder Mean Reversion) und Parametern fest."),
+        ["Marktdaten.Id"] = ("ID (eindeutig)", "Eindeutige Kennung des Faktors (z. B. Inflation_VPI). Wird in Korrelationen und zur Zuordnung in Cashflows verwendet. Keine Leerzeichen."),
+        ["Marktdaten.Name"] = ("Name", "Anzeigename des Faktors (z. B. „Inflation (VPI)“ oder „Aktien Welt“). Erscheint in Listen und Auswahlfeldern."),
+        ["Marktdaten.ModelType"] = ("Modelltyp", "GBM (Geometrische Brownsche Bewegung): typisch für Aktien/Indizes; keine Rückkehr zu einem Niveau. Ornstein-Uhlenbeck: typisch für Inflation/Zinsen; der Prozess kehrt zu einem langfristigen Mittelwert zurück."),
+        ["Marktdaten.ExpectedReturn"] = ("Erwartete Rendite / Drift (μ)", "Langfristige erwartete Rendite bzw. Drift. Bei GBM: Drift der log-Renditen (z. B. 0,07 = 7 % p.a.). Bei Mean Reversion: Niveau, zu dem der Prozess reverts (z. B. 0,02 = 2 % Inflation)."),
+        ["Marktdaten.Volatility"] = ("Volatilität (σ)", "Schwankungsbreite des Faktors. Je höher, desto riskanter. Typisch 0,15–0,20 für Aktien, geringer für Zinsen/Inflation. Parameter σ im Wiener-Prozess (annualisiert)."),
+        ["Marktdaten.MeanReversionSpeed"] = ("Mean-Reversion-Speed (θ)", "Nur bei Ornstein-Uhlenbeck relevant. Steuert, wie schnell der Prozess zum langfristigen Mittelwert zurückkehrt. 0 = kaum Rückkehr (annähernd Random Walk); größere Werte = schnellere Anpassung."),
+        ["Marktdaten.InitialValue"] = ("Initialwert", "Startwert des Faktors zum Simulationsstart (z. B. Indexstand 100 oder Inflationsrate 0,02). Einheit abhängig vom Faktor."),
+        // Korrelationen (HelpKeyPrefix = "Korrelationen")
+        ["Korrelationen"] = ("Korrelationen", "Paarweise Korrelationen zwischen Marktfaktoren. Die Werte fließen in die Korrelationsmatrix ein; diese muss positiv definit sein (wird beim Speichern geprüft)."),
+        ["Korrelationen.FactorIdA"] = ("Faktor A", "Erster Faktor des Paars. Muss ein vorhandener Marktfaktor aus dem Bereich Marktdaten sein."),
+        ["Korrelationen.FactorIdB"] = ("Faktor B", "Zweiter Faktor des Paars. Muss von Faktor A verschieden und ein vorhandener Marktfaktor sein."),
+        ["Korrelationen.Correlation"] = ("Korrelation", "Pearson-Korrelation zwischen -1 und 1. 0 = unkorreliert; 1 = perfekt positiv; -1 = perfekt negativ. Die Gesamtmatrix aller Faktoren muss positiv definit bleiben."),
+        // Dynamisierung in Cashflows
+        ["CashflowStreams.EconomicFactorId"] = ("Dynamisierung / Marktfaktor", "Optional: Ein Marktfaktor (z. B. Inflation), an den dieser Cashflow gekoppelt wird. „Keine“ = nominaler Betrag ohne Dynamisierung."),
+        ["CashflowEvents.EconomicFactorId"] = ("Dynamisierung / Marktfaktor", "Optional: Ein Marktfaktor (z. B. Inflation), an den dieses Event gekoppelt wird. „Keine“ = nominaler Betrag ohne Dynamisierung."),
     }.ToFrozenDictionary();
 
     /// <inheritdoc />

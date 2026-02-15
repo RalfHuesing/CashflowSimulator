@@ -55,6 +55,18 @@ public interface ICurrentProjectService
     void UpdateEvents(IReadOnlyList<CashflowEventDto> events);
 
     /// <summary>
+    /// Aktualisiert die ökonomischen Faktoren (Marktdaten) des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateEconomicFactors(IReadOnlyList<EconomicFactorDto> economicFactors);
+
+    /// <summary>
+    /// Aktualisiert die Korrelationen zwischen Faktoren des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateCorrelations(IReadOnlyList<CorrelationEntryDto> correlations);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

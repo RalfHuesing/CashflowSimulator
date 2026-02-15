@@ -13,4 +13,10 @@ public record CashflowEventDto
     public DateOnly TargetDate { get; init; }
     public int? EarliestMonthOffset { get; init; }
     public int? LatestMonthOffset { get; init; }
+
+    /// <summary>
+    /// Optional: ID eines ökonomischen Faktors zur Dynamisierung (z. B. Inflation).
+    /// null = nominal (keine Dynamisierung).
+    /// </summary>
+    public string? EconomicFactorId { get; init; }
 }

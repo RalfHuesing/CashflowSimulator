@@ -40,6 +40,22 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     [ObservableProperty]
     private int? _latestMonthOffset;
 
+    /// <summary>Optional: Marktfaktor zur Dynamisierung (null = Keine).</summary>
+    [ObservableProperty]
+    private string? _economicFactorId;
+
+    /// <summary>Für ComboBox: „Keine“ + alle Marktfaktoren.</summary>
+    public ObservableCollection<DynamicFactorOption> DynamicFactorOptions { get; } = [];
+
+    [ObservableProperty]
+    private DynamicFactorOption? _selectedDynamicFactor;
+
+    partial void OnSelectedDynamicFactorChanged(DynamicFactorOption? value)
+    {
+        _economicFactorId = value?.Id;
+        ScheduleValidateAndSave();
+    }
+
     [ObservableProperty]
     private string? _editingId;
 
@@ -60,6 +76,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         _cashflowType = cashflowType;
         PageHelpKey = "CashflowEvents";
         _currentProjectService.ProjectChanged += OnProjectChanged;
+        RefreshDynamicFactorOptions();
         RefreshItems();
     }
 
@@ -79,6 +96,8 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
             TargetDate = value.TargetDate;
             EarliestMonthOffset = value.EarliestMonthOffset;
             LatestMonthOffset = value.LatestMonthOffset;
+            EconomicFactorId = value.EconomicFactorId;
+            SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id == value.EconomicFactorId);
         }
         finally
         {
@@ -116,11 +135,28 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
             Amount = Amount,
             TargetDate = TargetDate.GetValueOrDefault(),
             EarliestMonthOffset = EarliestMonthOffset,
-            LatestMonthOffset = LatestMonthOffset
+            LatestMonthOffset = LatestMonthOffset,
+            EconomicFactorId = EconomicFactorId
         };
     }
 
-    private void OnProjectChanged(object? sender, EventArgs e) => RefreshItems();
+    private void OnProjectChanged(object? sender, EventArgs e)
+    {
+        RefreshDynamicFactorOptions();
+        RefreshItems();
+    }
+
+    private void RefreshDynamicFactorOptions()
+    {
+        DynamicFactorOptions.Clear();
+        DynamicFactorOptions.Add(new DynamicFactorOption(null, "Keine"));
+        var factors = _currentProjectService.Current?.EconomicFactors;
+        if (factors is not null)
+        {
+            foreach (var f in factors)
+                DynamicFactorOptions.Add(new DynamicFactorOption(f.Id, f.Name));
+        }
+    }
 
     private void RefreshItems()
     {
@@ -140,6 +176,8 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         TargetDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1));
         EarliestMonthOffset = null;
         LatestMonthOffset = null;
+        EconomicFactorId = null;
+        SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id is null);
         ClearValidationErrors();
     }
 
@@ -175,7 +213,8 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
                 Amount = Amount,
                 TargetDate = TargetDate!.Value,
                 EarliestMonthOffset = EarliestMonthOffset,
-                LatestMonthOffset = LatestMonthOffset
+                LatestMonthOffset = LatestMonthOffset,
+                EconomicFactorId = EconomicFactorId
             };
             list.Add(newItem);
             _currentProjectService.UpdateEvents(list);
@@ -194,7 +233,8 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
                 Amount = Amount,
                 TargetDate = TargetDate!.Value,
                 EarliestMonthOffset = EarliestMonthOffset,
-                LatestMonthOffset = LatestMonthOffset
+                LatestMonthOffset = LatestMonthOffset,
+                EconomicFactorId = EconomicFactorId
             };
             _currentProjectService.UpdateEvents(list);
             RefreshItems();
@@ -220,3 +260,6 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     private bool HasCurrentProject() => _currentProjectService.Current is not null;
     private bool CanDelete() => SelectedItem is not null && _currentProjectService.Current is not null;
 }
+
+/// <summary>Eintrag für Dynamisierung-ComboBox (Id null = „Keine“).</summary>
+public record DynamicFactorOption(string? Id, string Display);

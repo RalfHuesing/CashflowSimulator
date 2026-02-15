@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Korrelationen"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="CashflowSimulator.Desktop.Features.Korrelationen.KorrelationenView"
+             x:DataType="vm:KorrelationenViewModel">
+
+    <controls:FeatureLayoutView Title="Korrelationen"
+                                Description="Paarweise Korrelationen zwischen Marktfaktoren. Die Gesamtmatrix muss positiv definit sein.">
+        <controls:MasterDetailView NewCommand="{Binding NewCommand}"
+                                   SaveCommand="{Binding SaveCommand}"
+                                   DeleteCommand="{Binding DeleteCommand}">
+            <controls:MasterDetailView.MasterContent>
+                <DataGrid ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem}"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Faktor A" Width="*" Binding="{Binding FactorIdA}"/>
+                        <DataGridTextColumn Header="Faktor B" Width="*" Binding="{Binding FactorIdB}"/>
+                        <DataGridTemplateColumn Header="Korrelation" Width="100" SortMemberPath="Correlation">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Correlation, StringFormat='{}{0:F2}'}"
+                                               TextAlignment="Right"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </controls:MasterDetailView.MasterContent>
+            <controls:MasterDetailView.DetailContent>
+                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Faktor A"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Classes="form-input"
+                              ItemsSource="{Binding FactorOptions}"
+                              SelectedItem="{Binding SelectedFactorA}"
+                              Margin="{StaticResource FormInputMargin}"
+                              behaviors:FocusHelpBehavior.HelpKey="FactorIdA"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="FactorIdA">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:FactorOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Faktor B"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" Classes="form-input"
+                              ItemsSource="{Binding FactorOptions}"
+                              SelectedItem="{Binding SelectedFactorB}"
+                              Margin="{StaticResource FormInputMargin}"
+                              behaviors:FocusHelpBehavior.HelpKey="FactorIdB"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="FactorIdB">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:FactorOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Korrelation (-1 bis 1)"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Classes="form-input"
+                                   Value="{Binding Correlation}" Increment="0.1"
+                                   Margin="{StaticResource FormInputMarginLast}"
+                                   behaviors:FocusHelpBehavior.HelpKey="Correlation"
+                                   behaviors:FocusHelpBehavior.ErrorPropertyName="Correlation"/>
+                </Grid>
+            </controls:MasterDetailView.DetailContent>
+        </controls:MasterDetailView>
+    </controls:FeatureLayoutView>
+</UserControl>

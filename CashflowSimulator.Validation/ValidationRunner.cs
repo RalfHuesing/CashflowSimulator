@@ -16,6 +16,8 @@ public static class ValidationRunner
     private static readonly SimulationProjectValidator ProjectValidator = new();
     private static readonly CashflowStreamDtoValidator StreamValidator = new();
     private static readonly CashflowEventDtoValidator EventValidator = new();
+    private static readonly EconomicFactorDtoValidator EconomicFactorValidator = new();
+    private static readonly CorrelationEntryDtoValidator CorrelationEntryValidator = new();
 
     /// <summary>
     /// Validiert <see cref="SimulationParametersDto"/> (z. B. für Eckdaten-Apply).
@@ -59,6 +61,24 @@ public static class ValidationRunner
     public static ValidationResult Validate(CashflowEventDto dto)
     {
         var result = EventValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="EconomicFactorDto"/> (z. B. für das Marktdaten-Formular).
+    /// </summary>
+    public static ValidationResult Validate(EconomicFactorDto dto)
+    {
+        var result = EconomicFactorValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="CorrelationEntryDto"/> (z. B. für das Korrelationen-Formular).
+    /// </summary>
+    public static ValidationResult Validate(CorrelationEntryDto dto)
+    {
+        var result = CorrelationEntryValidator.Validate(dto);
         return ToValidationResult(result);
     }
 

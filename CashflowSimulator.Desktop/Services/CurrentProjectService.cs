@@ -99,6 +99,30 @@ public sealed class CurrentProjectService : ICurrentProjectService
         OnProjectChanged();
     }
 
+    /// <inheritdoc />
+    public void UpdateEconomicFactors(IReadOnlyList<EconomicFactorDto> economicFactors)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { EconomicFactors = economicFactors.ToList() };
+        });
+        OnProjectChanged();
+    }
+
+    /// <inheritdoc />
+    public void UpdateCorrelations(IReadOnlyList<CorrelationEntryDto> correlations)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { Correlations = correlations.ToList() };
+        });
+        OnProjectChanged();
+    }
+
     private void WithLock(Action action)
     {
         using (_lock.EnterScope())

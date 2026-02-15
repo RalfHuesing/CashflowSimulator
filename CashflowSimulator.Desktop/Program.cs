@@ -9,6 +9,8 @@ using CashflowSimulator.Desktop.Features.CashflowStreams;
 using CashflowSimulator.Desktop.Features.Eckdaten;
 using CashflowSimulator.Desktop.Features.Main;
 using CashflowSimulator.Desktop.Features.Main.Navigation;
+using CashflowSimulator.Desktop.Features.Marktdaten;
+using CashflowSimulator.Desktop.Features.Korrelationen;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Services;
@@ -62,6 +64,10 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<Func<MetaEditViewModel>>(sp => () => sp.GetRequiredService<MetaEditViewModel>());
                 services.AddTransient<EckdatenViewModel>();
                 services.AddSingleton<Func<EckdatenViewModel>>(sp => () => sp.GetRequiredService<EckdatenViewModel>());
+                services.AddTransient<MarktdatenViewModel>();
+                services.AddSingleton<Func<MarktdatenViewModel>>(sp => () => sp.GetRequiredService<MarktdatenViewModel>());
+                services.AddTransient<KorrelationenViewModel>();
+                services.AddSingleton<Func<KorrelationenViewModel>>(sp => () => sp.GetRequiredService<KorrelationenViewModel>());
                 services.AddTransient<SettingsViewModel>();
                 services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
                 services.AddSingleton<Func<CashflowType, CashflowStreamsViewModel>>(sp => type =>

@@ -40,7 +40,7 @@
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
@@ -77,13 +77,28 @@
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="EarliestMonthOffset"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Spätestens (Monate vom Zieldatum)"
-                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
                                    Value="{Binding LatestMonthOffset}" Increment="1"
-                                   Margin="{StaticResource FormInputMarginLast}"
+                                   Margin="{StaticResource FormInputMargin}"
                                    AllowSpin="True"
                                    behaviors:FocusHelpBehavior.HelpKey="LatestMonthOffset"
                                    behaviors:FocusHelpBehavior.ErrorPropertyName="LatestMonthOffset"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Dynamisierung / Marktfaktor"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <ComboBox Grid.Row="5" Grid.Column="1" Classes="form-input"
+                              ItemsSource="{Binding DynamicFactorOptions}"
+                              SelectedItem="{Binding SelectedDynamicFactor}"
+                              Margin="{StaticResource FormInputMarginLast}"
+                              behaviors:FocusHelpBehavior.HelpKey="EconomicFactorId"
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="EconomicFactorId">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:DynamicFactorOption">
+                                <TextBlock Text="{Binding Display}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </Grid>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>

@@ -13,4 +13,10 @@ public record CashflowStreamDto
 
     public DateOnly StartDate { get; init; }
     public DateOnly? EndDate { get; init; }
+
+    /// <summary>
+    /// Optional: ID eines ökonomischen Faktors zur Dynamisierung (z. B. Inflation).
+    /// null = nominal (keine Dynamisierung).
+    /// </summary>
+    public string? EconomicFactorId { get; init; }
 }
