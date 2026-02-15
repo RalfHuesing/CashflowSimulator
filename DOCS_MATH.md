@@ -88,6 +88,12 @@ Um bei vielen Monte-Carlo-Iterationen effizient einen „repräsentativen“ Pfa
 
 Validierung (z. B. in CashflowSimulator.Validation): Faktor-IDs in Correlations müssen in EconomicFactors vorkommen; Correlation in \( [-1, 1] \); Korrelationsmatrix positiv definit; sinnvolle Grenzen für Volatility, MeanReversionSpeed, MonteCarloIterations.
 
+## 5. Zukünftige Konzepte: Black Swan Ereignisse & Stress-Tests
+
+Um die Realitätsnähe über die Standard-Normalverteilung (GBM) hinaus zu erhöhen:
+- **Jump-Diffusion (Merton-Modell):** Ergänzung von EconomicFactorDto um Sprung-Wahrscheinlichkeiten ($\lambda$) und Sprunghöhen, um plötzliche Crashs (Fat Tails) abzubilden.
+- **Economic Shocks:** Manuelle Events, die Faktoren einmalig um $X\%$ senken (Stress-Tests wie "Corona-Schock").
+- **Krisen-Korrelation:** Dynamische Anpassung der Korrelationsmatrix in Stressphasen (Asset-Klassen korrelieren in Krisen oft stärker gegen 1,0).
 ---
 
 *Stand: Spezifikation für die Engine-Implementierung; DTOs und Enums sind in CashflowSimulator.Contracts definiert.*
