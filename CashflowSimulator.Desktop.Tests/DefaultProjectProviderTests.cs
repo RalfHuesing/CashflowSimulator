@@ -16,9 +16,11 @@ public sealed class DefaultProjectProviderTests
         Assert.NotNull(project.Events);
         Assert.NotNull(project.EconomicFactors);
         Assert.NotNull(project.Correlations);
+        Assert.NotNull(project.AssetClasses);
         Assert.Equal(10, project.Streams.Count);
         Assert.Equal(6, project.Events.Count);
-        Assert.Equal(3, project.EconomicFactors.Count);
+        Assert.Equal(4, project.EconomicFactors.Count);
+        Assert.Equal(3, project.AssetClasses.Count);
         Assert.True(project.Correlations.Count >= 1);
     }
 

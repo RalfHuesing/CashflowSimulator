@@ -73,6 +73,12 @@ public interface ICurrentProjectService
     void UpdatePortfolio(PortfolioDto portfolio);
 
     /// <summary>
+    /// Aktualisiert die Anlageklassen des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateAssetClasses(IReadOnlyList<AssetClassDto> assetClasses);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

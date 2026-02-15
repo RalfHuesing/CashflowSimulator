@@ -30,6 +30,19 @@ public record AssetDto
     public AssetType AssetType { get; init; }
 
     /// <summary>
+    /// ID der Anlageklasse (<see cref="AssetClassDto"/>), der dieses Asset zugeordnet ist.
+    /// Leer = keine Zuordnung (z. B. bei Tagesgeld).
+    /// </summary>
+    public string AssetClassId { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Aktueller Stückpreis (Kurs) des Assets. Startwert für die Simulation und Basis für
+    /// die Anzeige des aktuellen Gesamtwerts (Stückzahl × CurrentPrice).
+    /// Einheit: Währung (decimal).
+    /// </summary>
+    public decimal CurrentPrice { get; init; }
+
+    /// <summary>
     /// ID des ökonomischen Faktors (<see cref="EconomicFactorDto"/>), der die Wertentwicklung
     /// dieses Assets steuert. Die Stochastik (z. B. GBM mit Drift/Volatilität) wird ausschließlich
     /// im Faktor definiert; alle Assets mit derselben EconomicFactorId folgen demselben simulierten

@@ -51,10 +51,20 @@
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"/>
         </DataTemplate>
+        <DataTemplate DataType="portfolio:AssetClassesViewModel">
+            <portfolio:AssetClassesView DataContext="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"/>
+        </DataTemplate>
         <DataTemplate DataType="portfolio:PortfolioViewModel">
             <portfolio:PortfolioView DataContext="{Binding}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="portfolio:TransactionsViewModel">
+            <portfolio:TransactionsView DataContext="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"/>
         </DataTemplate>
     </Application.DataTemplates>
 

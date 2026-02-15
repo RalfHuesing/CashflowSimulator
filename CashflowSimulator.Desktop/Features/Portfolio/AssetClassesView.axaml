@@ -1,0 +1,106 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Portfolio"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
+             xmlns:data="using:Avalonia.Data.Converters"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="CashflowSimulator.Desktop.Features.Portfolio.AssetClassesView"
+             x:DataType="vm:AssetClassesViewModel">
+
+    <controls:FeatureLayoutView Title="Anlageklassen"
+                                Description="Zielallokation (Buckets) für Ihr Portfolio – z. B. Aktien Welt 70 %, Anleihen 30 %. Die Summe sollte 100 % ergeben.">
+        <controls:FeatureLayoutView.ActionContent>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
+                <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Add" FontSize="16"/>
+                        <TextBlock Text="Neu" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding SaveCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Save" FontSize="16"/>
+                        <TextBlock Text="Speichern" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding DeleteCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Delete" FontSize="16"/>
+                        <TextBlock Text="Löschen" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </controls:FeatureLayoutView.ActionContent>
+        <controls:MasterDetailView>
+            <controls:MasterDetailView.MasterContent>
+                <DataGrid ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem}"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                        <DataGridTemplateColumn Width="120" SortMemberPath="TargetWeight">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Zielgewichtung" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TargetWeight, StringFormat='{}{0:P0}'}"
+                                               TextAlignment="Right"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </controls:MasterDetailView.MasterContent>
+            <controls:MasterDetailView.DetailContent>
+                <StackPanel Spacing="16">
+                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
+                                 Text="{Binding Name}" Margin="{StaticResource FormInputMargin}"
+                                 behaviors:FocusHelpBehavior.HelpKey="Name"
+                                 behaviors:FocusHelpBehavior.ErrorPropertyName="Name"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Zielgewichtung (0–100 %)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <NumericUpDown Grid.Row="1" Grid.Column="1" Classes="form-input"
+                                       Value="{Binding TargetWeight}"
+                                       Minimum="0"
+                                       Maximum="1"
+                                       Increment="0.05"
+                                       Margin="{StaticResource FormInputMargin}"
+                                       behaviors:FocusHelpBehavior.HelpKey="TargetWeight"
+                                       behaviors:FocusHelpBehavior.ErrorPropertyName="TargetWeight"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Farbe (optional, Hex)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Classes="form-input"
+                                 Text="{Binding Color}" Watermark="#1E88E5"
+                                 Margin="{StaticResource FormInputMargin}"
+                                 behaviors:FocusHelpBehavior.HelpKey="Color"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Summe Gewichte"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <StackPanel Grid.Row="3" Grid.Column="1" Spacing="4" Margin="{StaticResource FormInputMargin}">
+                            <TextBlock Text="{Binding TotalWeightPercentText}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding WeightSumWarning}"
+                                       IsVisible="{Binding WeightSumWarning, Converter={x:Static data:ObjectConverters.IsNotNull}}"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </controls:MasterDetailView.DetailContent>
+        </controls:MasterDetailView>
+    </controls:FeatureLayoutView>
+</UserControl>

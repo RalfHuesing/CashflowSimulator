@@ -18,6 +18,12 @@ public record SimulationProjectDto
     public List<EconomicFactorDto> EconomicFactors { get; init; } = [];
 
     /// <summary>
+    /// Anlageklassen (Buckets) für die strategische Zielallokation (z. B. "Aktien Welt 70 %", "Anleihen 30 %").
+    /// Vermögenswerte werden über <see cref="AssetDto.AssetClassId"/> einer Klasse zugeordnet.
+    /// </summary>
+    public List<AssetClassDto> AssetClasses { get; init; } = [];
+
+    /// <summary>
     /// Portfolio des Nutzers: alle gehaltenen Vermögenswerte (Assets) und optional Strategie/Rebalancing.
     /// Jedes Asset verknüpft sich über <see cref="AssetDto.EconomicFactorId"/> mit einem
     /// <see cref="EconomicFactorDto"/> aus <see cref="EconomicFactors"/> für die Wertentwicklung.

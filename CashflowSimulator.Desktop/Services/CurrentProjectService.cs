@@ -135,6 +135,18 @@ public sealed class CurrentProjectService : ICurrentProjectService
         OnProjectChanged();
     }
 
+    /// <inheritdoc />
+    public void UpdateAssetClasses(IReadOnlyList<AssetClassDto> assetClasses)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { AssetClasses = assetClasses.ToList() };
+        });
+        OnProjectChanged();
+    }
+
     private void WithLock(Action action)
     {
         using (_lock.EnterScope())

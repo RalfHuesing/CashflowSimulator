@@ -12,7 +12,7 @@
              x:DataType="vm:PortfolioViewModel">
 
     <controls:FeatureLayoutView Title="Vermögenswerte"
-                                Description="Vermögenswerte (ETFs, Anleihen, Tagesgeld) und Transaktionshistorie.">
+                                Description="Konkrete Produkte (ETFs, Konten): Stammdaten, aktueller Kurs und Zuordnung zu Anlageklasse sowie Marktfaktor. Transaktionen werden im Bereich Transaktionen geführt.">
         <controls:FeatureLayoutView.ActionContent>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
                 <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
@@ -79,7 +79,7 @@
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
                 <StackPanel Spacing="16">
-                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                    Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                         <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
@@ -124,9 +124,34 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Steuerart"
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Anlageklasse"
                                    Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                         <ComboBox Grid.Row="4" Grid.Column="1" Classes="form-input"
+                                  ItemsSource="{Binding AssetClassOptions}"
+                                  SelectedItem="{Binding SelectedAssetClass}"
+                                  Margin="{StaticResource FormInputMargin}"
+                                  behaviors:FocusHelpBehavior.HelpKey="AssetClassId"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="AssetClassId">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="vm:AssetClassOption">
+                                    <TextBlock Text="{Binding Display}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Aktueller Kurs (Stückpreis)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <NumericUpDown Grid.Row="5" Grid.Column="1" Classes="form-input"
+                                       Value="{Binding CurrentPrice}"
+                                       Minimum="0"
+                                       Increment="0.01"
+                                       Margin="{StaticResource FormInputMargin}"
+                                       behaviors:FocusHelpBehavior.HelpKey="CurrentPrice"
+                                       behaviors:FocusHelpBehavior.ErrorPropertyName="CurrentPrice"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Steuerart"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <ComboBox Grid.Row="6" Grid.Column="1" Classes="form-input"
                                   ItemsSource="{x:Static vm:PortfolioViewModel.TaxTypeOptions}"
                                   SelectedItem="{Binding SelectedTaxTypeOption}"
                                   Margin="{StaticResource FormInputMargin}"
@@ -139,48 +164,23 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Aktiv bespart"
-                                   Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
-                        <CheckBox Grid.Row="5" Grid.Column="1" Content="Dieses Asset wird aktuell bespart"
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Aktiv bespart"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <CheckBox Grid.Row="7" Grid.Column="1" Content="Dieses Asset wird aktuell bespart"
                                   IsChecked="{Binding IsActiveSavingsInstrument}"
-                                  Margin="{StaticResource FormInputMarginLast}"
+                                  Margin="{StaticResource FormInputMargin}"
                                   behaviors:FocusHelpBehavior.HelpKey="IsActiveSavingsInstrument"/>
-                    </Grid>
 
-                    <TextBlock Text="Transaktionen (nur Anzeige)" FontWeight="SemiBold" Margin="0,8,0,4"/>
-                    <DataGrid ItemsSource="{Binding SelectedAssetTransactions}"
-                              IsReadOnly="True"
-                              SelectionMode="Single"
-                              MinHeight="120">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Datum" Width="110" Binding="{Binding Date}"/>
-                            <DataGridTextColumn Header="Typ" Width="90" Binding="{Binding Type, Converter={StaticResource EnumDescriptionConverter}}"/>
-                            <DataGridTemplateColumn Header="Menge" Width="80" SortMemberPath="Quantity">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Quantity, StringFormat='{}{0:N2}'}"
-                                                   TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Preis" Width="90" SortMemberPath="PricePerUnit">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding PricePerUnit, StringFormat='{}{0:C}'}"
-                                                   TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Gesamt" Width="100" SortMemberPath="TotalAmount">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding TotalAmount, StringFormat='{}{0:C}'}"
-                                                   TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Stückzahl (berechnet/Bestand)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding DisplayQuantity, StringFormat='{}{0:N2}'}"
+                                   VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="Aktueller Gesamtwert"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                        <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding DisplayTotalValue, StringFormat='{}{0:C}'}"
+                                   VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    </Grid>
                 </StackPanel>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>

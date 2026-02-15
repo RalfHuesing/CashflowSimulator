@@ -9,8 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 namespace CashflowSimulator.Desktop.Features.Portfolio;
 
 /// <summary>
-/// ViewModel für Vermögenswerte (Portfolio): Master-Liste mit Suche, Detail-Formular und Transaktionshistorie.
-/// Filterung nach Name/ISIN reaktiv mit Debounce. Transaktionen nur Anzeige (read-only).
+/// ViewModel für Vermögenswerte (Assets): Master-Liste mit Suche, Detail-Formular.
+/// Transaktionen werden hier nicht angezeigt (siehe Transaktionen-View). Enthält aktueller Kurs und Anlageklasse.
 /// </summary>
 public partial class PortfolioViewModel : ValidatingViewModelBase
 {
@@ -21,6 +21,8 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
+    [NotifyPropertyChangedFor(nameof(DisplayQuantity))]
+    [NotifyPropertyChangedFor(nameof(DisplayTotalValue))]
     private AssetDto? _selectedItem;
 
     [ObservableProperty]
@@ -44,6 +46,19 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
     [ObservableProperty]
     private TaxType _taxType = TaxType.EquityFund;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayTotalValue))]
+    private decimal _currentPrice;
+
+    [ObservableProperty]
+    private string? _assetClassId;
+
+    /// <summary>Stückzahl (aus Bestand/Transaktionen, read-only Anzeige).</summary>
+    public decimal DisplayQuantity => SelectedItem?.CurrentQuantity ?? 0;
+
+    /// <summary>Aktueller Gesamtwert = aktueller Kurs × Stückzahl.</summary>
+    public decimal DisplayTotalValue => CurrentPrice * DisplayQuantity;
+
     /// <summary>Für ComboBox: ausgewählter Marktfaktor.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EconomicFactorId))]
@@ -52,6 +67,16 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
     partial void OnSelectedFactorChanged(FactorOption? value)
     {
         _economicFactorId = value?.Id;
+        ScheduleValidateAndSaveIfNeeded();
+    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AssetClassId))]
+    private AssetClassOption? _selectedAssetClass;
+
+    partial void OnSelectedAssetClassChanged(AssetClassOption? value)
+    {
+        _assetClassId = value?.Id;
         ScheduleValidateAndSaveIfNeeded();
     }
 
@@ -88,10 +113,9 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
     /// <summary>Gefilterte Anzeige der Assets (reaktiv auf SearchText).</summary>
     public ObservableCollection<AssetDto> Assets { get; } = [];
 
-    /// <summary>Transaktionen des ausgewählten Assets (leer wenn keiner ausgewählt). Für read-only DataGrid.</summary>
-    public IReadOnlyList<TransactionDto> SelectedAssetTransactions => SelectedItem?.Transactions ?? [];
-
     public ObservableCollection<FactorOption> FactorOptions { get; } = [];
+
+    public ObservableCollection<AssetClassOption> AssetClassOptions { get; } = [];
 
     public static IReadOnlyList<EnumDisplayEntry> TaxTypeOptions { get; } =
         EnumExtensions.ToDisplayList<TaxType>();
@@ -110,6 +134,7 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
         PageHelpKey = "Portfolio";
         _currentProjectService.ProjectChanged += OnProjectChanged;
         RefreshFactorOptions();
+        RefreshAssetClassOptions();
         RefreshAndFilterAssets();
     }
 
@@ -120,7 +145,6 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
 
     partial void OnSelectedItemChanged(AssetDto? value)
     {
-        OnPropertyChanged(nameof(SelectedAssetTransactions));
         if (value is null)
         {
             ClearForm();
@@ -136,7 +160,10 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
             EconomicFactorId = value.EconomicFactorId;
             IsActiveSavingsInstrument = value.IsActiveSavingsInstrument;
             TaxType = value.TaxType;
+            CurrentPrice = value.CurrentPrice;
+            AssetClassId = value.AssetClassId;
             SelectedFactor = FactorOptions.FirstOrDefault(o => o.Id == value.EconomicFactorId);
+            SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == value.AssetClassId);
             SelectedTaxTypeOption = TaxTypeOptions.FirstOrDefault(o => Equals(o.Value, value.TaxType));
             SelectedAssetTypeOption = AssetTypeOptions.FirstOrDefault(o => Equals(o.Value, value.AssetType));
         }
@@ -150,6 +177,7 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
     partial void OnIsinChanged(string value) => ScheduleValidateAndSaveIfNeeded();
     partial void OnEconomicFactorIdChanged(string? value) => ScheduleValidateAndSaveIfNeeded();
     partial void OnIsActiveSavingsInstrumentChanged(bool value) => ScheduleValidateAndSaveIfNeeded();
+    partial void OnCurrentPriceChanged(decimal value) => ScheduleValidateAndSaveIfNeeded();
 
     private void ScheduleValidateAndSaveIfNeeded()
     {
@@ -161,6 +189,7 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
     private void OnProjectChanged(object? sender, EventArgs e)
     {
         RefreshFactorOptions();
+        RefreshAssetClassOptions();
         RefreshAndFilterAssets();
     }
 
@@ -172,6 +201,17 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
         {
             foreach (var f in factors)
                 FactorOptions.Add(new FactorOption(f.Id, f.Name));
+        }
+    }
+
+    private void RefreshAssetClassOptions()
+    {
+        AssetClassOptions.Clear();
+        var classes = _currentProjectService.Current?.AssetClasses;
+        if (classes is not null)
+        {
+            foreach (var c in classes)
+                AssetClassOptions.Add(new AssetClassOption(c.Id, c.Name));
         }
     }
 
@@ -211,6 +251,9 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
         SelectedAssetTypeOption = AssetTypeOptions.FirstOrDefault();
         EconomicFactorId = null;
         SelectedFactor = FactorOptions.FirstOrDefault();
+        AssetClassId = null;
+        SelectedAssetClass = null;
+        CurrentPrice = 0;
         IsActiveSavingsInstrument = false;
         TaxType = TaxType.EquityFund;
         SelectedTaxTypeOption = TaxTypeOptions.FirstOrDefault(o => Equals(o.Value, TaxType.EquityFund));
@@ -222,17 +265,21 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
         var current = _currentProjectService.Current;
         var existing = current?.Portfolio?.Assets?.FirstOrDefault(a => a.Id == EditingId);
         var transactions = existing?.Transactions ?? [];
+        var quantity = existing?.CurrentQuantity ?? 0;
+        var totalValue = CurrentPrice * quantity;
         return new AssetDto
         {
             Id = EditingId ?? Guid.NewGuid().ToString(),
             Name = Name?.Trim() ?? string.Empty,
             Isin = Isin?.Trim() ?? string.Empty,
             AssetType = AssetType,
+            AssetClassId = AssetClassId ?? string.Empty,
+            CurrentPrice = CurrentPrice,
             EconomicFactorId = EconomicFactorId ?? string.Empty,
             IsActiveSavingsInstrument = IsActiveSavingsInstrument,
             TaxType = TaxType,
-            CurrentQuantity = existing?.CurrentQuantity ?? 0,
-            CurrentValue = existing?.CurrentValue,
+            CurrentQuantity = quantity,
+            CurrentValue = totalValue,
             Transactions = transactions
         };
     }
@@ -294,3 +341,6 @@ public partial class PortfolioViewModel : ValidatingViewModelBase
 
 /// <summary>Eintrag für Marktfaktor-ComboBox.</summary>
 public record FactorOption(string Id, string Display);
+
+/// <summary>Eintrag für Anlageklassen-ComboBox.</summary>
+public record AssetClassOption(string Id, string Display);

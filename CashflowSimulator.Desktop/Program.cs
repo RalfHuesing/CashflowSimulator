@@ -69,8 +69,12 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<Func<MarktdatenViewModel>>(sp => () => sp.GetRequiredService<MarktdatenViewModel>());
                 services.AddTransient<KorrelationenViewModel>();
                 services.AddSingleton<Func<KorrelationenViewModel>>(sp => () => sp.GetRequiredService<KorrelationenViewModel>());
+                services.AddTransient<AssetClassesViewModel>();
+                services.AddSingleton<Func<AssetClassesViewModel>>(sp => () => sp.GetRequiredService<AssetClassesViewModel>());
                 services.AddTransient<PortfolioViewModel>();
                 services.AddSingleton<Func<PortfolioViewModel>>(sp => () => sp.GetRequiredService<PortfolioViewModel>());
+                services.AddTransient<TransactionsViewModel>();
+                services.AddSingleton<Func<TransactionsViewModel>>(sp => () => sp.GetRequiredService<TransactionsViewModel>());
                 services.AddTransient<SettingsViewModel>();
                 services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
                 services.AddSingleton<Func<CashflowType, CashflowStreamsViewModel>>(sp => type =>

@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.Portfolio"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
+             xmlns:ext="using:CashflowSimulator.Desktop.Common.Extensions"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="CashflowSimulator.Desktop.Features.Portfolio.TransactionsView"
+             x:DataType="vm:TransactionsViewModel">
+
+    <controls:FeatureLayoutView Title="Transaktionen"
+                                Description="Zentrales Journal aller Käufe und Verkäufe über alle Vermögenswerte. Neueste zuerst.">
+        <controls:FeatureLayoutView.ActionContent>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
+                <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Add" FontSize="16"/>
+                        <TextBlock Text="Neu" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding SaveCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Save" FontSize="16"/>
+                        <TextBlock Text="Speichern" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding DeleteCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Delete" FontSize="16"/>
+                        <TextBlock Text="Löschen" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </controls:FeatureLayoutView.ActionContent>
+        <controls:MasterDetailView>
+            <controls:MasterDetailView.MasterContent>
+                <DataGrid ItemsSource="{Binding AllTransactions}"
+                          SelectedItem="{Binding SelectedItem}"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Datum" Width="110" Binding="{Binding Transaction.Date}"/>
+                        <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding Transaction.Type, Converter={StaticResource EnumDescriptionConverter}}"/>
+                        <DataGridTextColumn Header="Asset" Width="*" Binding="{Binding AssetName}"/>
+                        <DataGridTemplateColumn Header="Betrag" Width="120" SortMemberPath="Transaction.TotalAmount">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.TotalAmount, StringFormat='{}{0:C}'}"
+                                               TextAlignment="Right"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </controls:MasterDetailView.MasterContent>
+            <controls:MasterDetailView.DetailContent>
+                <StackPanel Spacing="16">
+                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Vermögenswert (Asset)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" Classes="form-input"
+                                  ItemsSource="{Binding AssetOptions}"
+                                  SelectedItem="{Binding SelectedAsset}"
+                                  Margin="{StaticResource FormInputMargin}"
+                                  behaviors:FocusHelpBehavior.HelpKey="AssetId"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="AssetId">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="vm:AssetOption">
+                                    <TextBlock Text="{Binding Display}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Datum"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <CalendarDatePicker Grid.Row="1" Grid.Column="1" Classes="form-input"
+                                            SelectedDate="{Binding Date, Converter={StaticResource DateOnlyConverter}}"
+                                            SelectedDateFormat="Custom"
+                                            CustomDateFormatString="dd.MM.yyyy"
+                                            Watermark="TT.MM.JJJJ"
+                                            Margin="{StaticResource FormInputMargin}"
+                                            behaviors:FocusHelpBehavior.HelpKey="Date"
+                                            behaviors:FocusHelpBehavior.ErrorPropertyName="Date"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Typ"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
+                                  ItemsSource="{x:Static vm:TransactionsViewModel.TransactionTypeOptions}"
+                                  SelectedItem="{Binding SelectedTransactionTypeOption}"
+                                  Margin="{StaticResource FormInputMargin}"
+                                  behaviors:FocusHelpBehavior.HelpKey="TransactionType"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="TransactionType">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="ext:EnumDisplayEntry">
+                                    <TextBlock Text="{Binding Display}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Menge (Stück)"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <NumericUpDown Grid.Row="3" Grid.Column="1" Classes="form-input"
+                                      Value="{Binding Quantity}"
+                                      Minimum="0"
+                                      Increment="0.01"
+                                      Margin="{StaticResource FormInputMargin}"
+                                      behaviors:FocusHelpBehavior.HelpKey="Quantity"
+                                      behaviors:FocusHelpBehavior.ErrorPropertyName="Quantity"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Preis pro Stück"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
+                                      Value="{Binding PricePerUnit}"
+                                      Minimum="0"
+                                      Increment="0.01"
+                                      Margin="{StaticResource FormInputMargin}"
+                                      behaviors:FocusHelpBehavior.HelpKey="PricePerUnit"
+                                      behaviors:FocusHelpBehavior.ErrorPropertyName="PricePerUnit"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Gesamtbetrag"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                        <NumericUpDown Grid.Row="5" Grid.Column="1" Classes="form-input"
+                                      Value="{Binding TotalAmount}"
+                                      Increment="100"
+                                      Margin="{StaticResource FormInputMargin}"
+                                      behaviors:FocusHelpBehavior.HelpKey="TotalAmount"
+                                      behaviors:FocusHelpBehavior.ErrorPropertyName="TotalAmount"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Steueranteil"
+                                   Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                        <NumericUpDown Grid.Row="6" Grid.Column="1" Classes="form-input"
+                                       Value="{Binding TaxAmount}"
+                                       Minimum="0"
+                                       Increment="10"
+                                       Margin="{StaticResource FormInputMarginLast}"
+                                       behaviors:FocusHelpBehavior.HelpKey="TaxAmount"
+                                       behaviors:FocusHelpBehavior.ErrorPropertyName="TaxAmount"/>
+                    </Grid>
+                </StackPanel>
+            </controls:MasterDetailView.DetailContent>
+        </controls:MasterDetailView>
+    </controls:FeatureLayoutView>
+</UserControl>
