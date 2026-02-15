@@ -40,7 +40,9 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 
 ## Datumsfelder (CalendarDatePicker)
 
-- **Deutsches Format:** Für korrekte Texteingabe und -anzeige (TT.MM.JJJJ) an allen CalendarDatePicker **SelectedDateFormat="Custom"** und **CustomDateFormatString="dd.MM.yyyy"** setzen. Watermark z. B. `"TT.MM.JJJJ"`. Ohne diese Einstellung kann die Parsing-Kultur (z. B. en-US) zu ungültigem Datum und Validierungsfehlern führen.
+- **Kultur:** In **Program.cs** wird zu App-Start **CultureInfo "de-DE"** für CurrentCulture und CurrentUICulture gesetzt, damit Datumseingaben (z. B. "15.02.2026") und Zahlenformate konsistent geparst werden.
+- **DateOnly in ViewModels:** Datums-Properties in ViewModels sind **DateOnly?** (bzw. **DateOnly** wo fachlich erforderlich); DTOs nutzen ebenfalls DateOnly. Die Bindung an CalendarDatePicker erfolgt über den zentralen **DateOnlyConverter** (Common/Converters); in der View: `SelectedDate="{Binding StartDate, Converter={StaticResource DateOnlyConverter}}"`.
+- **Deutsches Format:** An allen CalendarDatePicker **SelectedDateFormat="Custom"**, **CustomDateFormatString="dd.MM.yyyy"** und Watermark z. B. `"TT.MM.JJJJ"` setzen.
 
 ## Master-Detail und Listen-Ansichten
 

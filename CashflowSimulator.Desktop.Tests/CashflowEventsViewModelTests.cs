@@ -79,7 +79,7 @@ public sealed class CashflowEventsViewModelTests
         var vm = new CashflowEventsViewModel(projectService, null!, CashflowType.Income);
         vm.Name = "Bonus";
         vm.Amount = 2000;
-        vm.TargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+        vm.TargetDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1));
 
         vm.SaveCommand.Execute(null);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using Avalonia;
 using CashflowSimulator.Contracts.Dtos;
@@ -24,6 +25,10 @@ namespace CashflowSimulator.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            var culture = new CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var logDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
             var logPath = Path.Combine(logDirectory, "cashflow-.log");
 

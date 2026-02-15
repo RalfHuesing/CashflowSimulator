@@ -32,7 +32,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     private decimal _amount;
 
     [ObservableProperty]
-    private DateTimeOffset? _targetDate;
+    private DateOnly? _targetDate;
 
     [ObservableProperty]
     private int? _earliestMonthOffset;
@@ -76,7 +76,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
             EditingId = value.Id;
             Name = value.Name;
             Amount = value.Amount;
-            TargetDate = new DateTimeOffset(value.TargetDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            TargetDate = value.TargetDate;
             EarliestMonthOffset = value.EarliestMonthOffset;
             LatestMonthOffset = value.LatestMonthOffset;
         }
@@ -88,7 +88,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();
     partial void OnAmountChanged(decimal value) => ScheduleValidateAndSave();
-    partial void OnTargetDateChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnTargetDateChanged(DateOnly? value) => ScheduleValidateAndSave();
     partial void OnEarliestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
     partial void OnLatestMonthOffsetChanged(int? value) => ScheduleValidateAndSave();
 
@@ -108,14 +108,13 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
 
     private CashflowEventDto BuildEventDtoFromForm()
     {
-        var targetDateValue = TargetDate.HasValue ? DateOnly.FromDateTime(TargetDate.Value.Date) : default;
         return new CashflowEventDto
         {
             Id = EditingId ?? Guid.NewGuid().ToString(),
             Name = Name?.Trim() ?? string.Empty,
             Type = _cashflowType,
             Amount = Amount,
-            TargetDate = targetDateValue,
+            TargetDate = TargetDate.GetValueOrDefault(),
             EarliestMonthOffset = EarliestMonthOffset,
             LatestMonthOffset = LatestMonthOffset
         };
@@ -138,7 +137,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         EditingId = null;
         Name = string.Empty;
         Amount = 0;
-        TargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+        TargetDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1));
         EarliestMonthOffset = null;
         LatestMonthOffset = null;
         ClearValidationErrors();
@@ -149,7 +148,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
     {
         SelectedItem = null;
         ClearForm();
-        TargetDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today.AddYears(1), DateTimeKind.Utc), TimeSpan.Zero);
+        TargetDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1));
     }
 
     [RelayCommand(CanExecute = nameof(HasCurrentProject))]
@@ -165,7 +164,6 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
         if (!validationResult.IsValid)
             return;
 
-        var targetDateValue = DateOnly.FromDateTime(TargetDate!.Value.Date);
         var list = current.Events.ToList();
         if (EditingId is null)
         {
@@ -175,7 +173,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
                 Name = Name.Trim(),
                 Type = _cashflowType,
                 Amount = Amount,
-                TargetDate = targetDateValue,
+                TargetDate = TargetDate!.Value,
                 EarliestMonthOffset = EarliestMonthOffset,
                 LatestMonthOffset = LatestMonthOffset
             };
@@ -194,7 +192,7 @@ public partial class CashflowEventsViewModel : ValidatingViewModelBase
             {
                 Name = Name.Trim(),
                 Amount = Amount,
-                TargetDate = targetDateValue,
+                TargetDate = TargetDate!.Value,
                 EarliestMonthOffset = EarliestMonthOffset,
                 LatestMonthOffset = LatestMonthOffset
             };

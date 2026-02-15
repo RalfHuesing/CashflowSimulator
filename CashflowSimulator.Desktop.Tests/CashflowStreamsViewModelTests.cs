@@ -86,7 +86,7 @@ public sealed class CashflowStreamsViewModelTests
         var vm = new CashflowStreamsViewModel(projectService, null!, CashflowType.Income);
         vm.Name = "Gehalt";
         vm.Amount = 2000;
-        vm.StartDate = new DateTimeOffset(DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc), TimeSpan.Zero);
+        vm.StartDate = DateOnly.FromDateTime(DateTime.Today);
         vm.Interval = "Monthly";
 
         vm.SaveCommand.Execute(null);

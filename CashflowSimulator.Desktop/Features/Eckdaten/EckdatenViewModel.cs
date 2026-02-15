@@ -32,7 +32,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentAgeText))]
-    private DateTimeOffset? _dateOfBirth;
+    private DateOnly? _dateOfBirth;
 
     [ObservableProperty]
     private decimal _retirementAge = 67;
@@ -60,7 +60,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         ? $"{GetAgeInYears(DateOfBirth.Value)} Jahre"
         : "—";
 
-    partial void OnDateOfBirthChanged(DateTimeOffset? value) => ScheduleValidateAndSave();
+    partial void OnDateOfBirthChanged(DateOnly? value) => ScheduleValidateAndSave();
     partial void OnRetirementAgeChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnLifeExpectancyChanged(decimal value) => ScheduleValidateAndSave();
     partial void OnInitialLiquidCashChanged(decimal value) => ScheduleValidateAndSave();
@@ -81,7 +81,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         _isLoading = true;
         try
         {
-            DateOfBirth = new DateTimeOffset(p.DateOfBirth.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            DateOfBirth = p.DateOfBirth;
             RetirementAge = p.RetirementDate.Year - p.DateOfBirth.Year;
             LifeExpectancy = p.SimulationEnd.Year - p.DateOfBirth.Year;
             InitialLiquidCash = p.InitialLiquidCash;
@@ -92,12 +92,11 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         }
     }
 
-    private static int GetAgeInYears(DateTimeOffset birth)
+    private static int GetAgeInYears(DateOnly birth)
     {
-        var today = DateOnly.FromDateTime(DateTimeOffset.Now.Date);
-        var birthDate = DateOnly.FromDateTime(birth.Date);
-        var age = today.Year - birthDate.Year;
-        if (birthDate > today.AddYears(-age))
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var age = today.Year - birth.Year;
+        if (birth > today.AddYears(-age))
             age--;
         return age;
     }
@@ -121,7 +120,7 @@ public partial class EckdatenViewModel : ValidatingViewModelBase
         if (!DateOfBirth.HasValue)
             return null;
 
-        var dob = DateOnly.FromDateTime(DateOfBirth.Value.Date);
+        var dob = DateOfBirth.Value;
         var simulationStart = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
         var retirementYears = (int)Math.Round(RetirementAge);
         var lifeYears = (int)Math.Round(LifeExpectancy);

@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:CashflowSimulator.Desktop.Common.Converters;assembly=CashflowSimulator.Desktop"
              xmlns:meta="clr-namespace:CashflowSimulator.Desktop.Features.Meta;assembly=CashflowSimulator.Desktop"
              xmlns:eckdaten="clr-namespace:CashflowSimulator.Desktop.Features.Eckdaten;assembly=CashflowSimulator.Desktop"
              xmlns:settings="clr-namespace:CashflowSimulator.Desktop.Features.Settings;assembly=CashflowSimulator.Desktop"
@@ -7,6 +8,9 @@
              xmlns:cashflowEvents="clr-namespace:CashflowSimulator.Desktop.Features.CashflowEvents;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
+    <Application.Resources>
+        <converters:DateOnlyConverter x:Key="DateOnlyConverter" />
+    </Application.Resources>
     <Application.DataTemplates>
         <DataTemplate DataType="meta:MetaEditViewModel">
             <meta:MetaEditView DataContext="{Binding}"

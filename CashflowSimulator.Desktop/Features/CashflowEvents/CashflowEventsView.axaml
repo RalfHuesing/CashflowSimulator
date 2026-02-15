@@ -59,7 +59,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Zieldatum"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <CalendarDatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
-                                        SelectedDate="{Binding TargetDate}"
+                                        SelectedDate="{Binding TargetDate, Converter={StaticResource DateOnlyConverter}}"
                                         SelectedDateFormat="Custom"
                                         CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ"

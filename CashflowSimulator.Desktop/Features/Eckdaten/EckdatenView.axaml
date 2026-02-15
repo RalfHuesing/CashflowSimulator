@@ -18,7 +18,7 @@
                            Margin="{StaticResource FormLabelMargin}"/>
                 <CalendarDatePicker Grid.Row="0" Grid.Column="1"
                                     Classes="form-input"
-                                    SelectedDate="{Binding DateOfBirth}"
+                                    SelectedDate="{Binding DateOfBirth, Converter={StaticResource DateOnlyConverter}}"
                                     SelectedDateFormat="Custom"
                                     CustomDateFormatString="dd.MM.yyyy"
                                     Watermark="TT.MM.JJJJ"

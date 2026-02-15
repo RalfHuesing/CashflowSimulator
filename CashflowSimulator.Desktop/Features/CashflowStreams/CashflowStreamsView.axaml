@@ -68,7 +68,7 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Von (Datum)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <CalendarDatePicker Grid.Row="3" Grid.Column="1" Classes="form-input"
-                                        SelectedDate="{Binding StartDate}"
+                                        SelectedDate="{Binding StartDate, Converter={StaticResource DateOnlyConverter}}"
                                         SelectedDateFormat="Custom"
                                         CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ"
@@ -79,7 +79,7 @@
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Bis (Datum, leer = unbegrenzt)"
                                Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
                     <CalendarDatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
-                                        SelectedDate="{Binding EndDate}"
+                                        SelectedDate="{Binding EndDate, Converter={StaticResource DateOnlyConverter}}"
                                         SelectedDateFormat="Custom"
                                         CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ (leer = unbegrenzt)"
