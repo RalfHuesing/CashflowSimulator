@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CashflowSimulator.Contracts\CashflowSimulator.Contracts.csproj" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

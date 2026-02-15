@@ -1,4 +1,5 @@
 using CashflowSimulator.Contracts.Dtos;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace CashflowSimulator.Validation;
 
@@ -6,9 +7,13 @@ namespace CashflowSimulator.Validation;
 /// Prüft, ob die aus <see cref="SimulationProjectDto.EconomicFactors"/> und
 /// <see cref="SimulationProjectDto.Correlations"/> gebildete Korrelationsmatrix positiv definit ist
 /// (Cholesky-Zerlegbarkeit). Die Engine benötigt dies für korrelierte Zufallsinnovationen.
+/// Nutzt MathNet.Numerics für numerisch stabile Prüfung (Cholesky-Zerlegung).
 /// </summary>
 public static class CorrelationMatrixValidation
 {
+    private const string NotPositiveDefiniteMessage =
+        "Die Korrelationsmatrix ist nicht positiv definit. Bitte Korrelationen so anpassen, dass die Matrix mathematisch zulässig ist (z. B. keine widersprüchlichen Werte).";
+
     /// <summary>
     /// Baut die Korrelationsmatrix aus Faktoren und Korrelationen und prüft positive Definitheit.
     /// </summary>
@@ -44,49 +49,31 @@ public static class CorrelationMatrixValidation
             R[ib, ia] = c;
         }
 
-        var Rcopy = (double[,])R.Clone();
-        return IsPositiveDefinite(Rcopy, n) ? null : "Die Korrelationsmatrix ist nicht positiv definit. Bitte Korrelationen so anpassen, dass die Matrix mathematisch zulässig ist (z. B. keine widersprüchlichen Werte).";
+        return IsPositiveDefinite(R, n) ? null : NotPositiveDefiniteMessage;
     }
 
     /// <summary>
-    /// Prüft positive Definitheit via Cholesky-Zerlegung (L*L^T = R).
-    /// Bei nicht positiv definiter Matrix liefert Cholesky eine nicht-positive Diagonale.
+    /// Prüft positive Definitheit via Cholesky-Zerlegung (MathNet.Numerics).
+    /// Keine Exception nach außen: bei nicht positiv definiter Matrix wird false zurückgegeben.
     /// </summary>
-    private static bool IsPositiveDefinite(double[,] A, int n)
+    private static bool IsPositiveDefinite(double[,] matrixData, int n)
     {
+        Matrix<double> matrix = Matrix<double>.Build.DenseOfArray(matrixData);
+
         try
         {
-            CholeskyDecompose(A, n);
+            _ = matrix.Cholesky();
             return true;
         }
         catch (ArgumentException)
         {
+            // MathNet wirft bei nicht positiv definiter Matrix (nicht-positive Diagonale in Cholesky).
             return false;
         }
-    }
-
-    /// <summary>
-    /// In-place Cholesky-Zerlegung (untere Dreiecksmatrix L in R überschreiben, obere ignoriert).
-    /// Wirft ArgumentException, wenn die Matrix nicht positiv definit ist.
-    /// </summary>
-    private static void CholeskyDecompose(double[,] A, int n)
-    {
-        for (int j = 0; j < n; j++)
+        catch (ArithmeticException)
         {
-            double sum = 0;
-            for (int k = 0; k < j; k++)
-                sum += A[j, k] * A[j, k];
-            double d = A[j, j] - sum;
-            if (d <= 0)
-                throw new ArgumentException("Matrix is not positive definite.");
-            A[j, j] = Math.Sqrt(d);
-            for (int i = j + 1; i < n; i++)
-            {
-                sum = 0;
-                for (int k = 0; k < j; k++)
-                    sum += A[i, k] * A[j, k];
-                A[i, j] = (A[i, j] - sum) / A[j, j];
-            }
+            // MathNet kann MatrixNotPositiveDefiniteException (von ArithmeticException) werfen.
+            return false;
         }
     }
 }
