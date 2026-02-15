@@ -40,5 +40,43 @@ public sealed class SimulationProjectValidator : AbstractValidator<SimulationPro
         RuleFor(x => x)
             .Must(project => CorrelationMatrixValidation.GetPositiveDefinitenessError(project) is null)
             .WithMessage(project => CorrelationMatrixValidation.GetPositiveDefinitenessError(project) ?? "Korrelationsmatrix ungültig.");
+
+        RuleForEach(x => x.TaxProfiles)
+            .SetValidator(new TaxProfileDtoValidator());
+
+        RuleForEach(x => x.StrategyProfiles)
+            .SetValidator(new StrategyProfileDtoValidator());
+
+        RuleForEach(x => x.LifecyclePhases)
+            .SetValidator(new LifecyclePhaseDtoValidator());
+
+        RuleForEach(x => x.LifecyclePhases)
+            .Must((project, phase) =>
+            {
+                var taxIds = project.TaxProfiles?.Select(p => p.Id).ToHashSet() ?? new HashSet<string>();
+                var strategyIds = project.StrategyProfiles?.Select(p => p.Id).ToHashSet() ?? new HashSet<string>();
+                return taxIds.Contains(phase.TaxProfileId) && strategyIds.Contains(phase.StrategyProfileId);
+            })
+            .WithMessage("Jede Lebensphase muss auf existierende Steuer- und Strategie-Profile verweisen (TaxProfileId, StrategyProfileId).");
+
+        RuleFor(x => x)
+            .Must(project =>
+            {
+                if (project.LifecyclePhases is null || project.LifecyclePhases.Count == 0)
+                    return false;
+                if (project.Parameters is null || project.Parameters.SimulationStart == default || project.Parameters.DateOfBirth == default)
+                    return true; // andere Regeln melden Parameter-Fehler
+                var ageAtStart = GetAgeInYears(project.Parameters.DateOfBirth, project.Parameters.SimulationStart);
+                return project.LifecyclePhases.Any(p => p.StartAge == 0 || p.StartAge <= ageAtStart);
+            })
+            .WithMessage("Es muss mindestens eine Lebensphase geben, die zum Simulationsstart aktiv ist (StartAge 0 oder StartAge ≤ Alter zum Start).");
+    }
+
+    private static int GetAgeInYears(DateOnly dateOfBirth, DateOnly atDate)
+    {
+        var years = atDate.Year - dateOfBirth.Year;
+        if (dateOfBirth.AddYears(years) > atDate)
+            years--;
+        return years;
     }
 }

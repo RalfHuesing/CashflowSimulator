@@ -24,6 +24,22 @@ public record SimulationProjectDto
     public List<AssetClassDto> AssetClasses { get; init; } = [];
 
     /// <summary>
+    /// Steuer-Profile (z. B. Standard, Rentenbesteuerung). Werden von <see cref="LifecyclePhases"/> referenziert.
+    /// </summary>
+    public List<TaxProfileDto> TaxProfiles { get; init; } = [];
+
+    /// <summary>
+    /// Strategie-Profile (z. B. Aufbau, Entnahme). Werden von <see cref="LifecyclePhases"/> referenziert.
+    /// </summary>
+    public List<StrategyProfileDto> StrategyProfiles { get; init; } = [];
+
+    /// <summary>
+    /// Lebensphasen (z. B. Ansparphase ab Start, Rentenphase ab 67). Pro Phase: Steuer- und Strategie-Profil.
+    /// Die Engine wählt pro Monat die Phase anhand des Alters (aus <see cref="SimulationParametersDto.DateOfBirth"/>).
+    /// </summary>
+    public List<LifecyclePhaseDto> LifecyclePhases { get; init; } = [];
+
+    /// <summary>
     /// Portfolio des Nutzers: alle gehaltenen Vermögenswerte (Assets) und optional Strategie/Rebalancing.
     /// Jedes Asset verknüpft sich über <see cref="AssetDto.EconomicFactorId"/> mit einem
     /// <see cref="EconomicFactorDto"/> aus <see cref="EconomicFactors"/> für die Wertentwicklung.

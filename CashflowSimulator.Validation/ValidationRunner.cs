@@ -18,6 +18,9 @@ public static class ValidationRunner
     private static readonly CashflowEventDtoValidator EventValidator = new();
     private static readonly EconomicFactorDtoValidator EconomicFactorValidator = new();
     private static readonly CorrelationEntryDtoValidator CorrelationEntryValidator = new();
+    private static readonly TaxProfileDtoValidator TaxProfileValidator = new();
+    private static readonly StrategyProfileDtoValidator StrategyProfileValidator = new();
+    private static readonly LifecyclePhaseDtoValidator LifecyclePhaseValidator = new();
 
     /// <summary>
     /// Validiert <see cref="SimulationParametersDto"/> (z. B. für Eckdaten-Apply).
@@ -79,6 +82,33 @@ public static class ValidationRunner
     public static ValidationResult Validate(CorrelationEntryDto dto)
     {
         var result = CorrelationEntryValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="TaxProfileDto"/> (z. B. für das Steuer-Profil-Formular).
+    /// </summary>
+    public static ValidationResult Validate(TaxProfileDto dto)
+    {
+        var result = TaxProfileValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="StrategyProfileDto"/> (z. B. für das Strategie-Profil-Formular).
+    /// </summary>
+    public static ValidationResult Validate(StrategyProfileDto dto)
+    {
+        var result = StrategyProfileValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="LifecyclePhaseDto"/> (z. B. für das Lebensphasen-Formular).
+    /// </summary>
+    public static ValidationResult Validate(LifecyclePhaseDto dto)
+    {
+        var result = LifecyclePhaseValidator.Validate(dto);
         return ToValidationResult(result);
     }
 
