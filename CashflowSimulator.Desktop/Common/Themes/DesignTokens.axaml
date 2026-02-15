@@ -77,11 +77,16 @@
         <sys:Double x:Key="InfoPanelMinWidth">280</sys:Double>
         <sys:Double x:Key="GridSplitterWidth">4</sys:Double>
 
-        <!-- MasterDetailView: Detail-Bereich (Formular + Buttons) -->
+        <!-- MasterDetailView: Detail-Bereich (Formular) -->
         <Thickness x:Key="MasterDetailDetailMargin">0,24,0,0</Thickness>
         <sys:Double x:Key="MasterDetailDetailMinHeight">240</sys:Double>
-        <sys:Double x:Key="MasterDetailButtonSpacing">8</sys:Double>
-        <sys:Double x:Key="MasterDetailButtonsMaxWidth">400</sys:Double>
+
+        <!-- Feature-Header-Toolbar: einheitliche Button-Größe -->
+        <sys:Double x:Key="ToolbarButtonWidth">120</sys:Double>
+        <sys:Double x:Key="ToolbarButtonHeight">36</sys:Double>
+        <sys:Double x:Key="ToolbarButtonSpacing">8</sys:Double>
+        <Color x:Key="ToolbarButtonHoverColor">#33FFFFFF</Color>
+        <SolidColorBrush x:Key="ToolbarButtonHoverBrush" Color="{StaticResource ToolbarButtonHoverColor}" />
 
         <!-- Error Tray (Info-Panel): Weinrot, Reinweiß, dunkler Rahmen -->
         <Color x:Key="ErrorTrayBackgroundColor">#6B2D3A</Color>

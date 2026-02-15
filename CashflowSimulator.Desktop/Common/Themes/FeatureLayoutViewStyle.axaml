@@ -15,17 +15,40 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0" RowDefinitions="Auto, *">
-                        
-                        <Border Grid.Row="0" Padding="24,0,24,0">
-                            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
-                                        Margin="{StaticResource FormHeaderBlockMargin}"
-                                        HorizontalAlignment="Left">
-                                <TextBlock Text="{TemplateBinding Title}" Classes="feature-page-title"/>
-                                <TextBlock Text="{TemplateBinding Description}" Classes="feature-page-description"/>
-                            </StackPanel>
+                        <!-- Dunkler Page-Header (nahtlos zur Sidebar), Titel + Beschreibung links, Aktionen rechts -->
+                        <Border Grid.Row="0"
+                                Background="{StaticResource SidebarBackgroundBrush}"
+                                Padding="24,12,24,12"
+                                Margin="0,0,0,0">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <StackPanel Grid.Column="0"
+                                            Spacing="{StaticResource SpacingSmallValue}"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Text="{TemplateBinding Title}"
+                                               Foreground="{StaticResource TextOnDarkBrush}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Margin="0,0,0,4"/>
+                                    <TextBlock Text="{TemplateBinding Description}"
+                                               Foreground="{StaticResource TextOnDarkBrush}"
+                                               FontSize="14"
+                                               Opacity="0.9"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,0"/>
+                                </StackPanel>
+                                <ContentPresenter Grid.Column="1"
+                                                  Content="{TemplateBinding ActionContent}"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Right"/>
+                            </Grid>
                         </Border>
 
-                        <Border Grid.Row="1" Padding="24,0,24,24">
+                        <!-- Content-Bereich: heller Hintergrund, kein Abstand zum Header -->
+                        <Border Grid.Row="1"
+                                Background="{StaticResource ContentBackgroundBrush}"
+                                Padding="24,24,24,24"
+                                Margin="0,0,0,0">
                             <ContentPresenter Content="{TemplateBinding Content}"/>
                         </Border>
                     </Grid>

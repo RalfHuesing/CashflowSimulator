@@ -17,6 +17,9 @@ public partial class FeatureLayoutView : ContentControl
     public static readonly StyledProperty<string?> DescriptionProperty =
         AvaloniaProperty.Register<FeatureLayoutView, string?>(nameof(Description));
 
+    public static readonly StyledProperty<object?> ActionContentProperty =
+        AvaloniaProperty.Register<FeatureLayoutView, object?>(nameof(ActionContent));
+
     public string? Title
     {
         get => GetValue(TitleProperty);
@@ -27,6 +30,12 @@ public partial class FeatureLayoutView : ContentControl
     {
         get => GetValue(DescriptionProperty);
         set => SetValue(DescriptionProperty, value);
+    }
+
+    public object? ActionContent
+    {
+        get => GetValue(ActionContentProperty);
+        set => SetValue(ActionContentProperty, value);
     }
 
     public FeatureLayoutView()

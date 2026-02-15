@@ -39,4 +39,21 @@
         </Style>
     </Style>
 
+    <!-- Feature-Header-Toolbar: einheitliche Größe, weißer Text/Icon auf dunklem Grund -->
+    <Style Selector="Button.toolbar-button">
+        <Setter Property="Width" Value="{StaticResource ToolbarButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource ToolbarButtonHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="8,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource ToolbarButtonHoverBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
+        </Style>
+    </Style>
+
 </Styles>

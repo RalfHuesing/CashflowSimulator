@@ -6,15 +6,36 @@
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              xmlns:ext="using:CashflowSimulator.Desktop.Common.Extensions"
+             xmlns:fi="using:FluentIcons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="CashflowSimulator.Desktop.Features.Marktdaten.MarktdatenView"
              x:DataType="vm:MarktdatenViewModel">
 
     <controls:FeatureLayoutView Title="Marktdaten"
                                 Description="Stochastische Marktfaktoren (z. B. Inflation, Aktienindex) für die Simulation. Hier legen Sie Modelltyp und Parameter fest.">
-        <controls:MasterDetailView NewCommand="{Binding NewCommand}"
-                                   SaveCommand="{Binding SaveCommand}"
-                                   DeleteCommand="{Binding DeleteCommand}">
+        <controls:FeatureLayoutView.ActionContent>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
+                <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Add" FontSize="16"/>
+                        <TextBlock Text="Neu" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding SaveCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Save" FontSize="16"/>
+                        <TextBlock Text="Speichern" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding DeleteCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Delete" FontSize="16"/>
+                        <TextBlock Text="Löschen" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </controls:FeatureLayoutView.ActionContent>
+        <controls:MasterDetailView>
             <controls:MasterDetailView.MasterContent>
                 <DataGrid ItemsSource="{Binding Items}"
                           SelectedItem="{Binding SelectedItem}"

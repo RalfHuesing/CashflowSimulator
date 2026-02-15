@@ -6,15 +6,36 @@
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
              xmlns:ext="using:CashflowSimulator.Desktop.Common.Extensions"
+             xmlns:fi="using:FluentIcons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="CashflowSimulator.Desktop.Features.CashflowStreams.CashflowStreamsView"
              x:DataType="vm:CashflowStreamsViewModel">
 
     <controls:FeatureLayoutView Title="{Binding Title}"
                                 Description="Wiederkehrende Einnahmen und Ausgaben (z. B. Gehalt, Miete).">
-        <controls:MasterDetailView NewCommand="{Binding NewCommand}"
-                                   SaveCommand="{Binding SaveCommand}"
-                                   DeleteCommand="{Binding DeleteCommand}">
+        <controls:FeatureLayoutView.ActionContent>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource ToolbarButtonSpacing}">
+                <Button Classes="toolbar-button primary" Command="{Binding NewCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Add" FontSize="16"/>
+                        <TextBlock Text="Neu" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding SaveCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Save" FontSize="16"/>
+                        <TextBlock Text="Speichern" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="toolbar-button" Command="{Binding DeleteCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="Delete" FontSize="16"/>
+                        <TextBlock Text="Löschen" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </controls:FeatureLayoutView.ActionContent>
+        <controls:MasterDetailView>
             <controls:MasterDetailView.MasterContent>
                 <DataGrid ItemsSource="{Binding Items}"
                           SelectedItem="{Binding SelectedItem}"
