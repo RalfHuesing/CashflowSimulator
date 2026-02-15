@@ -81,6 +81,7 @@ public partial class CashflowStreamsViewModel : CrudViewModelBase<CashflowStream
         _cashflowType = cashflowType;
         PageHelpKey = "CashflowStreams";
         RefreshDynamicFactorOptions();
+        RefreshItems();
     }
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();

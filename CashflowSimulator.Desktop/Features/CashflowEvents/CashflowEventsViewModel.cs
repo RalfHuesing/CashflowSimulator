@@ -62,6 +62,7 @@ public partial class CashflowEventsViewModel : CrudViewModelBase<CashflowEventDt
         _cashflowType = cashflowType;
         PageHelpKey = "CashflowEvents";
         RefreshDynamicFactorOptions();
+        RefreshItems();
     }
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();

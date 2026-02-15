@@ -96,6 +96,30 @@ Neue Feature-Bereiche, die wie Eckdaten/Einstellungen funktionieren, folgen dies
 - **ViewModels:** CommunityToolkit.Mvvm verwenden – `[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`; keine handgeschriebenen ICommand- oder INotifyPropertyChanged-Implementierungen. ViewModels als `partial class` für Source Generators.
 - **Fehlerbehandlung in der UI:** State of the Art – z. B. Toasts oder zentrale Fehleranzeige; Fehler aus Result/Exceptions dem Nutzer klar und verständlich (Deutsch) anzeigen.
 
+### CRUD-ViewModels (Master-Detail-Pattern)
+
+Für Feature-ViewModels mit CRUD-Funktionalität (Create, Read, Update, Delete) und Master-Detail-Layout:
+
+- **Basisklasse:** `CrudViewModelBase<TDto>` (erbt von `ValidatingViewModelBase`) für generische CRUD-Logik verwenden.
+- **DTO-Anforderung:** Das DTO muss `IIdentifiable` implementieren (Property `Id`).
+- **Abstrakte Methoden implementieren:**
+  - `LoadItems()`: Lädt Items aus dem `ICurrentProjectService` (z. B. `current.Streams`).
+  - `UpdateProject(items)`: Schreibt Items zurück in den Service (z. B. `UpdateStreams`).
+  - `BuildDtoFromForm()`: Erstellt DTO aus Formularfeldern; `EditingId` ist gesetzt (null = neu).
+  - `MapDtoToForm(dto)`: Befüllt Formularfelder aus DTO beim Auswählen eines Items.
+  - `ClearFormCore()`: Leert Formular und setzt Standardwerte; `ClearValidationErrors()` aufrufen.
+  - `ValidateDto(dto)`: Ruft `ValidationRunner.Validate(dto)` auf.
+- **Optionale Hooks:**
+  - `OnNewItemCreated()`: Wird nach New-Command aufgerufen (z. B. für Default-Werte).
+  - `OnItemDeleted(deletedId)`: Wird nach Delete aufgerufen (z. B. zum Löschen von Referenzen in anderen Listen).
+  - `OnProjectChanged(sender, e)`: Kann überschrieben werden (Standard: `RefreshItems()`), z. B. um Dropdown-Optionen zu aktualisieren.
+- **Commands:** `SaveCommand`, `DeleteCommand`, `NewCommand` sind bereits in der Basisklasse implementiert.
+- **Collections:** `Items` (ObservableCollection) und `SelectedItem` sind in der Basisklasse verfügbar.
+- **Spezielle Anforderungen:**
+  - Bei Type-Filterung (z. B. Income/Expense): In `UpdateProject` die gefilterte Liste mit Items des anderen Typs mergen.
+  - Bei Suchfunktion: Eigene gefilterte Collection (z. B. `Assets`) pflegen und in `OnProjectChanged` aktualisieren.
+- **Beispiele:** `CashflowStreamsViewModel`, `CashflowEventsViewModel`, `MarktdatenViewModel`, `AssetClassesViewModel`, `PortfolioViewModel`.
+
 ## XAML und Styling
 
 - **Keine Hardcoded-Colors/Margins** im XAML; zentrale Ressourcen (Styles, Brushes, Themes) von Anfang an anlegen und nutzen.

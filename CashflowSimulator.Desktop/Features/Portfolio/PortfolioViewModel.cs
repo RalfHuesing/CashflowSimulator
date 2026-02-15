@@ -126,6 +126,7 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
         PageHelpKey = "Portfolio";
         RefreshFactorOptions();
         RefreshAssetClassOptions();
+        RefreshAndFilterAssets();
     }
 
     partial void OnSearchTextChanged(string value)

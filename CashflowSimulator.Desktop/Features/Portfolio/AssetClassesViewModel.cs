@@ -39,6 +39,7 @@ public partial class AssetClassesViewModel : CrudViewModelBase<AssetClassDto>
         : base(currentProjectService, helpProvider)
     {
         PageHelpKey = "AssetClasses";
+        RefreshItems();
     }
 
     partial void OnNameChanged(string value) => ScheduleValidateAndUpdateWeightSummary();

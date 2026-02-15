@@ -61,6 +61,7 @@ public partial class MarktdatenViewModel : CrudViewModelBase<EconomicFactorDto>
         : base(currentProjectService, helpProvider)
     {
         PageHelpKey = "Marktdaten";
+        RefreshItems();
     }
 
     partial void OnIdChanged(string value) => ScheduleValidateAndSave();

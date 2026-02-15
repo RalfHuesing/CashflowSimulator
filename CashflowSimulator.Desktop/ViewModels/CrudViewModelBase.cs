@@ -41,7 +41,9 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
     {
         CurrentProjectService = currentProjectService;
         CurrentProjectService.ProjectChanged += OnProjectChanged;
-        RefreshItems();
+        // RefreshItems() wird NICHT im Constructor aufgerufen, damit abgeleitete Klassen
+        // ihre Initialisierung abschließen können (z. B. Dropdown-Optionen befüllen).
+        // Abgeleitete Klassen müssen RefreshItems() oder ihre spezielle Variante selbst aufrufen.
     }
 
     partial void OnSelectedItemChanged(TDto? value)
@@ -187,7 +189,7 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
             list.Add(dto);
             UpdateProject(list);
             RefreshItems();
-            SelectedItem = Items.FirstOrDefault(x => x.Id == dto.Id);
+            // Nach dem Hinzufügen Formular leeren für nächstes Item
             ClearForm();
         }
         else
@@ -199,6 +201,7 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
                 list[idx] = dto;
                 UpdateProject(list);
                 RefreshItems();
+                // Nach Update: Item bleibt ausgewählt (SelectedItem wird durch RefreshItems aktualisiert)
                 SelectedItem = Items.FirstOrDefault(x => x.Id == EditingId);
             }
         }
