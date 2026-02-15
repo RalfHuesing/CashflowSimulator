@@ -87,8 +87,9 @@ Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Cl
 Wir arbeiten aktuell an folgenden Meilensteinen:
 
 - [x] Grundlegende Architektur & Datenmodelle (`Contracts`)
+- [x] Lifecycle-Phasen-Modell (Steuer-/Strategie-Profile, Validierung, Defaults)
 - [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale)
-- [ ] Validierungslogik für Eingaben
+- [x] Validierungslogik für Eingaben
 - [ ] Aufbau der Benutzeroberfläche (Avalonia XAML)
 - [ ] Persistierung (Speichern/Laden von Projekten)
 - [ ] Erste lauffähige Beta-Version

@@ -2,6 +2,7 @@ using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Engine.Services.Defaults;
+using CashflowSimulator.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -34,11 +35,39 @@ public sealed class DefaultProjectProviderTests
         Assert.NotNull(project.EconomicFactors);
         Assert.NotNull(project.Correlations);
         Assert.NotNull(project.AssetClasses);
+        Assert.NotNull(project.TaxProfiles);
+        Assert.NotNull(project.StrategyProfiles);
+        Assert.NotNull(project.LifecyclePhases);
         Assert.NotNull(project.Portfolio);
         Assert.NotNull(project.Portfolio.Assets);
         Assert.NotEqual(default, project.Parameters.SimulationStart);
         Assert.NotEqual(default, project.Parameters.SimulationEnd);
         Assert.NotEqual(default, project.Parameters.RetirementDate);
+    }
+
+    [Fact]
+    public void CreateDefault_ReturnsProjectWithLifecyclePhasesAndReferenceIntegrity()
+    {
+        var provider = CreateProvider();
+        var project = provider.CreateDefault();
+
+        Assert.NotNull(project.TaxProfiles);
+        Assert.NotNull(project.StrategyProfiles);
+        Assert.NotNull(project.LifecyclePhases);
+        Assert.Equal(2, project.TaxProfiles.Count);
+        Assert.Equal(2, project.StrategyProfiles.Count);
+        Assert.Equal(2, project.LifecyclePhases.Count);
+
+        var taxIds = project.TaxProfiles.Select(p => p.Id).ToHashSet();
+        var strategyIds = project.StrategyProfiles.Select(p => p.Id).ToHashSet();
+        foreach (var phase in project.LifecyclePhases)
+        {
+            Assert.Contains(phase.TaxProfileId, taxIds);
+            Assert.Contains(phase.StrategyProfileId, strategyIds);
+        }
+
+        var validationResult = ValidationRunner.Validate(project);
+        Assert.True(validationResult.IsValid, "Default-Projekt muss die Projekt-Validierung bestehen. Fehler: " + string.Join("; ", validationResult.Errors.Select(e => e.PropertyName + ": " + e.Message)));
     }
 
     [Fact]

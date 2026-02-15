@@ -68,6 +68,14 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 - **Korrelationen:** Flache Liste der Korrelationseinträge (Faktor A ↔ Faktor B, Korrelation −1 bis 1). Die Gesamt-Korrelationsmatrix wird auf positive Definitheit (Cholesky) geprüft; bei Inkonsistenz erscheint ein Fehler im Info-Panel.
 - **Dynamisierung:** In CashflowStreams und CashflowEvents kann pro Eintrag optional ein Marktfaktor zur Dynamisierung (z. B. Inflation) ausgewählt werden; „Keine“ = nominal.
 
+## Lifecycle & Strategie (Datenmodell)
+
+- **Lifecycle-Phasen:** Das Projekt enthält Lebensphasen (`LifecyclePhases`), die durch das Alter getriggert werden (z. B. Ansparphase ab aktuellem Alter, Rentenphase ab 67). Jede Phase verweist auf ein **Steuer-Profil** (`TaxProfiles`) und ein **Strategie-Profil** (`StrategyProfiles`).
+- **Steuer-Profile:** Pro Phase z. B. Kapitalertragsteuer-Satz, Freibetrag, Einkommensteuer-Satz (nachgelagerte Besteuerung).
+- **Strategie-Profile:** Pro Phase z. B. Liquiditätsreserve (Monate), Rebalancing-Schwelle, Lookahead (Monate) für geplante Events.
+- **Asset-Allokation pro Phase:** Optional können in einer Phase Zielgewichtungen von Anlageklassen überschrieben werden (`AssetAllocationOverrides`).
+- Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer- und Strategie-Profil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“.
+
 ## Erweiterung
 
 - Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
