@@ -30,7 +30,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
     private DateOnly? _date;
 
     [ObservableProperty]
-    private TransactionType _transactionType = TransactionType.Buy;
+    private TransactionType _type = TransactionType.Buy;
 
     [ObservableProperty]
     private decimal _quantity;
@@ -69,13 +69,13 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         EnumExtensions.ToDisplayList<TransactionType>();
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TransactionType))]
-    private EnumDisplayEntry? _selectedTransactionTypeOption;
+    [NotifyPropertyChangedFor(nameof(Type))]
+    private EnumDisplayEntry? _selectedTypeOption;
 
-    partial void OnSelectedTransactionTypeOptionChanged(EnumDisplayEntry? value)
+    partial void OnSelectedTypeOptionChanged(EnumDisplayEntry? value)
     {
         if (value?.Value is TransactionType tt)
-            _transactionType = tt;
+            _type = tt;
     }
 
     protected override string HelpKeyPrefix => "Transactions";
@@ -102,12 +102,12 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         SelectedAsset = AssetOptions.FirstOrDefault(o => o.Id == value.AssetId);
         var t = value.Transaction;
         Date = t.Date;
-        TransactionType = t.Type;
+        Type = t.Type;
         Quantity = t.Quantity;
         PricePerUnit = t.PricePerUnit;
         TotalAmount = t.TotalAmount;
         TaxAmount = t.TaxAmount;
-        SelectedTransactionTypeOption = TransactionTypeOptions.FirstOrDefault(o => Equals(o.Value, t.Type));
+        SelectedTypeOption = TransactionTypeOptions.FirstOrDefault(o => Equals(o.Value, t.Type));
     }
 
     private void OnProjectChanged(object? sender, EventArgs e)
@@ -144,8 +144,8 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         EditingTransactionId = null;
         SelectedAsset = null;
         Date = null;
-        TransactionType = TransactionType.Buy;
-        SelectedTransactionTypeOption = TransactionTypeOptions.FirstOrDefault(o => Equals(o.Value, TransactionType.Buy));
+        Type = TransactionType.Buy;
+        SelectedTypeOption = TransactionTypeOptions.FirstOrDefault(o => Equals(o.Value, TransactionType.Buy));
         Quantity = 0;
         PricePerUnit = 0;
         TotalAmount = 0;
@@ -159,7 +159,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         {
             Id = EditingTransactionId ?? Guid.NewGuid().ToString(),
             Date = Date ?? DateOnly.FromDateTime(DateTime.Today),
-            Type = TransactionType,
+            Type = Type,
             Quantity = Quantity,
             PricePerUnit = PricePerUnit,
             TotalAmount = TotalAmount,

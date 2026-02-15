@@ -93,10 +93,10 @@
                                    Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                         <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
                                   ItemsSource="{x:Static vm:TransactionsViewModel.TransactionTypeOptions}"
-                                  SelectedItem="{Binding SelectedTransactionTypeOption}"
+                                  SelectedItem="{Binding SelectedTypeOption}"
                                   Margin="{StaticResource FormInputMargin}"
-                                  behaviors:FocusHelpBehavior.HelpKey="TransactionType"
-                                  behaviors:FocusHelpBehavior.ErrorPropertyName="TransactionType">
+                                  behaviors:FocusHelpBehavior.HelpKey="Type"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="Type">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="ext:EnumDisplayEntry">
                                     <TextBlock Text="{Binding Display}"/>

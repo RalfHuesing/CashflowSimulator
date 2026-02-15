@@ -69,7 +69,7 @@ public sealed class HelpProvider : IHelpProvider
         ["Transactions"] = ("Transaktionen", "Zentrales Journal aller Käufe und Verkäufe über alle Vermögenswerte. Hier erfassen Sie jede Buchung am richtigen Asset. Sortierung: neueste zuerst."),
         ["Transactions.AssetId"] = ("Vermögenswert", "Zu welchem Produkt (ETF, Konto) gehört diese Transaktion? Wählen Sie das passende Asset aus der Liste."),
         ["Transactions.Date"] = ("Datum", "Wertstellungs- oder Handelsdatum der Transaktion. Wichtig für die chronologische Historie und die FIFO-Steuerberechnung bei Verkäufen."),
-        ["Transactions.TransactionType"] = ("Typ", "Kauf, Verkauf, Ausschüttung oder Vorabpauschale. Bestimmt die Buchungslogik (z. B. bei Kauf erhöht sich die Stückzahl)."),
+        ["Transactions.Type"] = ("Typ", "Kauf, Verkauf, Ausschüttung oder Vorabpauschale. Bestimmt die Buchungslogik (z. B. bei Kauf erhöht sich die Stückzahl)."),
         ["Transactions.Quantity"] = ("Menge", "Anzahl der Anteile/Stück bei Kauf oder Verkauf. Bei Ausschüttung/Vorabpauschale kann 0 oder eine rechnerische Menge stehen."),
         ["Transactions.PricePerUnit"] = ("Preis pro Stück", "Kurs zum Transaktionszeitpunkt (z. B. Einstandskurs bei Kauf). Wird zusammen mit der Menge für den Gesamtbetrag herangezogen."),
         ["Transactions.TotalAmount"] = ("Gesamtbetrag", "Gesamtwert der Transaktion (z. B. Menge × Preis bei Kauf/Verkauf) oder Ausschüttungsbetrag in Währung."),
