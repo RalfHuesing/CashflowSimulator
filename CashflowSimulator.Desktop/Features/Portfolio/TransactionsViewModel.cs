@@ -10,8 +10,9 @@ namespace CashflowSimulator.Desktop.Features.Portfolio;
 
 /// <summary>
 /// Eintrag für die flache Transaktionsliste: Transaktion plus Asset-Info.
+/// Identifikation über <see cref="TransactionDto.Id"/> (ID-basiert, unabhängig von Sortierung).
 /// </summary>
-public record TransactionEntry(string AssetId, string AssetName, int TransactionIndex, TransactionDto Transaction);
+public record TransactionEntry(string AssetId, string AssetName, TransactionDto Transaction);
 
 /// <summary>
 /// ViewModel für das Transaktions-Journal: flache Liste aller Transaktionen aus allen Assets,
@@ -45,6 +46,10 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
 
     [ObservableProperty]
     private string? _editingAssetId;
+
+    /// <summary>Id der bearbeiteten Transaktion (null = neue Transaktion).</summary>
+    [ObservableProperty]
+    private string? _editingTransactionId;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditingAssetId))]
@@ -93,6 +98,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
             return;
         }
         EditingAssetId = value.AssetId;
+        EditingTransactionId = value.Transaction.Id;
         SelectedAsset = AssetOptions.FirstOrDefault(o => o.Id == value.AssetId);
         var t = value.Transaction;
         Date = t.Date;
@@ -125,8 +131,8 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         var list = new List<TransactionEntry>();
         foreach (var asset in assets)
         {
-            for (var i = 0; i < asset.Transactions.Count; i++)
-                list.Add(new TransactionEntry(asset.Id, asset.Name, i, asset.Transactions[i]));
+            foreach (var transaction in asset.Transactions)
+                list.Add(new TransactionEntry(asset.Id, asset.Name, transaction));
         }
         foreach (var entry in list.OrderByDescending(e => e.Transaction.Date))
             AllTransactions.Add(entry);
@@ -135,6 +141,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
     private void ClearForm()
     {
         EditingAssetId = null;
+        EditingTransactionId = null;
         SelectedAsset = null;
         Date = null;
         TransactionType = TransactionType.Buy;
@@ -150,6 +157,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
     {
         return new TransactionDto
         {
+            Id = EditingTransactionId ?? Guid.NewGuid().ToString(),
             Date = Date ?? DateOnly.FromDateTime(DateTime.Today),
             Type = TransactionType,
             Quantity = Quantity,
@@ -186,8 +194,11 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         if (assetIndex < 0)
             return;
 
-        if (SelectedItem is null)
+        var editingId = EditingTransactionId;
+
+        if (editingId is null)
         {
+            // Neue Transaktion zum gewählten Asset hinzufügen
             var asset = assets[assetIndex];
             var newTransactions = asset.Transactions.ToList();
             newTransactions.Add(dto);
@@ -195,40 +206,40 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         }
         else
         {
-            var entry = SelectedItem;
-            if (entry.AssetId == assetId)
+            // Bestehende Transaktion: per Id finden (unabhängig von Sortierung)
+            var (oldAssetIndex, transactionIndexInAsset) = FindTransactionIndex(assets, editingId);
+            if (oldAssetIndex >= 0 && transactionIndexInAsset >= 0)
             {
-                var asset = assets[assetIndex];
-                var newTransactions = asset.Transactions.ToList();
-                if (entry.TransactionIndex >= 0 && entry.TransactionIndex < newTransactions.Count)
-                {
-                    newTransactions[entry.TransactionIndex] = dto;
-                    assets[assetIndex] = asset with { Transactions = newTransactions };
-                }
+                var oldAsset = assets[oldAssetIndex];
+                var oldList = oldAsset.Transactions.ToList();
+                oldList.RemoveAt(transactionIndexInAsset);
+                assets[oldAssetIndex] = oldAsset with { Transactions = oldList };
             }
+
+            var targetAsset = assets[assetIndex];
+            var targetList = targetAsset.Transactions.ToList();
+            if (oldAssetIndex == assetIndex && transactionIndexInAsset >= 0)
+                targetList.Insert(transactionIndexInAsset, dto);
             else
-            {
-                var oldAssetIndex = assets.FindIndex(a => a.Id == entry.AssetId);
-                if (oldAssetIndex >= 0)
-                {
-                    var oldAsset = assets[oldAssetIndex];
-                    var oldList = oldAsset.Transactions.ToList();
-                    if (entry.TransactionIndex >= 0 && entry.TransactionIndex < oldList.Count)
-                    {
-                        oldList.RemoveAt(entry.TransactionIndex);
-                        assets[oldAssetIndex] = oldAsset with { Transactions = oldList };
-                    }
-                }
-                var asset = assets[assetIndex];
-                var newTransactions = asset.Transactions.ToList();
-                newTransactions.Add(dto);
-                assets[assetIndex] = asset with { Transactions = newTransactions };
-            }
+                targetList.Add(dto);
+            assets[assetIndex] = targetAsset with { Transactions = targetList };
         }
 
         _currentProjectService.UpdatePortfolio(current.Portfolio with { Assets = assets });
         RefreshTransactions();
         ClearForm();
+    }
+
+    /// <summary>Findet Asset-Index und Listen-Index einer Transaktion anhand ihrer Id.</summary>
+    private static (int AssetIndex, int TransactionIndex) FindTransactionIndex(List<AssetDto> assets, string transactionId)
+    {
+        for (var ai = 0; ai < assets.Count; ai++)
+        {
+            var idx = assets[ai].Transactions.FindIndex(t => t.Id == transactionId);
+            if (idx >= 0)
+                return (ai, idx);
+        }
+        return (-1, -1);
     }
 
     [RelayCommand(CanExecute = nameof(CanDelete))]
@@ -240,20 +251,17 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         if (current?.Portfolio is null)
             return;
 
-        var entry = SelectedItem;
+        var transactionId = SelectedItem.Transaction.Id;
         var assets = current.Portfolio.Assets.ToList();
-        var assetIndex = assets.FindIndex(a => a.Id == entry.AssetId);
-        if (assetIndex < 0)
+        var (assetIndex, transactionIndex) = FindTransactionIndex(assets, transactionId);
+        if (assetIndex < 0 || transactionIndex < 0)
             return;
 
         var asset = assets[assetIndex];
         var newTransactions = asset.Transactions.ToList();
-        if (entry.TransactionIndex >= 0 && entry.TransactionIndex < newTransactions.Count)
-        {
-            newTransactions.RemoveAt(entry.TransactionIndex);
-            assets[assetIndex] = asset with { Transactions = newTransactions };
-            _currentProjectService.UpdatePortfolio(current.Portfolio with { Assets = assets });
-        }
+        newTransactions.RemoveAt(transactionIndex);
+        assets[assetIndex] = asset with { Transactions = newTransactions };
+        _currentProjectService.UpdatePortfolio(current.Portfolio with { Assets = assets });
 
         RefreshTransactions();
         SelectedItem = null;

@@ -68,6 +68,14 @@ public sealed class DefaultProjectProviderTests
 
         var validationResult = ValidationRunner.Validate(project);
         Assert.True(validationResult.IsValid, "Default-Projekt muss die Projekt-Validierung bestehen. Fehler: " + string.Join("; ", validationResult.Errors.Select(e => e.PropertyName + ": " + e.Message)));
+
+        foreach (var phase in project.LifecyclePhases)
+            Assert.False(string.IsNullOrEmpty(phase.Id), "Jede LifecyclePhase muss eine gültige Id haben.");
+        foreach (var asset in project.Portfolio.Assets)
+        {
+            foreach (var tx in asset.Transactions)
+                Assert.False(string.IsNullOrEmpty(tx.Id), "Jede Transaktion muss eine gültige Id haben.");
+        }
     }
 
     [Fact]

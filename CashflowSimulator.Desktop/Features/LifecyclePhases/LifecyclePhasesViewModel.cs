@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using CashflowSimulator.Contracts.Common;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.ViewModels;
@@ -27,18 +28,10 @@ public partial class LifecycleOverrideRowViewModel : ObservableObject
 
 /// <summary>
 /// ViewModel für Lebensphasen (Master-Detail). Startalter, Steuer- und Strategie-Profil, optionale Asset-Overrides.
+/// Nutzt <see cref="CrudViewModelBase{TDto}"/> für CRUD; ID-basierte Identifikation.
 /// </summary>
-public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
+public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhaseDto>
 {
-    private const int ValidationDebounceMs = 300;
-
-    private readonly ICurrentProjectService _currentProjectService;
-    private bool _isLoading;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
-    private LifecyclePhaseDto? _selectedItem;
-
     [ObservableProperty]
     private int _startAge;
 
@@ -55,7 +48,7 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
     partial void OnSelectedTaxProfileChanged(ProfileOption? value)
     {
         _taxProfileId = value?.Id ?? string.Empty;
-        ScheduleValidateForm();
+        ScheduleValidateAndSave();
     }
 
     [ObservableProperty]
@@ -65,14 +58,13 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
     partial void OnSelectedStrategyProfileChanged(ProfileOption? value)
     {
         _strategyProfileId = value?.Id ?? string.Empty;
-        ScheduleValidateForm();
+        ScheduleValidateAndSave();
     }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveOverrideCommand))]
     private LifecycleOverrideRowViewModel? _selectedOverrideRow;
 
-    public ObservableCollection<LifecyclePhaseDto> Items { get; } = [];
     public ObservableCollection<ProfileOption> TaxProfileOptions { get; } = [];
     public ObservableCollection<ProfileOption> StrategyProfileOptions { get; } = [];
     public ObservableCollection<ProfileOption> AssetClassOptions { get; } = [];
@@ -81,134 +73,32 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
     protected override string HelpKeyPrefix => "LifecyclePhases";
 
     public LifecyclePhasesViewModel(ICurrentProjectService currentProjectService, IHelpProvider helpProvider)
-        : base(helpProvider)
+        : base(currentProjectService, helpProvider)
     {
-        _currentProjectService = currentProjectService;
         PageHelpKey = "LifecyclePhases";
-        _currentProjectService.ProjectChanged += OnProjectChanged;
         RefreshOptions();
         RefreshItems();
     }
 
-    partial void OnSelectedItemChanged(LifecyclePhaseDto? value)
-    {
-        if (value is null)
-        {
-            ClearForm();
-            return;
-        }
-        _isLoading = true;
-        try
-        {
-            StartAge = value.StartAge;
-            TaxProfileId = value.TaxProfileId;
-            StrategyProfileId = value.StrategyProfileId;
-            SelectedTaxProfile = TaxProfileOptions.FirstOrDefault(o => o.Id == value.TaxProfileId);
-            SelectedStrategyProfile = StrategyProfileOptions.FirstOrDefault(o => o.Id == value.StrategyProfileId);
-            OverrideRows.Clear();
-            foreach (var ov in value.AssetAllocationOverrides ?? [])
-            {
-                OverrideRows.Add(new LifecycleOverrideRowViewModel
-                {
-                    SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == ov.AssetClassId),
-                    TargetWeight = ov.TargetWeight
-                });
-            }
-        }
-        finally
-        {
-            _isLoading = false;
-        }
-    }
+    partial void OnStartAgeChanged(int value) => ScheduleValidateAndSave();
 
-    partial void OnStartAgeChanged(int value) => ScheduleValidateForm();
-
-    private void ScheduleValidateForm()
+    /// <inheritdoc />
+    protected override IEnumerable<LifecyclePhaseDto> LoadItems()
     {
-        if (_isLoading)
-            return;
-        ScheduleDebounced(ValidationDebounceMs, ValidateForm);
-    }
-
-    private void ValidateForm()
-    {
-        var dto = BuildPhaseDtoFromForm();
-        var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors);
-    }
-
-    private void OnProjectChanged(object? sender, EventArgs e)
-    {
-        RefreshOptions();
-        RefreshItems();
-        if (SelectedItem is not null)
-        {
-            var id = SelectedItem.StartAge;
-            SelectedTaxProfile = TaxProfileOptions.FirstOrDefault(o => o.Id == TaxProfileId);
-            SelectedStrategyProfile = StrategyProfileOptions.FirstOrDefault(o => o.Id == StrategyProfileId);
-            var current = _currentProjectService.Current;
-            var phase = current?.LifecyclePhases?.FirstOrDefault(p => p.StartAge == id);
-            if (phase is not null)
-            {
-                _isLoading = true;
-                try
-                {
-                    OverrideRows.Clear();
-                    foreach (var ov in phase.AssetAllocationOverrides ?? [])
-                    {
-                        OverrideRows.Add(new LifecycleOverrideRowViewModel
-                        {
-                            SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == ov.AssetClassId),
-                            TargetWeight = ov.TargetWeight
-                        });
-                    }
-                }
-                finally
-                {
-                    _isLoading = false;
-                }
-            }
-        }
-    }
-
-    private void RefreshOptions()
-    {
-        var current = _currentProjectService.Current;
-        TaxProfileOptions.Clear();
-        StrategyProfileOptions.Clear();
-        AssetClassOptions.Clear();
-        if (current is null)
-            return;
-        foreach (var t in current.TaxProfiles ?? [])
-            TaxProfileOptions.Add(new ProfileOption(t.Id, t.Name));
-        foreach (var s in current.StrategyProfiles ?? [])
-            StrategyProfileOptions.Add(new ProfileOption(s.Id, s.Name));
-        foreach (var c in current.AssetClasses ?? [])
-            AssetClassOptions.Add(new ProfileOption(c.Id, c.Name));
-    }
-
-    private void RefreshItems()
-    {
-        var current = _currentProjectService.Current;
-        Items.Clear();
+        var current = CurrentProjectService.Current;
         if (current?.LifecyclePhases is null)
-            return;
-        foreach (var item in current.LifecyclePhases)
-            Items.Add(item);
+            return [];
+        return current.LifecyclePhases;
     }
 
-    private void ClearForm()
+    /// <inheritdoc />
+    protected override void UpdateProject(IEnumerable<LifecyclePhaseDto> items)
     {
-        StartAge = 0;
-        TaxProfileId = string.Empty;
-        StrategyProfileId = string.Empty;
-        SelectedTaxProfile = null;
-        SelectedStrategyProfile = null;
-        OverrideRows.Clear();
-        ClearValidationErrors();
+        CurrentProjectService.UpdateLifecyclePhases(items.ToList());
     }
 
-    private LifecyclePhaseDto BuildPhaseDtoFromForm()
+    /// <inheritdoc />
+    protected override LifecyclePhaseDto BuildDtoFromForm()
     {
         var overrides = OverrideRows
             .Where(r => !string.IsNullOrEmpty(r.SelectedAssetClass?.Id))
@@ -220,6 +110,7 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
             .ToList();
         return new LifecyclePhaseDto
         {
+            Id = EditingId ?? Guid.NewGuid().ToString(),
             StartAge = StartAge,
             TaxProfileId = TaxProfileId?.Trim() ?? string.Empty,
             StrategyProfileId = StrategyProfileId?.Trim() ?? string.Empty,
@@ -227,62 +118,67 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
         };
     }
 
-    [RelayCommand]
-    private void New()
+    /// <inheritdoc />
+    protected override void MapDtoToForm(LifecyclePhaseDto dto)
     {
-        SelectedItem = null;
-        ClearForm();
-    }
-
-    [RelayCommand(CanExecute = nameof(HasCurrentProject))]
-    private void Save()
-    {
-        var current = _currentProjectService.Current;
-        if (current is null)
-            return;
-
-        var dto = BuildPhaseDtoFromForm();
-        var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors);
-        if (!validationResult.IsValid)
-            return;
-
-        var list = current.LifecyclePhases.ToList();
-        if (SelectedItem is null)
+        StartAge = dto.StartAge;
+        TaxProfileId = dto.TaxProfileId;
+        StrategyProfileId = dto.StrategyProfileId;
+        SelectedTaxProfile = TaxProfileOptions.FirstOrDefault(o => o.Id == dto.TaxProfileId);
+        SelectedStrategyProfile = StrategyProfileOptions.FirstOrDefault(o => o.Id == dto.StrategyProfileId);
+        OverrideRows.Clear();
+        foreach (var ov in dto.AssetAllocationOverrides ?? [])
         {
-            list.Add(dto);
-            _currentProjectService.UpdateLifecyclePhases(list);
-            RefreshItems();
-            SelectedItem = Items.FirstOrDefault(x => x.StartAge == dto.StartAge);
-            ClearForm();
-        }
-        else
-        {
-            var idx = list.FindIndex(p => p.StartAge == SelectedItem.StartAge);
-            if (idx < 0)
-                return;
-            list[idx] = dto;
-            _currentProjectService.UpdateLifecyclePhases(list);
-            RefreshItems();
-            SelectedItem = Items.FirstOrDefault(x => x.StartAge == dto.StartAge);
+            OverrideRows.Add(new LifecycleOverrideRowViewModel
+            {
+                SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == ov.AssetClassId),
+                TargetWeight = ov.TargetWeight
+            });
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanDelete))]
-    private void Delete()
+    /// <inheritdoc />
+    protected override void ClearFormCore()
     {
-        if (SelectedItem is null)
-            return;
-        var current = _currentProjectService.Current;
+        StartAge = 0;
+        TaxProfileId = string.Empty;
+        StrategyProfileId = string.Empty;
+        SelectedTaxProfile = null;
+        SelectedStrategyProfile = null;
+        OverrideRows.Clear();
+        ClearValidationErrors();
+    }
+
+    /// <inheritdoc />
+    protected override ValidationResult ValidateDto(LifecyclePhaseDto dto)
+    {
+        return ValidationRunner.Validate(dto);
+    }
+
+    /// <inheritdoc />
+    protected override void OnProjectChanged(object? sender, EventArgs e)
+    {
+        var editingId = SelectedItem?.Id;
+        RefreshOptions();
+        base.OnProjectChanged(sender, e);
+        if (editingId is not null)
+            SelectedItem = Items.FirstOrDefault(x => x.Id == editingId);
+    }
+
+    private void RefreshOptions()
+    {
+        var current = CurrentProjectService.Current;
+        TaxProfileOptions.Clear();
+        StrategyProfileOptions.Clear();
+        AssetClassOptions.Clear();
         if (current is null)
             return;
-
-        var toRemove = SelectedItem.StartAge;
-        var list = current.LifecyclePhases.Where(p => p.StartAge != toRemove).ToList();
-        _currentProjectService.UpdateLifecyclePhases(list);
-        RefreshItems();
-        SelectedItem = null;
-        ClearForm();
+        foreach (var t in current.TaxProfiles ?? [])
+            TaxProfileOptions.Add(new ProfileOption(t.Id, t.Name));
+        foreach (var s in current.StrategyProfiles ?? [])
+            StrategyProfileOptions.Add(new ProfileOption(s.Id, s.Name));
+        foreach (var c in current.AssetClasses ?? [])
+            AssetClassOptions.Add(new ProfileOption(c.Id, c.Name));
     }
 
     [RelayCommand(CanExecute = nameof(HasCurrentProject))]
@@ -304,7 +200,6 @@ public partial class LifecyclePhasesViewModel : ValidatingViewModelBase
         SelectedOverrideRow = null;
     }
 
-    private bool HasCurrentProject() => _currentProjectService.Current is not null;
-    private bool CanDelete() => SelectedItem is not null && _currentProjectService.Current is not null;
+    private bool HasCurrentProject() => CurrentProjectService.Current is not null;
     private bool CanRemoveOverride() => SelectedOverrideRow is not null;
 }

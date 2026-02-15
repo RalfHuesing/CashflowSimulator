@@ -1,6 +1,7 @@
 using CashflowSimulator.Contracts.Dtos;
-using CashflowSimulator.Desktop.Features.TaxProfiles;
+using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
+using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Services;
 using Xunit;
 
@@ -88,5 +89,33 @@ public sealed class LifecycleProfileViewModelTests
         Assert.Equal(string.Empty, phase0.StrategyProfileId);
         var phase67 = current.LifecyclePhases.First(p => p.StartAge == 67);
         Assert.Equal("strategy-other", phase67.StrategyProfileId);
+    }
+
+    [Fact]
+    public void LifecyclePhasesViewModel_Save_ExistingPhase_UpdatesInPlaceAndPreservesId()
+    {
+        var phaseId = Guid.NewGuid().ToString();
+        var taxId = Guid.NewGuid().ToString();
+        var strategyId = Guid.NewGuid().ToString();
+        var project = ProjectWithLifecycle(
+            taxProfiles: [new TaxProfileDto { Id = taxId, Name = "T1", CapitalGainsTaxRate = 0.26m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.35m }],
+            strategyProfiles: [new StrategyProfileDto { Id = strategyId, Name = "S1", CashReserveMonths = 3, RebalancingThreshold = 0.05m, LookaheadMonths = 12 }],
+            lifecyclePhases: [
+                new LifecyclePhaseDto { Id = phaseId, StartAge = 30, TaxProfileId = taxId, StrategyProfileId = strategyId, AssetAllocationOverrides = [] }
+            ]);
+        var service = new CurrentProjectService();
+        service.SetCurrent(project);
+
+        var vm = new LifecyclePhasesViewModel(service, null!);
+        vm.SelectedItem = project.LifecyclePhases[0];
+        vm.StartAge = 45;
+        vm.SaveCommand.Execute(null);
+
+        var current = service.Current;
+        Assert.NotNull(current);
+        Assert.Single(current.LifecyclePhases);
+        var phase = current.LifecyclePhases[0];
+        Assert.Equal(phaseId, phase.Id);
+        Assert.Equal(45, phase.StartAge);
     }
 }

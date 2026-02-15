@@ -1,3 +1,5 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -6,8 +8,11 @@ namespace CashflowSimulator.Contracts.Dtos;
 /// Die Engine kann anhand der Kaufdaten und -mengen die zuerst gekauften Anteile zuordnen und
 /// daraus Gewinn/Verlust und Steuerlast ermitteln.
 /// </summary>
-public record TransactionDto
+public record TransactionDto : IIdentifiable
 {
+    /// <inheritdoc />
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+
     /// <summary>
     /// Datum der Transaktion (Wertstellung bzw. Handelsdatum, je nach fachlicher Definition).
     /// </summary>

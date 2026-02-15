@@ -63,7 +63,7 @@ Damit ist die DTO-Struktur in der Lage, beliebig viele MSCI-World-ETFs (oder and
 Assets tragen Attribute für die **deutsche Besteuerung**:
 
 - **TaxType:** z. B. Aktienfonds (Teilfreistellung 30 %), Mischfonds, Anleihenfonds, None (voll steuerpflichtig). Wird für Veräußerungsgewinne und Ausschüttungen genutzt.
-- **Transaktionshistorie:** Für eine exakte **FIFO-Steuerberechnung** bei Verkäufen müssen Kaufdaten und -mengen vorliegen (`TransactionDto` mit Typ `Buy`/`Sell`). Die Engine kann daraus realisierte Gewinne/Verluste und Kapitalertragsteuer ableiten.
+- **Transaktionshistorie:** Für eine exakte **FIFO-Steuerberechnung** bei Verkäufen müssen Kaufdaten und -mengen vorliegen (`TransactionDto` mit Typ `Buy`/`Sell`). Jede Transaktion hat eine eindeutige **Id**; die Desktop-App nutzt diese für robustes Bearbeiten und Löschen (unabhängig von Listenreihenfolge/Sortierung). Die Engine kann anhand der Id bzw. der Historie realisierte Gewinne/Verluste und Kapitalertragsteuer ableiten.
 - **Vorabpauschale / Ausschüttung:** Transaktionstypen `TaxPrepayment` und `Dividend` in der Historie unterstützen die Nachbildung von Besteuerung und Cashflows.
 
 Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der Engine (Core); die Contracts liefern die dafür notwendigen Daten.
@@ -76,7 +76,7 @@ Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der 
 |-----|--------|
 | **EconomicFactorDto** | Markt: Id, Name, Modell, Drift, Volatilität, Startwert. Keine Stückzahl, keine Transaktionen. |
 | **AssetDto** | Besitz: Id, Name, ISIN, **EconomicFactorId**, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue, Transactions. |
-| **TransactionDto** | Einzelne Buchung: Datum, Typ (Buy/Sell/Dividend/TaxPrepayment), Menge, Preis, Gesamtbetrag, Steueranteil. |
+| **TransactionDto** | Einzelne Buchung: **Id** (eindeutig, Guid-String), Datum, Typ (Buy/Sell/Dividend/TaxPrepayment), Menge, Preis, Gesamtbetrag, Steueranteil. Die Id ermöglicht robustes Update/Löschen in der UI und eine eindeutige Zuordnung für die Engine (z. B. FIFO). |
 | **PortfolioDto** | Container: Liste aller Assets, optional Strategy (Rebalancing etc., später). |
 
 `SimulationProjectDto` enthält sowohl `EconomicFactors` als auch `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen (Validierung in CashflowSimulator.Validation).

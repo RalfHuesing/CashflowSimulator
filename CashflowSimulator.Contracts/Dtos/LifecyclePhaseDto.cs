@@ -1,11 +1,16 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
 /// Eine Lebensphase in der Simulation (z. B. Erwerbsleben, Rente).
 /// Getriggert durch <see cref="StartAge"/>; verweist auf Steuer- und Strategie-Profil.
 /// </summary>
-public record LifecyclePhaseDto
+public record LifecyclePhaseDto : IIdentifiable
 {
+    /// <inheritdoc />
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+
     /// <summary>
     /// Alter (in Jahren), ab dem diese Phase aktiv ist. 0 = von Simulationsstart an.
     /// </summary>
