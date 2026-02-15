@@ -18,11 +18,6 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
     private const int SearchDebounceMs = 200;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(DisplayQuantity))]
-    [NotifyPropertyChangedFor(nameof(DisplayTotalValue))]
-    private AssetDto? _selectedItem;
-
-    [ObservableProperty]
     private string _searchText = string.Empty;
 
     [ObservableProperty]
@@ -192,6 +187,10 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
         SelectedAssetClass = AssetClassOptions.FirstOrDefault(o => o.Id == dto.AssetClassId);
         SelectedTaxTypeOption = TaxTypeOptions.FirstOrDefault(o => Equals(o.Value, dto.TaxType));
         SelectedAssetTypeOption = AssetTypeOptions.FirstOrDefault(o => Equals(o.Value, dto.AssetType));
+        
+        // Benachrichtige berechnete Properties, die vom SelectedItem abhängen
+        OnPropertyChanged(nameof(DisplayQuantity));
+        OnPropertyChanged(nameof(DisplayTotalValue));
     }
 
     protected override void ClearFormCore()
@@ -208,6 +207,10 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
         IsActiveSavingsInstrument = false;
         TaxType = TaxType.EquityFund;
         SelectedTaxTypeOption = TaxTypeOptions.FirstOrDefault(o => Equals(o.Value, TaxType.EquityFund));
+        
+        // Benachrichtige berechnete Properties beim Leeren
+        OnPropertyChanged(nameof(DisplayQuantity));
+        OnPropertyChanged(nameof(DisplayTotalValue));
     }
 
     protected override ValidationResult ValidateDto(AssetDto dto)
