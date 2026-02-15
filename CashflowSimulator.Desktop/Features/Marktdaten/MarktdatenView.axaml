@@ -5,6 +5,7 @@
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Marktdaten"
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
+             xmlns:ext="using:CashflowSimulator.Desktop.Common.Extensions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="CashflowSimulator.Desktop.Features.Marktdaten.MarktdatenView"
              x:DataType="vm:MarktdatenViewModel">
@@ -73,7 +74,7 @@
                               behaviors:FocusHelpBehavior.HelpKey="ModelType"
                               behaviors:FocusHelpBehavior.ErrorPropertyName="ModelType">
                         <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="vm:ModelTypeOption">
+                            <DataTemplate DataType="ext:EnumDisplayEntry">
                                 <TextBlock Text="{Binding Display}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>

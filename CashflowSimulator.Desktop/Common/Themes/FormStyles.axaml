@@ -49,4 +49,10 @@
         <Setter Property="UseFloatingWatermark" Value="False"/>
     </Style>
 
+    <!-- ComboBox: bündig im Formular-Raster, volle Breite wie andere Form-Inputs -->
+    <Style Selector="ComboBox.form-input">
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+
 </Styles>

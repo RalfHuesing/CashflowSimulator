@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -22,11 +24,13 @@ public enum StochasticModelType
     /// Geometrische Brownsche Bewegung (GBM). Modell: dS = μ·S·dt + σ·S·dW.
     /// Typisch für Aktien/Indizes; keine Mean-Reversion; <see cref="EconomicFactorDto.MeanReversionSpeed"/> wird ignoriert.
     /// </summary>
+    [Description("Geometrische Brownsche Bewegung (GBM)")]
     GeometricBrownianMotion,
 
     /// <summary>
     /// Ornstein-Uhlenbeck-Prozess. Modell: dX = θ·(μ − X)·dt + σ·dW.
     /// Typisch für Zinsen/Inflation; Rückkehr zum langfristigen Mittelwert; <see cref="EconomicFactorDto.MeanReversionSpeed"/> (θ) steuert die Stärke.
     /// </summary>
+    [Description("Ornstein-Uhlenbeck (Mean Reversion)")]
     OrnsteinUhlenbeck
 }

@@ -53,8 +53,8 @@
         <SolidColorBrush x:Key="FormInputErrorIconBrush" Color="{StaticResource FormInputErrorIconColor}" />
         <sys:Double x:Key="FormLabelWidth">180</sys:Double>
         <sys:Double x:Key="FormInputWidth">220</sys:Double>
-        <sys:Double x:Key="FormRowSpacing">12</sys:Double>
-        <Thickness x:Key="FormLabelMargin">0,0,16,12</Thickness>
+        <sys:Double x:Key="FormRowSpacing">16</sys:Double>
+        <Thickness x:Key="FormLabelMargin">0,0,16,16</Thickness>
         <Thickness x:Key="FormLabelMarginLast">0,0,16,0</Thickness>
         <Thickness x:Key="FormInputMargin">0,0,0,12</Thickness>
         <Thickness x:Key="FormInputMarginLast">0,0,0,0</Thickness>
@@ -77,9 +77,10 @@
         <sys:Double x:Key="GridSplitterWidth">4</sys:Double>
 
         <!-- MasterDetailView: Detail-Bereich (Formular + Buttons) -->
-        <Thickness x:Key="MasterDetailDetailMargin">0,12,0,0</Thickness>
+        <Thickness x:Key="MasterDetailDetailMargin">0,24,0,0</Thickness>
         <sys:Double x:Key="MasterDetailDetailMinHeight">240</sys:Double>
         <sys:Double x:Key="MasterDetailButtonSpacing">8</sys:Double>
+        <sys:Double x:Key="MasterDetailButtonsMaxWidth">400</sys:Double>
 
         <!-- Error Tray (Info-Panel): Weinrot, Reinweiß, dunkler Rahmen -->
         <Color x:Key="ErrorTrayBackgroundColor">#6B2D3A</Color>

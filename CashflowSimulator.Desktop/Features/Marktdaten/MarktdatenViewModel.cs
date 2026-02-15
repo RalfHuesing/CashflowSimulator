@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Common.Extensions;
 using CashflowSimulator.Desktop.ViewModels;
 using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -36,13 +37,13 @@ public partial class MarktdatenViewModel : ValidatingViewModelBase
     /// <summary>Für ComboBox-Bindung: ausgewählte Modelltyp-Option.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModelType))]
-    private ModelTypeOption? _selectedModelTypeOption;
+    private EnumDisplayEntry? _selectedModelTypeOption;
 
-    partial void OnSelectedModelTypeOptionChanged(ModelTypeOption? value)
+    partial void OnSelectedModelTypeOptionChanged(EnumDisplayEntry? value)
     {
-        if (value is not null)
+        if (value?.Value is StochasticModelType modelType)
         {
-            _modelType = value.Value;
+            _modelType = modelType;
             ScheduleValidateAndSave();
         }
     }
@@ -64,12 +65,9 @@ public partial class MarktdatenViewModel : ValidatingViewModelBase
 
     public ObservableCollection<EconomicFactorDto> Items { get; } = [];
 
-    /// <summary>Optionen für die ComboBox Modelltyp (Wert + Anzeigetext).</summary>
-    public static IReadOnlyList<ModelTypeOption> ModelTypeOptions { get; } =
-    [
-        new ModelTypeOption(StochasticModelType.GeometricBrownianMotion, "Geometrische Brownsche Bewegung (GBM)"),
-        new ModelTypeOption(StochasticModelType.OrnsteinUhlenbeck, "Ornstein-Uhlenbeck (Mean Reversion)")
-    ];
+    /// <summary>Optionen für die ComboBox Modelltyp (Wert + Anzeigetext aus Description-Attribut).</summary>
+    public static IReadOnlyList<EnumDisplayEntry> ModelTypeOptions { get; } =
+        EnumExtensions.ToDisplayList<StochasticModelType>();
 
     protected override string HelpKeyPrefix => "Marktdaten";
 
@@ -96,7 +94,7 @@ public partial class MarktdatenViewModel : ValidatingViewModelBase
             Id = value.Id;
             Name = value.Name;
             ModelType = value.ModelType;
-            SelectedModelTypeOption = ModelTypeOptions.FirstOrDefault(o => o.Value == value.ModelType);
+            SelectedModelTypeOption = ModelTypeOptions.FirstOrDefault(o => Equals(o.Value, value.ModelType));
             ExpectedReturn = (decimal)value.ExpectedReturn;
             Volatility = (decimal)value.Volatility;
             MeanReversionSpeed = (decimal)value.MeanReversionSpeed;
@@ -162,7 +160,7 @@ public partial class MarktdatenViewModel : ValidatingViewModelBase
         Id = string.Empty;
         Name = string.Empty;
         ModelType = StochasticModelType.GeometricBrownianMotion;
-        SelectedModelTypeOption = ModelTypeOptions[0];
+        SelectedModelTypeOption = ModelTypeOptions.Count > 0 ? ModelTypeOptions[0] : null;
         ExpectedReturn = 0.07m;
         Volatility = 0.15m;
         MeanReversionSpeed = 0m;
@@ -284,6 +282,3 @@ public partial class MarktdatenViewModel : ValidatingViewModelBase
     private bool HasCurrentProject() => _currentProjectService.Current is not null;
     private bool CanDelete() => SelectedItem is not null && _currentProjectService.Current is not null;
 }
-
-/// <summary>Eintrag für Modelltyp-ComboBox.</summary>
-public record ModelTypeOption(StochasticModelType Value, string Display);

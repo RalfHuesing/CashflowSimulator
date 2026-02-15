@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -5,6 +7,9 @@ namespace CashflowSimulator.Contracts.Dtos;
 /// </summary>
 public enum CashflowType
 {
+    [Description("Einnahme")]
     Income,
+
+    [Description("Ausgabe")]
     Expense
 }
