@@ -1,10 +1,12 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
 /// Strategie-Profil für eine Lebensphase (z. B. Aufbau vs. Entnahme).
 /// Wird von <see cref="LifecyclePhaseDto"/> referenziert.
 /// </summary>
-public record StrategyProfileDto
+public record StrategyProfileDto : IIdentifiable
 {
     /// <summary>
     /// Eindeutige ID des Profils (Guid-String).

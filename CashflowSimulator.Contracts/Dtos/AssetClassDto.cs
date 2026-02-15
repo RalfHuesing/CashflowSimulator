@@ -1,3 +1,5 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace CashflowSimulator.Contracts.Dtos;
 /// Beispiele: "Aktien Welt 70 %", "Schwellenländer 10 %", "Sicherheitsbaustein 20 %".
 /// Die Summe der <see cref="TargetWeight"/> aller Klassen sollte idealerweise 1,0 (100 %) ergeben.
 /// </summary>
-public record AssetClassDto
+public record AssetClassDto : IIdentifiable
 {
     /// <summary>
     /// Eindeutige ID der Anlageklasse (z. B. Guid).

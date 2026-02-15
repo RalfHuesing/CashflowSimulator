@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
+using CashflowSimulator.Contracts.Common;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Common.Extensions;
 using CashflowSimulator.Desktop.ViewModels;
 using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace CashflowSimulator.Desktop.Features.CashflowStreams;
 
@@ -14,17 +14,9 @@ namespace CashflowSimulator.Desktop.Features.CashflowStreams;
 /// Validierung über <see cref="ValidationRunner"/>; Fehler nur im Info-Panel.
 /// Property-Namen 1:1 wie im DTO (Rules-konform).
 /// </summary>
-public partial class CashflowStreamsViewModel : ValidatingViewModelBase
+public partial class CashflowStreamsViewModel : CrudViewModelBase<CashflowStreamDto>
 {
-    private const int ValidationDebounceMs = 300;
-
-    private readonly ICurrentProjectService _currentProjectService;
     private readonly CashflowType _cashflowType;
-    private bool _isLoading;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
-    private CashflowStreamDto? _selectedItem;
 
     [ObservableProperty]
     private string _name = string.Empty;
@@ -59,7 +51,7 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     [ObservableProperty]
     private string? _economicFactorId;
 
-    /// <summary>Für ComboBox: „Keine“ + alle Marktfaktoren.</summary>
+    /// <summary>Für ComboBox: „Keine" + alle Marktfaktoren.</summary>
     [ObservableProperty]
     private DynamicFactorOption? _selectedDynamicFactor;
 
@@ -68,12 +60,6 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         _economicFactorId = value?.Id;
         ScheduleValidateAndSave();
     }
-
-    /// <summary>Id des Eintrags im Bearbeitungsformular (null = Neu).</summary>
-    [ObservableProperty]
-    private string? _editingId;
-
-    public ObservableCollection<CashflowStreamDto> Items { get; } = [];
 
     public ObservableCollection<DynamicFactorOption> DynamicFactorOptions { get; } = [];
 
@@ -90,40 +76,11 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         ICurrentProjectService currentProjectService,
         IHelpProvider helpProvider,
         CashflowType cashflowType)
-        : base(helpProvider)
+        : base(currentProjectService, helpProvider)
     {
-        _currentProjectService = currentProjectService;
         _cashflowType = cashflowType;
         PageHelpKey = "CashflowStreams";
-        _currentProjectService.ProjectChanged += OnProjectChanged;
         RefreshDynamicFactorOptions();
-        RefreshItems();
-    }
-
-    partial void OnSelectedItemChanged(CashflowStreamDto? value)
-    {
-        if (value is null)
-        {
-            ClearForm();
-            return;
-        }
-        _isLoading = true;
-        try
-        {
-            EditingId = value.Id;
-            Name = value.Name;
-            Amount = value.Amount;
-            Interval = value.Interval;
-            StartDate = value.StartDate;
-            EndDate = value.EndDate;
-            EconomicFactorId = value.EconomicFactorId;
-            SelectedIntervalOption = IntervalOptions.FirstOrDefault(o => Equals(o.Value, value.Interval));
-            SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id == value.EconomicFactorId);
-        }
-        finally
-        {
-            _isLoading = false;
-        }
     }
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();
@@ -132,21 +89,28 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     partial void OnStartDateChanged(DateOnly? value) => ScheduleValidateAndSave();
     partial void OnEndDateChanged(DateOnly? value) => ScheduleValidateAndSave();
 
-    private void ScheduleValidateAndSave()
+    protected override IEnumerable<CashflowStreamDto> LoadItems()
     {
-        if (_isLoading)
+        var current = CurrentProjectService.Current;
+        if (current?.Streams is null)
+            return [];
+        return current.Streams.Where(s => s.Type == _cashflowType);
+    }
+
+    protected override void UpdateProject(IEnumerable<CashflowStreamDto> items)
+    {
+        var current = CurrentProjectService.Current;
+        if (current is null)
             return;
-        ScheduleDebounced(ValidationDebounceMs, ValidateAndSave);
+
+        // Wichtig: Die Liste enthält nur Items des aktuellen Typs (_cashflowType).
+        // Wir müssen sie mit den Items des anderen Typs mergen.
+        var otherTypeItems = current.Streams.Where(s => s.Type != _cashflowType).ToList();
+        var mergedList = otherTypeItems.Concat(items).ToList();
+        CurrentProjectService.UpdateStreams(mergedList);
     }
 
-    private void ValidateAndSave()
-    {
-        var dto = BuildStreamDtoFromForm();
-        var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors);
-    }
-
-    private CashflowStreamDto BuildStreamDtoFromForm()
+    protected override CashflowStreamDto BuildDtoFromForm()
     {
         return new CashflowStreamDto
         {
@@ -161,129 +125,60 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         };
     }
 
-    private void OnProjectChanged(object? sender, EventArgs e)
+    protected override void MapDtoToForm(CashflowStreamDto dto)
+    {
+        Name = dto.Name;
+        Amount = dto.Amount;
+        Interval = dto.Interval;
+        StartDate = dto.StartDate;
+        EndDate = dto.EndDate;
+        EconomicFactorId = dto.EconomicFactorId;
+        SelectedIntervalOption = IntervalOptions.FirstOrDefault(o => Equals(o.Value, dto.Interval));
+        SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id == dto.EconomicFactorId);
+    }
+
+    protected override void ClearFormCore()
+    {
+        Name = string.Empty;
+        Amount = 0;
+        Interval = CashflowInterval.Monthly;
+        SelectedIntervalOption = IntervalOptions.Count > 0 ? IntervalOptions[0] : null;
+        var start = CurrentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
+        StartDate = start;
+        EndDate = null;
+        EconomicFactorId = null;
+        SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id is null);
+    }
+
+    protected override ValidationResult ValidateDto(CashflowStreamDto dto)
+    {
+        return ValidationRunner.Validate(dto);
+    }
+
+    protected override void OnProjectChanged(object? sender, EventArgs e)
     {
         RefreshDynamicFactorOptions();
-        RefreshItems();
+        base.OnProjectChanged(sender, e);
+    }
+
+    protected override void OnNewItemCreated()
+    {
+        var start = CurrentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
+        StartDate = start;
     }
 
     private void RefreshDynamicFactorOptions()
     {
         DynamicFactorOptions.Clear();
         DynamicFactorOptions.Add(new DynamicFactorOption(null, "Keine"));
-        var factors = _currentProjectService.Current?.EconomicFactors;
+        var factors = CurrentProjectService.Current?.EconomicFactors;
         if (factors is not null)
         {
             foreach (var f in factors)
                 DynamicFactorOptions.Add(new DynamicFactorOption(f.Id, f.Name));
         }
     }
-
-    private void RefreshItems()
-    {
-        var current = _currentProjectService.Current;
-        Items.Clear();
-        if (current?.Streams is null)
-            return;
-        foreach (var item in current.Streams.Where(s => s.Type == _cashflowType))
-            Items.Add(item);
-    }
-
-    private void ClearForm()
-    {
-        EditingId = null;
-        Name = string.Empty;
-        Amount = 0;
-        Interval = CashflowInterval.Monthly;
-        SelectedIntervalOption = IntervalOptions.Count > 0 ? IntervalOptions[0] : null;
-        var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
-        StartDate = start;
-        EndDate = null;
-        EconomicFactorId = null;
-        SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id is null);
-        ClearValidationErrors();
-    }
-
-    [RelayCommand]
-    private void New()
-    {
-        SelectedItem = null;
-        ClearForm();
-        var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
-        StartDate = start;
-    }
-
-    [RelayCommand(CanExecute = nameof(HasCurrentProject))]
-    private void Save()
-    {
-        var current = _currentProjectService.Current;
-        if (current is null)
-            return;
-
-        var dto = BuildStreamDtoFromForm();
-        var validationResult = ValidationRunner.Validate(dto);
-        SetValidationErrors(validationResult.Errors);
-        if (!validationResult.IsValid)
-            return;
-
-        var list = current.Streams.ToList();
-        if (EditingId is null)
-        {
-            var newItem = new CashflowStreamDto
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = Name.Trim(),
-                Type = _cashflowType,
-                Amount = Amount,
-                Interval = Interval,
-                StartDate = StartDate!.Value,
-                EndDate = EndDate,
-                EconomicFactorId = EconomicFactorId
-            };
-            list.Add(newItem);
-            _currentProjectService.UpdateStreams(list);
-            RefreshItems();
-            SelectedItem = Items.FirstOrDefault(x => x.Id == newItem.Id);
-            ClearForm();
-        }
-        else
-        {
-            var idx = list.FindIndex(x => x.Id == EditingId);
-            if (idx < 0)
-                return;
-            list[idx] = list[idx] with
-            {
-                Name = Name.Trim(),
-                Amount = Amount,
-                Interval = Interval,
-                StartDate = StartDate!.Value,
-                EndDate = EndDate,
-                EconomicFactorId = EconomicFactorId
-            };
-            _currentProjectService.UpdateStreams(list);
-            RefreshItems();
-            SelectedItem = Items.FirstOrDefault(x => x.Id == EditingId);
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanDelete))]
-    private void Delete()
-    {
-        if (SelectedItem is null)
-            return;
-        var current = _currentProjectService.Current;
-        if (current is null)
-            return;
-        var list = current.Streams.Where(x => x.Id != SelectedItem.Id).ToList();
-        _currentProjectService.UpdateStreams(list);
-        RefreshItems();
-        SelectedItem = null;
-        ClearForm();
-    }
-
-    private bool HasCurrentProject() => _currentProjectService.Current is not null;
-    private bool CanDelete() => SelectedItem is not null && _currentProjectService.Current is not null;
 }
 
-/// <summary>Eintrag für Dynamisierung-ComboBox (Id null = „Keine“).</summary>
+/// <summary>Eintrag für Dynamisierung-ComboBox (Id null = „Keine").</summary>
 public record DynamicFactorOption(string? Id, string Display);

@@ -1,9 +1,11 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
 /// Geplantes Einzelereignis (z. B. Anschaffung) mit optionaler Toleranz für die Simulation.
 /// </summary>
-public record CashflowEventDto
+public record CashflowEventDto : IIdentifiable
 {
     public string Id { get; init; } = Guid.NewGuid().ToString();
     public string Name { get; init; } = string.Empty;

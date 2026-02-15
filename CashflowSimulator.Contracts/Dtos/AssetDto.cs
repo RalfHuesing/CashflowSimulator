@@ -1,3 +1,5 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -7,7 +9,7 @@ namespace CashflowSimulator.Contracts.Dtos;
 /// (z. B. drei verschiedene MSCI-World-ETFs), werden aber getrennt mit eigener Stückzahl
 /// und Transaktionshistorie geführt.
 /// </summary>
-public record AssetDto
+public record AssetDto : IIdentifiable
 {
     /// <summary>
     /// Eindeutige ID des Assets (z. B. Guid). Wird für Referenzen und Persistenz genutzt.

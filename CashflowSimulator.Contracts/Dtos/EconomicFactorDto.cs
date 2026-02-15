@@ -1,3 +1,5 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace CashflowSimulator.Contracts.Dtos;
 /// Statistische Größen (Drift, Volatilität, Mean-Reversion) sind als <see cref="double"/> definiert,
 /// da sie in stochastischen Formeln und Matrixoperationen verwendet werden. Geldbeträge bleiben in anderen DTOs als <c>decimal</c>.
 /// </remarks>
-public record EconomicFactorDto
+public record EconomicFactorDto : IIdentifiable
 {
     /// <summary>
     /// Eindeutige ID des Faktors (z. B. "MSCI_World", "Inflation"). Wird in <see cref="CorrelationEntryDto"/>

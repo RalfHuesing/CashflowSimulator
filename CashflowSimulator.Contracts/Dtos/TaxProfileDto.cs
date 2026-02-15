@@ -1,10 +1,12 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
 /// Steuer-Profil für eine Lebensphase (z. B. Erwerbsleben vs. Rente).
 /// Wird von <see cref="LifecyclePhaseDto"/> referenziert.
 /// </summary>
-public record TaxProfileDto
+public record TaxProfileDto : IIdentifiable
 {
     /// <summary>
     /// Eindeutige ID des Profils (Guid-String).

@@ -1,9 +1,11 @@
+using CashflowSimulator.Contracts.Interfaces;
+
 namespace CashflowSimulator.Contracts.Dtos;
 
 /// <summary>
 /// Wiederkehrender Cashflow (z. B. Gehalt, Miete).
 /// </summary>
-public record CashflowStreamDto
+public record CashflowStreamDto : IIdentifiable
 {
     public string Id { get; init; } = Guid.NewGuid().ToString();
     public string Name { get; init; } = string.Empty;
