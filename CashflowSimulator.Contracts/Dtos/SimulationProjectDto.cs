@@ -18,6 +18,13 @@ public record SimulationProjectDto
     public List<EconomicFactorDto> EconomicFactors { get; init; } = [];
 
     /// <summary>
+    /// Portfolio des Nutzers: alle gehaltenen Vermögenswerte (Assets) und optional Strategie/Rebalancing.
+    /// Jedes Asset verknüpft sich über <see cref="AssetDto.EconomicFactorId"/> mit einem
+    /// <see cref="EconomicFactorDto"/> aus <see cref="EconomicFactors"/> für die Wertentwicklung.
+    /// </summary>
+    public PortfolioDto Portfolio { get; init; } = new();
+
+    /// <summary>
     /// Paarweise Pearson-Korrelationen zwischen Faktoren. Nur Einträge, bei denen die Korrelation
     /// von der impliziten 0 (bzw. 1 auf der Diagonale) abweicht, müssen angegeben werden.
     /// Die Engine baut daraus die volle Korrelationsmatrix und wendet die Cholesky-Zerlegung an.
