@@ -4,7 +4,6 @@
         xmlns:controls="clr-namespace:CashflowSimulator.Desktop.Common.Controls;assembly=CashflowSimulator.Desktop"
         xmlns:vm="clr-namespace:CashflowSimulator.Desktop.ViewModels;assembly=CashflowSimulator.Desktop">
 
-    <!-- FeatureLayoutView: Content links, GridSplitter, InfoPanel rechts. Template sorgt dafür, dass Kind-Content nur im ContentPresenter landet. -->
     <Style Selector="controls|FeatureLayoutView">
         <Setter Property="Template">
             <ControlTemplate>
@@ -14,60 +13,65 @@
                         <ColumnDefinition Width="4"/>
                         <ColumnDefinition Width="400" MinWidth="280"/>
                     </Grid.ColumnDefinitions>
-                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <Border Padding="{StaticResource ContentPadding}">
-                            <StackPanel>
-                                <StackPanel Spacing="{StaticResource SpacingSmallValue}"
-                                            Margin="{StaticResource FormHeaderBlockMargin}"
-                                            HorizontalAlignment="Left">
-                                    <TextBlock Text="{TemplateBinding Title}" Classes="feature-page-title"/>
-                                    <TextBlock Text="{TemplateBinding Description}" Classes="feature-page-description"/>
-                                </StackPanel>
-                                <ContentPresenter Content="{TemplateBinding Content}"/>
+
+                    <Grid Grid.Column="0" RowDefinitions="Auto, *">
+                        
+                        <Border Grid.Row="0" Padding="24,0,24,0">
+                            <StackPanel Spacing="{StaticResource SpacingSmallValue}"
+                                        Margin="{StaticResource FormHeaderBlockMargin}"
+                                        HorizontalAlignment="Left">
+                                <TextBlock Text="{TemplateBinding Title}" Classes="feature-page-title"/>
+                                <TextBlock Text="{TemplateBinding Description}" Classes="feature-page-description"/>
                             </StackPanel>
                         </Border>
-                    </ScrollViewer>
+
+                        <Border Grid.Row="1" Padding="24,0,24,24">
+                            <ContentPresenter Content="{TemplateBinding Content}"/>
+                        </Border>
+                    </Grid>
+
                     <GridSplitter Grid.Column="1"
                                   Width="4"
                                   Background="{StaticResource GridSplitterBackgroundBrush}"
                                   ResizeDirection="Columns"
                                   ResizeBehavior="PreviousAndNext"/>
+
                     <Border Grid.Column="2"
                             Background="{StaticResource InfoPanelBackgroundBrush}"
                             BorderBrush="{StaticResource InfoPanelBorderBrush}"
                             BorderThickness="1,0,0,0"
                             Padding="16"
                             DataContext="{TemplateBinding DataContext}">
-                        <StackPanel Spacing="16" x:DataType="vm:ValidatingViewModelBase">
-                            <StackPanel IsVisible="{Binding HasActiveHelpErrors}" Spacing="4">
-                                <Border Classes="error-tray" Padding="12,8">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="VALIDIERUNGSFEHLER" Classes="error-tray-caption"/>
-                                        <ItemsControl ItemsSource="{Binding ActiveHelpErrors}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate DataType="sys:String">
-                                                    <TextBlock Text="{Binding}" Classes="error-tray-item"/>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </Border>
+                        <ScrollViewer> <StackPanel Spacing="16" x:DataType="vm:ValidatingViewModelBase">
+                                <StackPanel IsVisible="{Binding HasActiveHelpErrors}" Spacing="4">
+                                    <Border Classes="error-tray" Padding="12,8">
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="VALIDIERUNGSFEHLER" Classes="error-tray-caption"/>
+                                            <ItemsControl ItemsSource="{Binding ActiveHelpErrors}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="sys:String">
+                                                        <TextBlock Text="{Binding}" Classes="error-tray-item"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="{Binding ActiveHelpTitle}"
+                                              FontWeight="SemiBold"
+                                              FontSize="14"
+                                              Foreground="{StaticResource InfoPanelTitleBrush}"/>
+                                    <TextBlock Text="{Binding ActiveHelpDescription}"
+                                              TextWrapping="Wrap"
+                                              FontSize="13"
+                                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
                             </StackPanel>
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="{Binding ActiveHelpTitle}"
-                                          FontWeight="SemiBold"
-                                          FontSize="14"
-                                          Foreground="{StaticResource InfoPanelTitleBrush}"/>
-                                <TextBlock Text="{Binding ActiveHelpDescription}"
-                                          TextWrapping="Wrap"
-                                          FontSize="13"
-                                          Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                        </StackPanel>
+                        </ScrollViewer>
                     </Border>
                 </Grid>
             </ControlTemplate>
         </Setter>
     </Style>
-
 </Styles>

@@ -2,22 +2,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              x:Class="CashflowSimulator.Desktop.Common.Controls.MasterDetailView">
-    <Grid RowDefinitions="*, 4, Auto" ColumnDefinitions="*"
+    
+    <Grid RowDefinitions="*, 4, Auto" 
+          ColumnDefinitions="*"
           VerticalAlignment="Stretch"
           HorizontalAlignment="Stretch">
+        
         <ContentPresenter Grid.Row="0"
                           Content="{Binding MasterContent, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"
                           VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"/>
+        
         <GridSplitter Grid.Row="1"
                       Background="{StaticResource GridSplitterBackgroundBrush}"
                       ResizeDirection="Rows"
                       ResizeBehavior="PreviousAndNext"/>
+        
         <StackPanel Grid.Row="2"
                     MinHeight="{StaticResource MasterDetailDetailMinHeight}"
                     Spacing="{StaticResource FormRowSpacing}"
                     Margin="{StaticResource MasterDetailDetailMargin}">
+            
             <ContentPresenter Content="{Binding DetailContent, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"/>
+            
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Spacing="{StaticResource MasterDetailButtonSpacing}"
