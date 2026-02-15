@@ -23,7 +23,10 @@
                           HorizontalAlignment="Stretch">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                        <DataGridTemplateColumn Header="Betrag" Width="100" SortMemberPath="Amount">
+                        <DataGridTemplateColumn Width="100" SortMemberPath="Amount">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Betrag" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Amount, StringFormat='{}{0:C}'}"

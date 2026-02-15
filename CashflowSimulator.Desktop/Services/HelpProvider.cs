@@ -25,7 +25,7 @@ public sealed class HelpProvider : IHelpProvider
         ["CashflowStreams"] = ("Laufende Cashflows", "Einnahmen oder Ausgaben mit wiederkehrendem Betrag und Intervall (monatlich/jährlich)."),
         ["CashflowStreams.Name"] = ("Bezeichnung", "Kurzer Name für diesen Cashflow (z. B. Gehalt, Miete)."),
         ["CashflowStreams.Amount"] = ("Betrag", "Wiederkehrender Betrag pro Intervall. Bei Einnahmen positiv, bei Ausgaben negativ eintragen."),
-        ["CashflowStreams.Interval"] = ("Intervall", "Häufigkeit: Monatlich (Monthly) oder Jährlich (Yearly). Der Betrag wird jeweils pro Intervall angesetzt."),
+        ["CashflowStreams.Interval"] = ("Intervall", "Häufigkeit: Monatlich oder Jährlich. Der Betrag wird jeweils pro Intervall angesetzt."),
         ["CashflowStreams.StartDate"] = ("Von (Datum)", "Startdatum des Cashflows. Ab diesem Datum wird der Betrag in der Simulation berücksichtigt."),
         ["CashflowStreams.EndDate"] = ("Bis (Datum)", "Enddatum des Cashflows. Leer lassen für unbegrenzte Laufzeit. Nach diesem Datum wird der Betrag nicht mehr angesetzt."),
         // CashflowEvents (HelpKeyPrefix = "CashflowEvents")

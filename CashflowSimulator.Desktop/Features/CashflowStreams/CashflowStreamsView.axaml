@@ -5,6 +5,7 @@
              xmlns:vm="using:CashflowSimulator.Desktop.Features.CashflowStreams"
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              xmlns:behaviors="using:CashflowSimulator.Desktop.Common.Behaviors"
+             xmlns:ext="using:CashflowSimulator.Desktop.Common.Extensions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="CashflowSimulator.Desktop.Features.CashflowStreams.CashflowStreamsView"
              x:DataType="vm:CashflowStreamsViewModel">
@@ -23,7 +24,10 @@
                           HorizontalAlignment="Stretch">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                        <DataGridTemplateColumn Header="Betrag" Width="100" SortMemberPath="Amount">
+                        <DataGridTemplateColumn Width="100" SortMemberPath="Amount">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Betrag" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Amount, StringFormat='{}{0:C}'}"
@@ -33,7 +37,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Intervall" Width="90" Binding="{Binding Interval}"/>
+                        <DataGridTextColumn Header="Intervall" Width="90" Binding="{Binding Interval, Converter={StaticResource EnumDescriptionConverter}}"/>
                         <DataGridTextColumn Header="Von" Width="120" Binding="{Binding StartDate}"/>
                         <DataGridTextColumn Header="Bis" Width="120" Binding="{Binding EndDate}"/>
                     </DataGrid.Columns>
@@ -60,10 +64,16 @@
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
                               ItemsSource="{x:Static vm:CashflowStreamsViewModel.IntervalOptions}"
-                              SelectedItem="{Binding Interval}"
+                              SelectedItem="{Binding SelectedIntervalOption}"
                               Margin="{StaticResource FormInputMargin}"
                               behaviors:FocusHelpBehavior.HelpKey="Interval"
-                              behaviors:FocusHelpBehavior.ErrorPropertyName="Interval"/>
+                              behaviors:FocusHelpBehavior.ErrorPropertyName="Interval">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="ext:EnumDisplayEntry">
+                                <TextBlock Text="{Binding Display}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Von (Datum)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>

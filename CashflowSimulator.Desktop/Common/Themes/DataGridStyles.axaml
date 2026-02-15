@@ -20,12 +20,12 @@
         <Setter Property="Background" Value="{StaticResource ContentBackgroundBrush}" />
     </Style>
 
-    <!-- Header: dunkel, fett, aus DesignTokens -->
+    <!-- Header: dunkel, fett, großzügiges Padding; HorizontalContentAlignment pro Spalte in der View setzbar -->
     <Style Selector="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource SidebarBackgroundBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Padding" Value="{StaticResource NavItemMargin}" />
+        <Setter Property="Padding" Value="{StaticResource DataGridHeaderPadding}" />
     </Style>
 
     <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">

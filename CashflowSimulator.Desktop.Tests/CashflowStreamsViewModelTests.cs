@@ -87,7 +87,7 @@ public sealed class CashflowStreamsViewModelTests
         vm.Name = "Gehalt";
         vm.Amount = 2000;
         vm.StartDate = DateOnly.FromDateTime(DateTime.Today);
-        vm.Interval = "Monthly";
+        vm.Interval = CashflowInterval.Monthly;
 
         vm.SaveCommand.Execute(null);
 

@@ -154,7 +154,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Gehalt (Netto)",
                 Type = CashflowType.Income,
                 Amount = 2850m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = retirement // Gehalt endet bei Renteneintritt
             },
@@ -164,7 +164,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Gesetzliche Rente (Prognose Netto)",
                 Type = CashflowType.Income,
                 Amount = 1950m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = retirement, // Rente beginnt bei Renteneintritt
                 EndDate = null
             }
@@ -184,7 +184,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Wohnen (Warmmiete + Strom)",
                 Type = CashflowType.Expense,
                 Amount = 1050m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = null
             },
@@ -194,7 +194,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Lebenshaltung (Supermarkt, Drogerie)",
                 Type = CashflowType.Expense,
                 Amount = 450m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = null
             },
@@ -204,7 +204,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Freizeit & Hobby",
                 Type = CashflowType.Expense,
                 Amount = 200m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = null
             }
@@ -224,7 +224,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Mobilität (ÖPNV + Carsharing)",
                 Type = CashflowType.Expense,
                 Amount = 120m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = null
             },
@@ -234,7 +234,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Digitale Abos & Internet",
                 Type = CashflowType.Expense,
                 Amount = 65m,
-                Interval = "Monthly",
+                Interval = CashflowInterval.Monthly,
                 StartDate = start,
                 EndDate = null
             }
@@ -254,7 +254,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Versicherungen (Haftpflicht, Hausrat, BU)",
                 Type = CashflowType.Expense,
                 Amount = 350m,
-                Interval = "Yearly",
+                Interval = CashflowInterval.Yearly,
                 StartDate = start,
                 EndDate = null
             },
@@ -264,7 +264,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Urlaubsbudget (Sommer)",
                 Type = CashflowType.Expense,
                 Amount = 2000m,
-                Interval = "Yearly",
+                Interval = CashflowInterval.Yearly,
                 StartDate = new DateOnly(start.Year, 6, 1),
                 EndDate = retirement // Im Alter ggf. anderes Reiseverhalten (hier vereinfacht)
             },
@@ -274,7 +274,7 @@ public sealed class DefaultProjectProvider : IDefaultProjectProvider
                 Name = "Weihnachten & Geschenke",
                 Type = CashflowType.Expense,
                 Amount = 600m,
-                Interval = "Yearly",
+                Interval = CashflowInterval.Yearly,
                 StartDate = new DateOnly(start.Year, 12, 1),
                 EndDate = null
             }

@@ -24,7 +24,10 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Faktor A" Width="*" Binding="{Binding FactorIdA}"/>
                         <DataGridTextColumn Header="Faktor B" Width="*" Binding="{Binding FactorIdB}"/>
-                        <DataGridTemplateColumn Header="Korrelation" Width="100" SortMemberPath="Correlation">
+                        <DataGridTemplateColumn Width="100" SortMemberPath="Correlation">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Korrelation" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Correlation, StringFormat='{}{0:F2}'}"

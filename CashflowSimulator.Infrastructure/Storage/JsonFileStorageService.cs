@@ -71,7 +71,8 @@ public class JsonFileStorageService<T> : IStorageService<T>
         return new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
+            WriteIndented = true,
+            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
         };
     }
 }

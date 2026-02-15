@@ -9,7 +9,7 @@ public record CashflowStreamDto
     public string Name { get; init; } = string.Empty;
     public CashflowType Type { get; init; }
     public decimal Amount { get; init; }
-    public string Interval { get; init; } = "Monthly";
+    public CashflowInterval Interval { get; init; } = CashflowInterval.Monthly;
 
     public DateOnly StartDate { get; init; }
     public DateOnly? EndDate { get; init; }

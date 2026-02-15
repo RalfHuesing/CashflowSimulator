@@ -12,8 +12,6 @@ public sealed class CashflowStreamDtoValidator : AbstractValidator<CashflowStrea
     private const int DateMinYear = 1900;
     private const int DateMaxYear = 2100;
 
-    private static readonly string[] AllowedIntervals = ["Monthly", "Yearly"];
-
     public CashflowStreamDtoValidator()
     {
         RuleFor(x => x.Name)
@@ -36,10 +34,8 @@ public sealed class CashflowStreamDtoValidator : AbstractValidator<CashflowStrea
             .WithMessage("Betrag muss größer als 0 sein.");
 
         RuleFor(x => x.Interval)
-            .NotEmpty()
-            .WithMessage("Intervall muss angegeben werden.")
-            .Must(interval => AllowedIntervals.Contains(interval))
-            .WithMessage("Intervall muss 'Monthly' oder 'Yearly' sein.");
+            .IsInEnum()
+            .WithMessage("Intervall muss Monatlich oder Jährlich sein.");
 
         RuleFor(x => x.EndDate)
             .Must(d => !d.HasValue || (d.Value.Year >= DateMinYear && d.Value.Year <= DateMaxYear))

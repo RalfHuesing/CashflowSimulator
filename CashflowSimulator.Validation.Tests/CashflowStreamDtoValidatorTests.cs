@@ -11,7 +11,7 @@ public sealed class CashflowStreamDtoValidatorTests
         Name = "Gehalt",
         Type = CashflowType.Income,
         Amount = 1000,
-        Interval = "Monthly",
+        Interval = CashflowInterval.Monthly,
         StartDate = DateOnly.FromDateTime(DateTime.Today)
     };
 
@@ -127,29 +127,9 @@ public sealed class CashflowStreamDtoValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyInterval_ReturnsError()
-    {
-        var dto = ValidDto() with { Interval = "" };
-        var result = ValidationRunner.Validate(dto);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == "Interval");
-    }
-
-    [Fact]
-    public void Validate_InvalidInterval_ReturnsError()
-    {
-        var dto = ValidDto() with { Interval = "Weekly" };
-        var result = ValidationRunner.Validate(dto);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == "Interval");
-    }
-
-    [Fact]
     public void Validate_YearlyInterval_ReturnsIsValid()
     {
-        var dto = ValidDto() with { Interval = "Yearly" };
+        var dto = ValidDto() with { Interval = CashflowInterval.Yearly };
         var result = ValidationRunner.Validate(dto);
 
         Assert.True(result.IsValid);
@@ -196,7 +176,7 @@ public sealed class CashflowStreamDtoValidatorTests
             StartDate = new DateOnly(2020, 1, 1),
             EndDate = new DateOnly(2100, 12, 31),
             Amount = 0.01m,
-            Interval = "Yearly"
+            Interval = CashflowInterval.Yearly
         };
         var result = ValidationRunner.Validate(dto);
 

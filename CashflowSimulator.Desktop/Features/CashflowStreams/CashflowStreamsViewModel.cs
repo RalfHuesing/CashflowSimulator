@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
+using CashflowSimulator.Desktop.Common.Extensions;
 using CashflowSimulator.Desktop.ViewModels;
 using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -32,7 +33,21 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
     private decimal _amount;
 
     [ObservableProperty]
-    private string _interval = "Monthly";
+    private CashflowInterval _interval = CashflowInterval.Monthly;
+
+    /// <summary>Für ComboBox-Bindung: ausgewählte Intervall-Option (Description-Anzeige).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Interval))]
+    private EnumDisplayEntry? _selectedIntervalOption;
+
+    partial void OnSelectedIntervalOptionChanged(EnumDisplayEntry? value)
+    {
+        if (value?.Value is CashflowInterval interval)
+        {
+            _interval = interval;
+            ScheduleValidateAndSave();
+        }
+    }
 
     [ObservableProperty]
     private DateOnly? _startDate;
@@ -64,7 +79,9 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
 
     public string Title => _cashflowType == CashflowType.Income ? "Laufende Einnahmen" : "Laufende Ausgaben";
 
-    public static IReadOnlyList<string> IntervalOptions { get; } = ["Monthly", "Yearly"];
+    /// <summary>Optionen für die ComboBox Intervall (Wert + Anzeigetext aus Description-Attribut).</summary>
+    public static IReadOnlyList<EnumDisplayEntry> IntervalOptions { get; } =
+        EnumExtensions.ToDisplayList<CashflowInterval>();
 
     /// <inheritdoc />
     protected override string HelpKeyPrefix => "CashflowStreams";
@@ -100,6 +117,7 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
             StartDate = value.StartDate;
             EndDate = value.EndDate;
             EconomicFactorId = value.EconomicFactorId;
+            SelectedIntervalOption = IntervalOptions.FirstOrDefault(o => Equals(o.Value, value.Interval));
             SelectedDynamicFactor = DynamicFactorOptions.FirstOrDefault(o => o.Id == value.EconomicFactorId);
         }
         finally
@@ -110,7 +128,7 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();
     partial void OnAmountChanged(decimal value) => ScheduleValidateAndSave();
-    partial void OnIntervalChanged(string value) => ScheduleValidateAndSave();
+    partial void OnIntervalChanged(CashflowInterval value) => ScheduleValidateAndSave();
     partial void OnStartDateChanged(DateOnly? value) => ScheduleValidateAndSave();
     partial void OnEndDateChanged(DateOnly? value) => ScheduleValidateAndSave();
 
@@ -176,7 +194,8 @@ public partial class CashflowStreamsViewModel : ValidatingViewModelBase
         EditingId = null;
         Name = string.Empty;
         Amount = 0;
-        Interval = "Monthly";
+        Interval = CashflowInterval.Monthly;
+        SelectedIntervalOption = IntervalOptions.Count > 0 ? IntervalOptions[0] : null;
         var start = _currentProjectService.Current?.Parameters.SimulationStart ?? DateOnly.FromDateTime(DateTime.Today);
         StartDate = start;
         EndDate = null;

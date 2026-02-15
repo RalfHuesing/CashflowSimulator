@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
-             xmlns:primitives="using:Avalonia.Controls.Primitives"
              x:Class="CashflowSimulator.Desktop.Common.Controls.MasterDetailView">
     
     <Grid RowDefinitions="*, 4, Auto" 
@@ -26,19 +25,21 @@
             
             <ContentPresenter Content="{Binding DetailContent, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"/>
             
-            <primitives:UniformGrid Rows="1" Columns="3"
-                         ColumnSpacing="{StaticResource MasterDetailButtonSpacing}"
-                         MaxWidth="{StaticResource MasterDetailButtonsMaxWidth}"
-                         HorizontalAlignment="Right"
-                         Margin="{StaticResource FormActionsMargin}">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="{StaticResource MasterDetailButtonSpacing}"
+                        Margin="{StaticResource FormActionsMargin}">
                 <Button Content="Neu"
+                        Width="120" Height="32"
                         Command="{Binding NewCommand, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"
                         Classes="primary"/>
                 <Button Content="Speichern"
+                        Width="120" Height="32"
                         Command="{Binding SaveCommand, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"/>
                 <Button Content="Löschen"
+                        Width="120" Height="32"
                         Command="{Binding DeleteCommand, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"/>
-            </primitives:UniformGrid>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

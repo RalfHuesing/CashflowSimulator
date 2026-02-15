@@ -12,6 +12,7 @@
              RequestedThemeVariant="Light">
     <Application.Resources>
         <converters:DateOnlyConverter x:Key="DateOnlyConverter" />
+        <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </Application.Resources>
     <Application.DataTemplates>
         <DataTemplate DataType="meta:MetaEditViewModel">

@@ -24,8 +24,11 @@
                           HorizontalAlignment="Stretch">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                        <DataGridTextColumn Header="Modell" Width="120" Binding="{Binding ModelType}"/>
-                        <DataGridTemplateColumn Header="Drift" Width="80" SortMemberPath="ExpectedReturn">
+                        <DataGridTextColumn Header="Modell" Width="140" Binding="{Binding ModelType, Converter={StaticResource EnumDescriptionConverter}}"/>
+                        <DataGridTemplateColumn Width="90" SortMemberPath="ExpectedReturn">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Drift" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ExpectedReturn, StringFormat='{}{0:P2}'}"
@@ -35,7 +38,10 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Vola" Width="80" SortMemberPath="Volatility">
+                        <DataGridTemplateColumn Width="90" SortMemberPath="Volatility">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Vola" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Volatility, StringFormat='{}{0:P2}'}"
@@ -45,7 +51,19 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Initial" Width="80" Binding="{Binding InitialValue}"/>
+                        <DataGridTemplateColumn Width="90" SortMemberPath="InitialValue">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Initial" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding InitialValue}"
+                                               TextAlignment="Right"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>

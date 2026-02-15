@@ -76,7 +76,7 @@ public sealed class ValidationRunnerTests
             Name = "Gehalt",
             Type = CashflowType.Income,
             Amount = 1000,
-            Interval = "Monthly",
+            Interval = CashflowInterval.Monthly,
             StartDate = DateOnly.FromDateTime(DateTime.Today)
         };
         var result = ValidationRunner.Validate(dto);
@@ -93,7 +93,7 @@ public sealed class ValidationRunnerTests
             Name = "",
             Type = CashflowType.Income,
             Amount = 0,
-            Interval = "Monthly",
+            Interval = CashflowInterval.Monthly,
             StartDate = DateOnly.FromDateTime(DateTime.Today)
         };
         var result = ValidationRunner.Validate(dto);

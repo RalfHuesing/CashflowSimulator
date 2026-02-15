@@ -33,6 +33,7 @@
         <Thickness x:Key="HeaderIconMargin">0,0,16,0</Thickness>
         <Thickness x:Key="NavItemMargin">0,2</Thickness>
         <Thickness x:Key="NavIconMargin">8,0,0,0</Thickness>
+        <Thickness x:Key="DataGridHeaderPadding">12,8,12,8</Thickness>
 
         <sys:Double x:Key="SpacingMediumValue">20</sys:Double>
         <sys:Double x:Key="SpacingSmallValue">8</sys:Double>
