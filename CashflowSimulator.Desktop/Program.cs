@@ -14,6 +14,9 @@ using CashflowSimulator.Desktop.Features.Korrelationen;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
+using CashflowSimulator.Desktop.Features.TaxProfiles;
+using CashflowSimulator.Desktop.Features.StrategyProfiles;
+using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Engine.Services.Defaults;
@@ -80,6 +83,12 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<Func<PortfolioViewModel>>(sp => () => sp.GetRequiredService<PortfolioViewModel>());
                 services.AddTransient<TransactionsViewModel>();
                 services.AddSingleton<Func<TransactionsViewModel>>(sp => () => sp.GetRequiredService<TransactionsViewModel>());
+                services.AddTransient<TaxProfilesViewModel>();
+                services.AddSingleton<Func<TaxProfilesViewModel>>(sp => () => sp.GetRequiredService<TaxProfilesViewModel>());
+                services.AddTransient<StrategyProfilesViewModel>();
+                services.AddSingleton<Func<StrategyProfilesViewModel>>(sp => () => sp.GetRequiredService<StrategyProfilesViewModel>());
+                services.AddTransient<LifecyclePhasesViewModel>();
+                services.AddSingleton<Func<LifecyclePhasesViewModel>>(sp => () => sp.GetRequiredService<LifecyclePhasesViewModel>());
                 services.AddTransient<SettingsViewModel>();
                 services.AddSingleton<Func<SettingsViewModel>>(sp => () => sp.GetRequiredService<SettingsViewModel>());
                 services.AddSingleton<Func<CashflowType, CashflowStreamsViewModel>>(sp => type =>

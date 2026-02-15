@@ -9,6 +9,9 @@ using CashflowSimulator.Desktop.Features.Korrelationen;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
+using CashflowSimulator.Desktop.Features.TaxProfiles;
+using CashflowSimulator.Desktop.Features.StrategyProfiles;
+using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -37,6 +40,9 @@ public partial class MainShellViewModel : ObservableObject
     private readonly Func<AssetClassesViewModel> _createAssetClassesViewModel;
     private readonly Func<PortfolioViewModel> _createPortfolioViewModel;
     private readonly Func<TransactionsViewModel> _createTransactionsViewModel;
+    private readonly Func<TaxProfilesViewModel> _createTaxProfilesViewModel;
+    private readonly Func<StrategyProfilesViewModel> _createStrategyProfilesViewModel;
+    private readonly Func<LifecyclePhasesViewModel> _createLifecyclePhasesViewModel;
     private readonly Func<SettingsViewModel> _createSettingsViewModel;
     private readonly ILogger<MainShellViewModel> _logger;
 
@@ -53,6 +59,9 @@ public partial class MainShellViewModel : ObservableObject
         Func<AssetClassesViewModel> createAssetClassesViewModel,
         Func<PortfolioViewModel> createPortfolioViewModel,
         Func<TransactionsViewModel> createTransactionsViewModel,
+        Func<TaxProfilesViewModel> createTaxProfilesViewModel,
+        Func<StrategyProfilesViewModel> createStrategyProfilesViewModel,
+        Func<LifecyclePhasesViewModel> createLifecyclePhasesViewModel,
         Func<SettingsViewModel> createSettingsViewModel,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
@@ -69,6 +78,9 @@ public partial class MainShellViewModel : ObservableObject
         _createAssetClassesViewModel = createAssetClassesViewModel;
         _createPortfolioViewModel = createPortfolioViewModel;
         _createTransactionsViewModel = createTransactionsViewModel;
+        _createTaxProfilesViewModel = createTaxProfilesViewModel;
+        _createStrategyProfilesViewModel = createStrategyProfilesViewModel;
+        _createLifecyclePhasesViewModel = createLifecyclePhasesViewModel;
         _createSettingsViewModel = createSettingsViewModel;
         _logger = logger;
         Navigation = navigationViewModel;
@@ -88,6 +100,9 @@ public partial class MainShellViewModel : ObservableObject
         OpenAnlageklassenCommand.NotifyCanExecuteChanged();
         OpenVermoegenswerteCommand.NotifyCanExecuteChanged();
         OpenTransaktionenCommand.NotifyCanExecuteChanged();
+        OpenSteuerprofileCommand.NotifyCanExecuteChanged();
+        OpenStrategieprofileCommand.NotifyCanExecuteChanged();
+        OpenLebensphasenCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
@@ -136,6 +151,9 @@ public partial class MainShellViewModel : ObservableObject
         OpenAnlageklassenCommand.NotifyCanExecuteChanged();
         OpenVermoegenswerteCommand.NotifyCanExecuteChanged();
         OpenTransaktionenCommand.NotifyCanExecuteChanged();
+        OpenSteuerprofileCommand.NotifyCanExecuteChanged();
+        OpenStrategieprofileCommand.NotifyCanExecuteChanged();
+        OpenLebensphasenCommand.NotifyCanExecuteChanged();
     }
 
     private string GetCurrentProjectTitle()
@@ -227,6 +245,27 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenGeplanteAusgabenCommand,
             IsActive = false
         };
+        var steuerprofileItem = new NavItemViewModel
+        {
+            DisplayName = "Steuerprofile",
+            Icon = Symbol.Receipt,
+            Command = OpenSteuerprofileCommand,
+            IsActive = false
+        };
+        var strategieprofileItem = new NavItemViewModel
+        {
+            DisplayName = "Strategieprofile",
+            Icon = Symbol.Target,
+            Command = OpenStrategieprofileCommand,
+            IsActive = false
+        };
+        var lebensphasenItem = new NavItemViewModel
+        {
+            DisplayName = "Lebensphasen",
+            Icon = Symbol.Person,
+            Command = OpenLebensphasenCommand,
+            IsActive = false
+        };
         var einstellungenItem = new NavItemViewModel
         {
             DisplayName = "Einstellungen",
@@ -246,6 +285,9 @@ public partial class MainShellViewModel : ObservableObject
         Navigation.Items.Add(laufendeAusgabenItem);
         Navigation.Items.Add(geplanteEinnahmenItem);
         Navigation.Items.Add(geplanteAusgabenItem);
+        Navigation.Items.Add(steuerprofileItem);
+        Navigation.Items.Add(strategieprofileItem);
+        Navigation.Items.Add(lebensphasenItem);
         Navigation.Items.Add(einstellungenItem);
     }
 
@@ -416,12 +458,38 @@ public partial class MainShellViewModel : ObservableObject
 
     private bool CanOpenCashflow() => _currentProjectService.Current is not null;
 
+    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
+    private void OpenSteuerprofile()
+    {
+        _logger.LogDebug("Steuerprofile geöffnet.");
+        CurrentContentViewModel = _createTaxProfilesViewModel();
+        SetActiveNavigationItem(11);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
+    private void OpenStrategieprofile()
+    {
+        _logger.LogDebug("Strategieprofile geöffnet.");
+        CurrentContentViewModel = _createStrategyProfilesViewModel();
+        SetActiveNavigationItem(12);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
+    private void OpenLebensphasen()
+    {
+        _logger.LogDebug("Lebensphasen geöffnet.");
+        CurrentContentViewModel = _createLifecyclePhasesViewModel();
+        SetActiveNavigationItem(13);
+    }
+
+    private bool CanOpenLifecycle() => _currentProjectService.Current is not null;
+
     [RelayCommand]
     private void OpenSettings()
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _createSettingsViewModel();
-        SetActiveNavigationItem(11);
+        SetActiveNavigationItem(14);
     }
 
     private void SetActiveNavigationItem(int index)

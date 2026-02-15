@@ -79,6 +79,24 @@ public interface ICurrentProjectService
     void UpdateAssetClasses(IReadOnlyList<AssetClassDto> assetClasses);
 
     /// <summary>
+    /// Aktualisiert die Steuer-Profile des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateTaxProfiles(IReadOnlyList<TaxProfileDto> taxProfiles);
+
+    /// <summary>
+    /// Aktualisiert die Strategie-Profile des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateStrategyProfiles(IReadOnlyList<StrategyProfileDto> strategyProfiles);
+
+    /// <summary>
+    /// Aktualisiert die Lebensphasen des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateLifecyclePhases(IReadOnlyList<LifecyclePhaseDto> lifecyclePhases);
+
+    /// <summary>
     /// Wird ausgelöst, wenn sich das Projekt oder der Dateipfad geändert hat.
     /// </summary>
     event EventHandler? ProjectChanged;

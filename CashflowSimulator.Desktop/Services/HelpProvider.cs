@@ -76,6 +76,25 @@ public sealed class HelpProvider : IHelpProvider
         // Dynamisierung in Cashflows
         ["CashflowStreams.EconomicFactorId"] = ("Dynamisierung / Marktfaktor", "Optional: Ein Marktfaktor (z. B. Inflation), an den dieser Cashflow gekoppelt wird. „Keine“ = nominaler Betrag ohne Dynamisierung."),
         ["CashflowEvents.EconomicFactorId"] = ("Dynamisierung / Marktfaktor", "Optional: Ein Marktfaktor (z. B. Inflation), an den dieses Event gekoppelt wird. „Keine“ = nominaler Betrag ohne Dynamisierung."),
+        // Steuerprofile (HelpKeyPrefix = "TaxProfiles")
+        ["TaxProfiles"] = ("Steuerprofile", "Steuersätze und Freibeträge pro Lebensphase (z. B. Erwerbsleben vs. Rente). Jede Lebensphase verweist auf ein Steuer-Profil."),
+        ["TaxProfiles.Id"] = ("ID (eindeutig)", "Eindeutige Kennung des Steuer-Profils. Wird von Lebensphasen referenziert. Keine Leerzeichen."),
+        ["TaxProfiles.Name"] = ("Name", "Anzeigename des Profils (z. B. „Standard (Erwerb)“ oder „Rentenbesteuerung“)."),
+        ["TaxProfiles.CapitalGainsTaxRate"] = ("Kapitalertragsteuer-Satz", "Satz für Kapitalerträge (inkl. Soli, Kirchensteuer) als Dezimal 0–1. Beispiel: 0,26375 = 26,375 % (Abgeltungsteuer in Deutschland)."),
+        ["TaxProfiles.TaxFreeAllowance"] = ("Freibetrag", "Sparerpauschbetrag bzw. Freibetrag für Kapitalerträge in Euro (z. B. 1000 €)."),
+        ["TaxProfiles.IncomeTaxRate"] = ("Einkommensteuer-Satz", "Satz für nachgelagerte Besteuerung (z. B. Rente) als Dezimal 0–1. In der Rente oft niedriger als im Erwerbsleben."),
+        // Strategieprofile (HelpKeyPrefix = "StrategyProfiles")
+        ["StrategyProfiles"] = ("Strategieprofile", "Liquiditätsreserve, Rebalancing und Lookahead pro Lebensphase (z. B. Aufbau vs. Entnahme). Werden von Lebensphasen referenziert."),
+        ["StrategyProfiles.Id"] = ("ID (eindeutig)", "Eindeutige Kennung des Strategie-Profils. Wird von Lebensphasen referenziert."),
+        ["StrategyProfiles.Name"] = ("Name", "Anzeigename des Profils (z. B. „Aufbau“ oder „Entnahme“)."),
+        ["StrategyProfiles.CashReserveMonths"] = ("Liquiditätsreserve (Monate)", "Anzahl Monatsausgaben als liquide Reserve (Notgroschen). Typisch 3–12 Monate."),
+        ["StrategyProfiles.RebalancingThreshold"] = ("Rebalancing-Schwelle", "Abweichungsschwelle (z. B. 0,05 = 5 %), ab der umgeschichtet wird. Größere Werte = selteneres Rebalancing."),
+        ["StrategyProfiles.LookaheadMonths"] = ("Lookahead (Monate)", "Wie viele Monate voraus auf geplante Events (Cashflow-Events) gespart wird. Relevant für Liquiditätsplanung."),
+        // Lebensphasen (HelpKeyPrefix = "LifecyclePhases")
+        ["LifecyclePhases"] = ("Lebensphasen", "Phasen ab Alter (z. B. Ansparphase ab Start, Rentenphase ab 67). Pro Phase: Steuer-Profil, Strategie-Profil und optionale Zielallokation."),
+        ["LifecyclePhases.StartAge"] = ("Startalter", "Alter in Jahren, ab dem diese Phase aktiv ist. 0 = von Simulationsstart an. Die Engine wählt pro Monat die Phase anhand des Alters."),
+        ["LifecyclePhases.TaxProfileId"] = ("Steuer-Profil", "Welches Steuer-Profil in dieser Phase gilt (Kapitalertragsteuer, Freibetrag, Einkommensteuer für Rente)."),
+        ["LifecyclePhases.StrategyProfileId"] = ("Strategie-Profil", "Welches Strategie-Profil in dieser Phase gilt (Liquiditätsreserve, Rebalancing, Lookahead)."),
     }.ToFrozenDictionary();
 
     /// <inheritdoc />

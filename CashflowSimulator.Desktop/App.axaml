@@ -9,6 +9,9 @@
              xmlns:marktdaten="clr-namespace:CashflowSimulator.Desktop.Features.Marktdaten;assembly=CashflowSimulator.Desktop"
              xmlns:korrelationen="clr-namespace:CashflowSimulator.Desktop.Features.Korrelationen;assembly=CashflowSimulator.Desktop"
              xmlns:portfolio="clr-namespace:CashflowSimulator.Desktop.Features.Portfolio;assembly=CashflowSimulator.Desktop"
+             xmlns:taxProfiles="clr-namespace:CashflowSimulator.Desktop.Features.TaxProfiles;assembly=CashflowSimulator.Desktop"
+             xmlns:strategyProfiles="clr-namespace:CashflowSimulator.Desktop.Features.StrategyProfiles;assembly=CashflowSimulator.Desktop"
+             xmlns:lifecyclePhases="clr-namespace:CashflowSimulator.Desktop.Features.LifecyclePhases;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
     <Application.Resources>
@@ -65,6 +68,21 @@
             <portfolio:TransactionsView DataContext="{Binding}"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="taxProfiles:TaxProfilesViewModel">
+            <taxProfiles:TaxProfilesView DataContext="{Binding}"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="strategyProfiles:StrategyProfilesViewModel">
+            <strategyProfiles:StrategyProfilesView DataContext="{Binding}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="lifecyclePhases:LifecyclePhasesViewModel">
+            <lifecyclePhases:LifecyclePhasesView DataContext="{Binding}"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch"/>
         </DataTemplate>
     </Application.DataTemplates>
 

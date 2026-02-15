@@ -147,6 +147,42 @@ public sealed class CurrentProjectService : ICurrentProjectService
         OnProjectChanged();
     }
 
+    /// <inheritdoc />
+    public void UpdateTaxProfiles(IReadOnlyList<TaxProfileDto> taxProfiles)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { TaxProfiles = taxProfiles.ToList() };
+        });
+        OnProjectChanged();
+    }
+
+    /// <inheritdoc />
+    public void UpdateStrategyProfiles(IReadOnlyList<StrategyProfileDto> strategyProfiles)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { StrategyProfiles = strategyProfiles.ToList() };
+        });
+        OnProjectChanged();
+    }
+
+    /// <inheritdoc />
+    public void UpdateLifecyclePhases(IReadOnlyList<LifecyclePhaseDto> lifecyclePhases)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { LifecyclePhases = lifecyclePhases.ToList() };
+        });
+        OnProjectChanged();
+    }
+
     private void WithLock(Action action)
     {
         using (_lock.EnterScope())
