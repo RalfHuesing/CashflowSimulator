@@ -69,6 +69,8 @@
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <CalendarDatePicker Grid.Row="3" Grid.Column="1" Classes="form-input"
                                         SelectedDate="{Binding StartDate}"
+                                        SelectedDateFormat="Custom"
+                                        CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ"
                                         Margin="{StaticResource FormInputMargin}"
                                         behaviors:FocusHelpBehavior.HelpKey="StartDate"
@@ -78,6 +80,8 @@
                                Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
                     <CalendarDatePicker Grid.Row="4" Grid.Column="1" Classes="form-input"
                                         SelectedDate="{Binding EndDate}"
+                                        SelectedDateFormat="Custom"
+                                        CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ (leer = unbegrenzt)"
                                         Margin="{StaticResource FormInputMarginLast}"
                                         behaviors:FocusHelpBehavior.HelpKey="EndDate"

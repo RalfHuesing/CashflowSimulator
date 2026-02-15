@@ -19,6 +19,8 @@
                 <CalendarDatePicker Grid.Row="0" Grid.Column="1"
                                     Classes="form-input"
                                     SelectedDate="{Binding DateOfBirth}"
+                                    SelectedDateFormat="Custom"
+                                    CustomDateFormatString="dd.MM.yyyy"
                                     Watermark="TT.MM.JJJJ"
                                     Margin="{StaticResource FormInputMargin}"
                                     TabIndex="1"

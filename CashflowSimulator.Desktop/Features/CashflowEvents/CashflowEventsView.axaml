@@ -60,6 +60,8 @@
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <CalendarDatePicker Grid.Row="2" Grid.Column="1" Classes="form-input"
                                         SelectedDate="{Binding TargetDate}"
+                                        SelectedDateFormat="Custom"
+                                        CustomDateFormatString="dd.MM.yyyy"
                                         Watermark="TT.MM.JJJJ"
                                         Margin="{StaticResource FormInputMargin}"
                                         behaviors:FocusHelpBehavior.HelpKey="TargetDate"
