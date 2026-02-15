@@ -1,65 +1,106 @@
-# Cashflow Simulator
+# CashflowSimulator
 
-## ‹berblick
+![License](https://img.shields.io/github/license/DEIN_USERNAME/CashflowSimulator)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
+![Status](https://img.shields.io/badge/status-pre--alpha-red)
 
-Der Cashflow Simulator ist mehr als ein einfacher Renditerechner. Er bildet die finanzielle Lebenssituation eines Nutzers ¸ber Dekaden und verschiedene Lebensphasen hinweg ab. **Zielgruppe:** Deutsche mit langfristiger Finanzplanung (Anspar- und Rentenphase).
-
-## Wozu? ? Kernfragen
-
-Die Anwendung soll unter anderem beantworten:
-
-- Kann ich mir das 3. Auto in 25 Jahren leisten?
-- Wieviel Cash brauche ich in einem gegebenen Lebensabschnitt (Anspar- oder Entsparphase), um die n‰chsten N Jahre auch bei Bˆrsencrashs abgesichert zu sein?
-- Wieviel kann ich heute langfristig investieren, ohne mein definiertes Cash-Bucket zu gef‰hrden?
-- In welche Assets soll investiert werden ? inkl. Rebalancing-Strategie?
-- Verschiedene Korrelationen und Strategien ¸ber die Lebensphasen simulieren; Verk‰ufe und Steuereffekte sind dabei zu ber¸cksichtigen.
-
-## Konzepte
-
-### Lebensabschnitte
-
-Es kˆnnen Lebensabschnitte definiert werden (z.B. Ansparphase und Rentenphase). Pro Abschnitt: Beginn- und Endalter sowie ein **Lookahead-Zeitraum**. In diesem Zeitraum soll versucht werden, alle geplanten Ausgaben als Cash vorzuhalten. Typisch sind zwei Abschnitte: Ansparphase und Rentenphase.
-
-### Cashflows
-
-- **Laufend:** Einnahmen und Ausgaben.
-- **Einmalig:** Geplante Einnahmen und Ausgaben (z.B. Auto in X Jahren).
-
-Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter innerhalb dieses Abschnitts. In der Entsparphase kˆnnen sich Werte und Verhalten ‰ndern (z.B. andere Miete/Kosten) ? daf¸r kˆnnen entsprechende Flows gepflegt werden.
-
-**Unsicherheit:** Einige Events haben eine Toleranz (z.B. ?Auto in 10?12 Jahren?); das darauf folgende Event verschiebt sich entsprechend (z.B. +10 Jahre Abstand).
-
-### Portfolio
-
-- Ein Portfolio besteht aus **Assetallokationen** (z.B. MSCI World 60 %, Anleihen 40 %).
-- Jede Allokation hat erwartete Rendite und Volatilit‰t (f¸r die Monte-Carlo-Simulation).
-- Pro Asset kˆnnen mehrere Wertpapiere existieren (z.B. verschiedene MSCI-World-ETFs ¸ber die Jahre). Nur ein Wertpapier pro Asset ist ?aktiv? und wird beim **Kauf** (Sparplan) verwendet.
-- Beim **Verkauf** wird steueroptimiert entschieden (FIFO, Transaktionshistorie mit Kauf, Verkauf, Dividenden, Vorabpauschale). Get‰tigte Verk‰ufe flieﬂen in die Akkumulation ein.
-
-**Rebalancing:**
-
-- **Per Sparplan:** Neues Geld wird in untergewichtete Assets gelenkt.
-- **Aktiv:** Wenn die Ist-Allokation um mehr als **X %** von der Zielallokation abweicht, wird durch Verkauf/Kauf rebalanciert. Die Schwelle **X %** ist konfigurierbar.
-
-### Unsicherheit und Simulation
-
-- Zuk¸nftige Wertschwankungen werden per **Monte-Carlo-Simulation** und Perzentil-Auswertung abgesch‰tzt.
-- **Inflation** wird ebenfalls als Monte-Carlo modelliert (z.B. erwartete negative reale Rendite, Volatilit‰t konfigurierbar, ggf. 0).
-- Gleiches gilt f¸r Gehalt und andere Cashflows sowie Wertpapiere. Die Schwankungsbereiche werden zentral definiert und den jeweiligen Assets bzw. Cashflows zugeordnet.
-
-### Stammdaten und Steuern
-
-- **Stammdaten:** u.a. Geburtsdatum (und Rentenalter).
-- **Steuern:** Verk‰ufe ¸ber Dekaden (FIFO, Vorabpauschale etc.) werden in der Simulation ber¸cksichtigt.
-
-## Szenarien
-
-Ein **Szenario** ist die vollst‰ndige Sammlung aller Eingaben f¸r eine Planungsvariante (Person, Cashflows, Portfolio, Strategie, Optionen). Es kˆnnen beliebig viele Szenarien angelegt werden; jedes wird typischerweise als eine Projektdatei (z.B. `Szenario.json`) gespeichert.
-
-## Validierung
-
-Validierung l‰uft zentral ¸ber **FluentValidation** im Projekt **CashflowSimulator.Validation**. Desktop und Engine nutzen dieselben Regeln; Fehler werden in der Desktop-App im zentralen Meldungsbereich der Shell angezeigt. Keine Validierung im XAML. Details in **`.cursor/rules/main.md`**.
+> **‚ö†Ô∏è WICHTIGER HINWEIS: PROJEKT IM AUFBAU**
+>
+> Dieses Projekt befindet sich aktuell in einer fr√ºhen Entwicklungsphase (**Pre-Alpha**).
+> Die Software ist **noch nicht funktionsf√§hig** und dient derzeit vor allem der Entwicklung und Architektur-Validierung. Es gibt noch keine ausf√ºhrbaren Releases.
+>
+> *Schau gerne sp√§ter wieder vorbei oder folge dem Projekt, um Updates zu erhalten!*
 
 ---
 
-Technische Architektur, Datenmodell (`SimulationProjectDto`) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.
+## üìñ √úber das Projekt
+
+**CashflowSimulator** ist eine leistungsstarke Desktop-Anwendung zur langfristigen Simulation von Verm√∂gensentwicklung und Cashflows. Anders als einfache Zinseszins-Rechner zielt dieses Tool darauf ab, komplexe finanzielle Realit√§ten abzubilden.
+
+Das Ziel ist eine detaillierte **Vorsorge- und Finanzplanung**, die echte steuerliche Gegebenheiten (Fokus: Deutschland) und Marktvolatilit√§ten ber√ºcksichtigt.
+
+### Geplante Kernfunktionen
+
+* **Detaillierte Verm√∂genssimulation:** Ber√ºcksichtigung von Aktien, Anleihen und ETFs.
+* **Realistische Steuerlogik:** Implementierung des deutschen Steuerrechts (Kapitalertragsteuer, Vorabpauschale, Teilfreistellung, FIFO-Prinzip).
+* **Marktsimulation:** Nutzung von historischen Daten oder Monte-Carlo-Simulationen (Volatilit√§t, Drift), um Risiken sichtbar zu machen.
+* **Cashflow-Events:** Einmalige oder wiederkehrende Einnahmen/Ausgaben (z.B. Gehalt, Renteneintritt, Hauskauf).
+* **Privacy First:** Alle Daten werden lokal gespeichert. Keine Cloud, kein Tracking.
+
+---
+
+## üì∏ Vorschau
+
+*(Hier sp√§ter Screenshots der Benutzeroberfl√§che einf√ºgen, sobald die UI steht)*
+
+---
+
+## üöÄ Installation & Nutzung
+
+### F√ºr Anwender
+Aktuell gibt es noch keine fertige Version zum Herunterladen. Sobald eine stabile Version verf√ºgbar ist, wirst du sie hier unter [Releases](https://github.com/DEIN_USERNAME/CashflowSimulator/releases) finden.
+
+Die Anwendung wird plattform√ºbergreifend f√ºr **Windows, macOS und Linux** verf√ºgbar sein.
+
+### F√ºr Entwickler (Build from Source)
+Wenn du dir den Code ansehen oder beim Aufbau helfen m√∂chtest:
+
+1.  **Voraussetzungen:**
+    * [.NET 9 SDK](https://dotnet.microsoft.com/download)
+    * Eine IDE (Visual Studio 2022, JetBrains Rider oder VS Code)
+
+2.  **Repository klonen:**
+    ```bash
+    git clone [https://github.com/DEIN_USERNAME/CashflowSimulator.git](https://github.com/DEIN_USERNAME/CashflowSimulator.git)
+    cd CashflowSimulator
+    ```
+
+3.  **Projekt bauen:**
+    ```bash
+    dotnet build
+    ```
+
+4.  **Starten (Desktop):**
+    ```bash
+    cd CashflowSimulator.Desktop
+    dotnet run
+    ```
+
+---
+
+## üõ† Technologie-Stack
+
+Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Clean Architecture):
+
+* **Core:** C# / .NET 9
+* **UI Framework:** [Avalonia UI](https://avaloniaui.net/) (f√ºr Cross-Platform Desktop Support)
+* **Architektur:**
+    * `Focus.Engine`: Die reine Rechenlogik (Steuern, Simulation).
+    * `Focus.Contracts`: Datendefinitionen und Schnittstellen.
+    * `Focus.Desktop`: Die MVVM-basierte Benutzeroberfl√§che.
+* **Testing:** xUnit
+
+---
+
+## üó∫ Roadmap
+
+Wir arbeiten aktuell an folgenden Meilensteinen:
+
+- [x] Grundlegende Architektur & Datenmodelle (`Contracts`)
+- [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale)
+- [ ] Validierungslogik f√ºr Eingaben
+- [ ] Aufbau der Benutzeroberfl√§che (Avalonia XAML)
+- [ ] Persistierung (Speichern/Laden von Projekten)
+- [ ] Erste lauff√§hige Beta-Version
+
+---
+
+## ü§ù Mitwirken
+
+Beitr√§ge sind willkommen! Da sich das Projekt noch im Aufbau befindet, √∂ffne bitte zuerst ein **Issue**, bevor du einen Pull Request startest, um gr√∂√üere √Ñnderungen zu besprechen.
+
+---
+
+## üìÑ Lizenz
+
+Dieses Projekt ist unter der [MIT Lizenz](LICENSE) ver√∂ffentlicht.
