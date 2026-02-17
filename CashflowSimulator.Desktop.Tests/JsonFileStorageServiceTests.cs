@@ -24,7 +24,7 @@ public sealed class JsonFileStorageServiceTests
     {
         var sut = CreateSut();
 
-        var result = await sut.LoadAsync("");
+        var result = await sut.LoadAsync("", TestContext.Current.CancellationToken);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("leer", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -35,7 +35,7 @@ public sealed class JsonFileStorageServiceTests
     {
         var sut = CreateSut();
 
-        var result = await sut.LoadAsync("   ");
+        var result = await sut.LoadAsync("   ", TestContext.Current.CancellationToken);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("leer", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -47,7 +47,7 @@ public sealed class JsonFileStorageServiceTests
         var sut = CreateSut();
         var path = Path.Combine(Path.GetTempPath(), $"CashflowSimulator_Test_{Guid.NewGuid():N}.json");
 
-        var result = await sut.LoadAsync(path);
+        var result = await sut.LoadAsync(path, TestContext.Current.CancellationToken);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("nicht gefunden", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -60,9 +60,9 @@ public sealed class JsonFileStorageServiceTests
         var path = Path.GetTempFileName();
         try
         {
-            await File.WriteAllTextAsync(path, "not valid json {");
+            await File.WriteAllTextAsync(path, "not valid json {", TestContext.Current.CancellationToken);
 
-            var result = await sut.LoadAsync(path);
+            var result = await sut.LoadAsync(path, TestContext.Current.CancellationToken);
 
             Assert.False(result.IsSuccess);
             Assert.Contains("JSON", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -81,9 +81,9 @@ public sealed class JsonFileStorageServiceTests
         var path = Path.GetTempFileName();
         try
         {
-            await File.WriteAllTextAsync(path, "null");
+            await File.WriteAllTextAsync(path, "null", TestContext.Current.CancellationToken);
 
-            var result = await sut.LoadAsync(path);
+            var result = await sut.LoadAsync(path, TestContext.Current.CancellationToken);
 
             Assert.False(result.IsSuccess);
             Assert.Contains("gültigen Daten", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -102,9 +102,9 @@ public sealed class JsonFileStorageServiceTests
         var path = Path.GetTempFileName();
         try
         {
-            await File.WriteAllTextAsync(path, """{"name":"Test","value":42}""");
+            await File.WriteAllTextAsync(path, """{"name":"Test","value":42}""", TestContext.Current.CancellationToken);
 
-            var result = await sut.LoadAsync(path);
+            var result = await sut.LoadAsync(path, TestContext.Current.CancellationToken);
 
             Assert.True(result.IsSuccess);
             Assert.NotNull(result.Value);
@@ -124,7 +124,7 @@ public sealed class JsonFileStorageServiceTests
         var sut = CreateSut();
         var data = new TestDto { Name = "A", Value = 1 };
 
-        var result = await sut.SaveAsync("", data);
+        var result = await sut.SaveAsync("", data, TestContext.Current.CancellationToken);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("leer", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -137,7 +137,7 @@ public sealed class JsonFileStorageServiceTests
         var path = Path.GetTempFileName();
         try
         {
-            var result = await sut.SaveAsync(path, null!);
+            var result = await sut.SaveAsync(path, null!, TestContext.Current.CancellationToken);
 
             Assert.False(result.IsSuccess);
             Assert.Contains("Daten", result.Error!, StringComparison.OrdinalIgnoreCase);
@@ -158,11 +158,11 @@ public sealed class JsonFileStorageServiceTests
         var data = new TestDto { Name = "Roundtrip", Value = 99 };
         try
         {
-            var result = await sut.SaveAsync(path, data);
+            var result = await sut.SaveAsync(path, data, TestContext.Current.CancellationToken);
 
             Assert.True(result.IsSuccess);
             Assert.True(File.Exists(path));
-            var json = await File.ReadAllTextAsync(path);
+            var json = await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken);
             Assert.Contains("Roundtrip", json);
             Assert.Contains("99", json);
         }
@@ -183,10 +183,10 @@ public sealed class JsonFileStorageServiceTests
         var original = new TestDto { Name = "Roundtrip", Value = 123 };
         try
         {
-            var saveResult = await sut.SaveAsync(path, original);
+            var saveResult = await sut.SaveAsync(path, original, TestContext.Current.CancellationToken);
             Assert.True(saveResult.IsSuccess);
 
-            var loadResult = await sut.LoadAsync(path);
+            var loadResult = await sut.LoadAsync(path, TestContext.Current.CancellationToken);
             Assert.True(loadResult.IsSuccess);
             Assert.Equal(original.Name, loadResult.Value!.Name);
             Assert.Equal(original.Value, loadResult.Value.Value);
