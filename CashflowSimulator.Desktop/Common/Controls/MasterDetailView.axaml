@@ -19,6 +19,7 @@
                       ResizeBehavior="PreviousAndNext"/>
         
         <Border Grid.Row="2"
+                Background="{StaticResource ContentBackgroundBrush}"
                 MinHeight="{StaticResource MasterDetailDetailMinHeight}"
                 Margin="{StaticResource MasterDetailDetailMargin}">
             <ContentPresenter Content="{Binding DetailContent, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"/>
