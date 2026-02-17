@@ -3,25 +3,25 @@
 
     <!-- Sidebar-Navigation: einheitliche Breite, seriöses Finanz-App-Farbschema -->
 
-    <!-- Gruppen-Expander: volle Breite, transparenter Hintergrund, kein Rahmen -->
+    <!-- Gruppen-Expander: dunkler Hintergrund (abgesetzt zur Sidebar), helle Schrift -->
     <Style Selector="Expander.nav-group">
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0,2,0,8" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Style Selector="^ /template/ ToggleButton#PART_ExpanderToggle">
-            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
             <Setter Property="Foreground" Value="{StaticResource SidebarNavGroupHeaderBrush}" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="Padding" Value="0,6,8,6" />
         </Style>
         <Style Selector="^ /template/ ContentPresenter#PART_ContentSite">
-            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
         </Style>
     </Style>
 
-    <!-- Gruppen-Header-Text: dezente, lesbare Farbe -->
+    <!-- Gruppen-Header-Text: gut lesbar (Bright Silver), mit Teal-Akzent in der View -->
     <Style Selector="TextBlock.nav-group-header">
         <Setter Property="FontSize" Value="{StaticResource NavItemFontSize}" />
         <Setter Property="FontWeight" Value="SemiBold" />
