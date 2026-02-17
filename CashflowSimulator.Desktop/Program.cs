@@ -19,7 +19,6 @@ using CashflowSimulator.Desktop.Features.StrategyProfiles;
 using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
-using CashflowSimulator.Engine.Services;
 using CashflowSimulator.Engine.Services.Defaults;
 using CashflowSimulator.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
