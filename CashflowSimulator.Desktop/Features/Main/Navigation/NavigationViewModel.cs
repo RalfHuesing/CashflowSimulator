@@ -4,24 +4,28 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace CashflowSimulator.Desktop.Features.Main.Navigation;
 
 /// <summary>
-/// Hält die Liste der Navigationselemente.
+/// Hält die gruppierte Navigation (auf-/zuklappbare Sektionen).
 /// Wird als Singleton oder im Scope der MainShell verwendet.
 /// </summary>
 public partial class NavigationViewModel : ObservableObject
 {
     /// <summary>
-    /// Liste der sichtbaren Navigationspunkte.
+    /// Gruppierte Navigationspunkte. Jede Gruppe kann zu- und aufgeklappt werden.
     /// </summary>
-    public ObservableCollection<NavItemViewModel> Items { get; } = [];
+    public ObservableCollection<NavGroupViewModel> Groups { get; } = [];
 
     /// <summary>
-    /// Konstruktor.
-    /// Hier könnten später statische Navigationspunkte (wie "Home") initialisiert werden,
-    /// aktuell erfolgt die Befüllung dynamisch über die MainShell.
+    /// Liefert alle Nav-Items in fester Reihenfolge (gruppenweise).
+    /// Wird für die Active-State-Steuerung nach Index benötigt.
     /// </summary>
-    public NavigationViewModel()
+    public IReadOnlyList<NavItemViewModel> GetAllItems()
     {
-        // Leerer Konstruktor für DI.
-        // Items werden zur Laufzeit von der Shell hinzugefügt (z.B. je nach geladenem Projekt).
+        var list = new List<NavItemViewModel>();
+        foreach (var group in Groups)
+        {
+            foreach (var item in group.Items)
+                list.Add(item);
+        }
+        return list;
     }
 }

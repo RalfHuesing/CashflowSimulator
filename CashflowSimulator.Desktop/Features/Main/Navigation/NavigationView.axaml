@@ -9,31 +9,46 @@
              x:DataType="vm:NavigationViewModel">
 
     <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl ItemsSource="{Binding Groups}">
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="vm:NavItemViewModel">
-                    <Button Classes="ghost" 
-                            Command="{Binding Command}"
-                            HorizontalAlignment="Stretch"
-                            Margin="{StaticResource NavItemMargin}">
-                        <Grid ColumnDefinitions="Auto, 16, *">
-                            <Border Grid.Column="0"
-                                    Width="4" Height="16"
-                                    CornerRadius="2"
-                                    Background="{DynamicResource PrimaryActionBrush}"
-                                    IsVisible="{Binding IsActive}"
-                                    HorizontalAlignment="Left"/>
-                            
-                            <fi:SymbolIcon Grid.Column="0" 
-                                           Symbol="{Binding Icon}" 
-                                           FontSize="{StaticResource NavIconSize}"
-                                           Margin="{StaticResource NavIconMargin}"/>
+                <DataTemplate DataType="vm:NavGroupViewModel">
+                    <Expander IsExpanded="{Binding IsExpanded}"
+                               Margin="0,0,0,4">
+                        <Expander.Header>
+                            <TextBlock Text="{Binding DisplayName}"
+                                       Classes="nav-item-text"
+                                       FontWeight="SemiBold"/>
+                        </Expander.Header>
+                        <ItemsControl ItemsSource="{Binding Items}"
+                                      Margin="{StaticResource NavIconMargin},0,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:NavItemViewModel">
+                                    <Button Classes="ghost"
+                                            Command="{Binding Command}"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="{StaticResource NavItemMargin}">
+                                        <Grid ColumnDefinitions="Auto, 16, *">
+                                            <Border Grid.Column="0"
+                                                    Width="4" Height="16"
+                                                    CornerRadius="2"
+                                                    Background="{DynamicResource PrimaryActionBrush}"
+                                                    IsVisible="{Binding IsActive}"
+                                                    HorizontalAlignment="Left"/>
 
-                            <TextBlock Grid.Column="2" 
-                                       Text="{Binding DisplayName}" 
-                                       Classes="nav-item-text"/>
-                        </Grid>
-                    </Button>
+                                            <fi:SymbolIcon Grid.Column="0"
+                                                           Symbol="{Binding Icon}"
+                                                           FontSize="{StaticResource NavIconSize}"
+                                                           Margin="{StaticResource NavIconMargin}"/>
+
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding DisplayName}"
+                                                       Classes="nav-item-text"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

@@ -248,22 +248,43 @@ public partial class MainShellViewModel : ObservableObject
             IsActive = false
         };
 
-        Navigation.Items.Add(szenarioItem);
-        Navigation.Items.Add(eckdatenItem);
-        Navigation.Items.Add(marktdatenItem);
-        Navigation.Items.Add(korrelationenItem);
-        Navigation.Items.Add(anlageklassenItem);
-        Navigation.Items.Add(vermoegenswerteItem);
-        Navigation.Items.Add(transaktionenItem);
-        Navigation.Items.Add(laufendeEinnahmenItem);
-        Navigation.Items.Add(laufendeAusgabenItem);
-        Navigation.Items.Add(geplanteEinnahmenItem);
-        Navigation.Items.Add(geplanteAusgabenItem);
-        Navigation.Items.Add(steuerprofileItem);
-        Navigation.Items.Add(strategieprofileItem);
-        Navigation.Items.Add(allocationProfilesItem);
-        Navigation.Items.Add(lebensphasenItem);
-        Navigation.Items.Add(einstellungenItem);
+        var groupSzenario = new NavGroupViewModel { DisplayName = "Szenario" };
+        groupSzenario.Items.Add(szenarioItem);
+
+        var groupStammdaten = new NavGroupViewModel { DisplayName = "Stammdaten" };
+        groupStammdaten.Items.Add(eckdatenItem);
+        groupStammdaten.Items.Add(marktdatenItem);
+        groupStammdaten.Items.Add(korrelationenItem);
+        groupStammdaten.Items.Add(anlageklassenItem);
+
+        var groupVermoegen = new NavGroupViewModel { DisplayName = "Vermögen & Cashflow" };
+        groupVermoegen.Items.Add(vermoegenswerteItem);
+        groupVermoegen.Items.Add(transaktionenItem);
+
+        var groupEinnahmenAusgaben = new NavGroupViewModel { DisplayName = "Einnahmen & Ausgaben" };
+        groupEinnahmenAusgaben.Items.Add(laufendeEinnahmenItem);
+        groupEinnahmenAusgaben.Items.Add(laufendeAusgabenItem);
+        groupEinnahmenAusgaben.Items.Add(geplanteEinnahmenItem);
+        groupEinnahmenAusgaben.Items.Add(geplanteAusgabenItem);
+
+        var groupProfile = new NavGroupViewModel { DisplayName = "Profile" };
+        groupProfile.Items.Add(steuerprofileItem);
+        groupProfile.Items.Add(strategieprofileItem);
+        groupProfile.Items.Add(allocationProfilesItem);
+
+        var groupLebensplanung = new NavGroupViewModel { DisplayName = "Lebensplanung" };
+        groupLebensplanung.Items.Add(lebensphasenItem);
+
+        var groupApp = new NavGroupViewModel { DisplayName = "App" };
+        groupApp.Items.Add(einstellungenItem);
+
+        Navigation.Groups.Add(groupSzenario);
+        Navigation.Groups.Add(groupStammdaten);
+        Navigation.Groups.Add(groupVermoegen);
+        Navigation.Groups.Add(groupEinnahmenAusgaben);
+        Navigation.Groups.Add(groupProfile);
+        Navigation.Groups.Add(groupLebensplanung);
+        Navigation.Groups.Add(groupApp);
     }
 
     [RelayCommand]
@@ -477,8 +498,9 @@ public partial class MainShellViewModel : ObservableObject
 
     private void SetActiveNavigationItem(int index)
     {
-        for (var i = 0; i < Navigation.Items.Count; i++)
-            Navigation.Items[i].IsActive = i == index;
+        var all = Navigation.GetAllItems();
+        for (var i = 0; i < all.Count; i++)
+            all[i].IsActive = i == index;
     }
 
 }
