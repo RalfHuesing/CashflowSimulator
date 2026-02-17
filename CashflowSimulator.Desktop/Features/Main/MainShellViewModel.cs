@@ -11,6 +11,7 @@ using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
+using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -66,6 +67,7 @@ public partial class MainShellViewModel : ObservableObject
         OpenTransaktionenCommand.NotifyCanExecuteChanged();
         OpenSteuerprofileCommand.NotifyCanExecuteChanged();
         OpenStrategieprofileCommand.NotifyCanExecuteChanged();
+        OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
         OpenLebensphasenCommand.NotifyCanExecuteChanged();
     }
 
@@ -117,6 +119,7 @@ public partial class MainShellViewModel : ObservableObject
         OpenTransaktionenCommand.NotifyCanExecuteChanged();
         OpenSteuerprofileCommand.NotifyCanExecuteChanged();
         OpenStrategieprofileCommand.NotifyCanExecuteChanged();
+        OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
         OpenLebensphasenCommand.NotifyCanExecuteChanged();
     }
 
@@ -223,6 +226,13 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenStrategieprofileCommand,
             IsActive = false
         };
+        var allocationProfilesItem = new NavItemViewModel
+        {
+            DisplayName = "Allokationsprofile",
+            Icon = Symbol.Grid,
+            Command = OpenAllocationProfilesCommand,
+            IsActive = false
+        };
         var lebensphasenItem = new NavItemViewModel
         {
             DisplayName = "Lebensphasen",
@@ -251,6 +261,7 @@ public partial class MainShellViewModel : ObservableObject
         Navigation.Items.Add(geplanteAusgabenItem);
         Navigation.Items.Add(steuerprofileItem);
         Navigation.Items.Add(strategieprofileItem);
+        Navigation.Items.Add(allocationProfilesItem);
         Navigation.Items.Add(lebensphasenItem);
         Navigation.Items.Add(einstellungenItem);
     }
@@ -439,11 +450,19 @@ public partial class MainShellViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
+    private void OpenAllocationProfiles()
+    {
+        _logger.LogDebug("Allokationsprofile geöffnet.");
+        CurrentContentViewModel = _navigationService.Create<AllocationProfilesViewModel>();
+        SetActiveNavigationItem(13);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
     private void OpenLebensphasen()
     {
         _logger.LogDebug("Lebensphasen geöffnet.");
         CurrentContentViewModel = _navigationService.Create<LifecyclePhasesViewModel>();
-        SetActiveNavigationItem(13);
+        SetActiveNavigationItem(14);
     }
 
     private bool CanOpenLifecycle() => _currentProjectService.Current is not null;
@@ -453,7 +472,7 @@ public partial class MainShellViewModel : ObservableObject
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _navigationService.Create<SettingsViewModel>();
-        SetActiveNavigationItem(14);
+        SetActiveNavigationItem(15);
     }
 
     private void SetActiveNavigationItem(int index)

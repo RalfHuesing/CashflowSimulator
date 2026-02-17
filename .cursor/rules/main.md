@@ -5,7 +5,7 @@ Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Archite
 ## Projekt- und Domain-Überblick
 
 - **Produkt:** Cashflow Simulator – finanzielle Lebenssimulation für deutsche Nutzer über Dekaden (Anspar- und Rentenphase).
-- **Kernkonzepte:** Szenarien, SimulationProjectDto, Lebensabschnitte, Cashflows (Einnahmen/Ausgaben), Portfolio/Assets, Monte-Carlo-Simulation, Steuerlogik (FIFO, Vorabpauschale), externe Kursdaten (über Interfaces).
+- **Kernkonzepte:** Szenarien, SimulationProjectDto, Lebensabschnitte, Cashflows (Einnahmen/Ausgaben), Portfolio/Assets, Allokationsprofile (Soll-Allokation pro Lebensphase, optional Glidepath), Monte-Carlo-Simulation, Steuerlogik (FIFO, Vorabpauschale), externe Kursdaten (über Interfaces).
 - **Zielsprache:** Deutsch (keine Lokalisierung).
 
 ## Solution-Struktur und Namenskonvention

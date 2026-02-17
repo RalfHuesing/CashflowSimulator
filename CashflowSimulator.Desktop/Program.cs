@@ -16,6 +16,7 @@ using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
+using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services;
@@ -81,6 +82,7 @@ namespace CashflowSimulator.Desktop
                 services.AddTransient<TransactionsViewModel>();
                 services.AddTransient<TaxProfilesViewModel>();
                 services.AddTransient<StrategyProfilesViewModel>();
+                services.AddTransient<AllocationProfilesViewModel>();
                 services.AddTransient<LifecyclePhasesViewModel>();
                 services.AddTransient<SettingsViewModel>();
                 

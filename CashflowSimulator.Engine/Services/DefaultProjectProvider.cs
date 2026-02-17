@@ -32,7 +32,7 @@ public sealed class DefaultProjectProvider(
         List<AssetClassDto> assetClasses = portfolioDefaultService.GetAssetClasses();
         PortfolioDto portfolio = portfolioDefaultService.GetPortfolio(simulationStart, assetClasses);
 
-        var (taxProfiles, strategyProfiles, lifecyclePhases) = CreateDefaultLifecycleData(parameters);
+        var (taxProfiles, strategyProfiles, allocationProfiles, lifecyclePhases) = CreateDefaultLifecycleData(parameters, assetClasses);
 
         return new SimulationProjectDto
         {
@@ -49,6 +49,7 @@ public sealed class DefaultProjectProvider(
             AssetClasses = assetClasses,
             TaxProfiles = taxProfiles,
             StrategyProfiles = strategyProfiles,
+            AllocationProfiles = allocationProfiles,
             LifecyclePhases = lifecyclePhases,
             Portfolio = portfolio,
             UiSettings = new UiSettingsDto()
@@ -56,15 +57,47 @@ public sealed class DefaultProjectProvider(
     }
 
     /// <summary>
-    /// Erzeugt Standard-Steuer- und Strategie-Profile sowie zwei Lebensphasen (Anspar, Rente).
+    /// Erzeugt Standard-Steuer- und Strategie-Profile, Allokationsprofile sowie zwei Lebensphasen (Anspar, Rente).
     /// </summary>
-    private static (List<TaxProfileDto> TaxProfiles, List<StrategyProfileDto> StrategyProfiles, List<LifecyclePhaseDto> LifecyclePhases)
-        CreateDefaultLifecycleData(SimulationParametersDto parameters)
+    private static (List<TaxProfileDto> TaxProfiles, List<StrategyProfileDto> StrategyProfiles, List<AllocationProfileDto> AllocationProfiles, List<LifecyclePhaseDto> LifecyclePhases)
+        CreateDefaultLifecycleData(SimulationParametersDto parameters, List<AssetClassDto> assetClasses)
     {
         var taxStandardId = Guid.NewGuid().ToString();
         var taxRetirementId = Guid.NewGuid().ToString();
         var strategyBuildId = Guid.NewGuid().ToString();
         var strategyWithdrawId = Guid.NewGuid().ToString();
+        var profileBuildId = Guid.NewGuid().ToString();
+        var profileWithdrawId = Guid.NewGuid().ToString();
+
+        var idAktien = assetClasses.First(c => c.Id == "Aktien_Welt").Id;
+        var idSchwellen = assetClasses.First(c => c.Id == "Schwellenlaender").Id;
+        var idSicherheit = assetClasses.First(c => c.Id == "Sicherheitsbaustein").Id;
+
+        var allocationProfiles = new List<AllocationProfileDto>
+        {
+            new()
+            {
+                Id = profileBuildId,
+                Name = "Aufbau",
+                Entries =
+                [
+                    new AllocationProfileEntryDto { AssetClassId = idAktien, TargetWeight = 0.70m },
+                    new AllocationProfileEntryDto { AssetClassId = idSchwellen, TargetWeight = 0.10m },
+                    new AllocationProfileEntryDto { AssetClassId = idSicherheit, TargetWeight = 0.20m }
+                ]
+            },
+            new()
+            {
+                Id = profileWithdrawId,
+                Name = "Rente",
+                Entries =
+                [
+                    new AllocationProfileEntryDto { AssetClassId = idAktien, TargetWeight = 0.60m },
+                    new AllocationProfileEntryDto { AssetClassId = idSchwellen, TargetWeight = 0m },
+                    new AllocationProfileEntryDto { AssetClassId = idSicherheit, TargetWeight = 0.40m }
+                ]
+            }
+        };
 
         var taxProfiles = new List<TaxProfileDto>
         {
@@ -117,18 +150,22 @@ public sealed class DefaultProjectProvider(
                 StartAge = ageAtStart,
                 TaxProfileId = taxStandardId,
                 StrategyProfileId = strategyBuildId,
-                AssetAllocationOverrides = []
+                AssetAllocationOverrides = [],
+                AllocationProfileId = profileBuildId,
+                GlidepathMonths = 0
             },
             new()
             {
                 StartAge = RetirementAge,
                 TaxProfileId = taxRetirementId,
                 StrategyProfileId = strategyWithdrawId,
-                AssetAllocationOverrides = []
+                AssetAllocationOverrides = [],
+                AllocationProfileId = profileWithdrawId,
+                GlidepathMonths = 60
             }
         };
 
-        return (taxProfiles, strategyProfiles, lifecyclePhases);
+        return (taxProfiles, strategyProfiles, allocationProfiles, lifecyclePhases);
     }
 
     private static int GetAgeInYears(DateOnly dateOfBirth, DateOnly atDate)

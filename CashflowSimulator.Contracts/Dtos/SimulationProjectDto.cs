@@ -34,6 +34,12 @@ public record SimulationProjectDto
     public List<StrategyProfileDto> StrategyProfiles { get; init; } = [];
 
     /// <summary>
+    /// Allokationsprofile (Soll-Gewichtungen pro Anlageklasse). Werden von <see cref="LifecyclePhases"/> referenziert.
+    /// Pro Phase kann ein Profil und optional ein Glidepath (Monate vor Phasenstart) definiert werden.
+    /// </summary>
+    public List<AllocationProfileDto> AllocationProfiles { get; init; } = [];
+
+    /// <summary>
     /// Lebensphasen (z. B. Ansparphase ab Start, Rentenphase ab 67). Pro Phase: Steuer- und Strategie-Profil.
     /// Die Engine wählt pro Monat die Phase anhand des Alters (aus <see cref="SimulationParametersDto.DateOfBirth"/>).
     /// </summary>

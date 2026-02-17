@@ -91,6 +91,12 @@ public interface ICurrentProjectService
     void UpdateStrategyProfiles(IReadOnlyList<StrategyProfileDto> strategyProfiles);
 
     /// <summary>
+    /// Aktualisiert die Allokationsprofile des aktuellen Projekts.
+    /// Löst <see cref="ProjectChanged"/> aus.
+    /// </summary>
+    void UpdateAllocationProfiles(IReadOnlyList<AllocationProfileDto> allocationProfiles);
+
+    /// <summary>
     /// Aktualisiert die Lebensphasen des aktuellen Projekts.
     /// Löst <see cref="ProjectChanged"/> aus.
     /// </summary>

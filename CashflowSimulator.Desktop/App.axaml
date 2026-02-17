@@ -11,6 +11,7 @@
              xmlns:portfolio="clr-namespace:CashflowSimulator.Desktop.Features.Portfolio;assembly=CashflowSimulator.Desktop"
              xmlns:taxProfiles="clr-namespace:CashflowSimulator.Desktop.Features.TaxProfiles;assembly=CashflowSimulator.Desktop"
              xmlns:strategyProfiles="clr-namespace:CashflowSimulator.Desktop.Features.StrategyProfiles;assembly=CashflowSimulator.Desktop"
+             xmlns:allocationProfiles="clr-namespace:CashflowSimulator.Desktop.Features.AllocationProfiles;assembly=CashflowSimulator.Desktop"
              xmlns:lifecyclePhases="clr-namespace:CashflowSimulator.Desktop.Features.LifecyclePhases;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
@@ -79,6 +80,11 @@
             <strategyProfiles:StrategyProfilesView DataContext="{Binding}"
                                                   HorizontalAlignment="Stretch"
                                                   VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="allocationProfiles:AllocationProfilesViewModel">
+            <allocationProfiles:AllocationProfilesView DataContext="{Binding}"
+                                                      HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Stretch"/>
         </DataTemplate>
         <DataTemplate DataType="lifecyclePhases:LifecyclePhasesViewModel">
             <lifecyclePhases:LifecyclePhasesView DataContext="{Binding}"

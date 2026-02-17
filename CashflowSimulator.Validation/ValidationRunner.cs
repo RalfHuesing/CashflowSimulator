@@ -20,6 +20,7 @@ public static class ValidationRunner
     private static readonly CorrelationEntryDtoValidator CorrelationEntryValidator = new();
     private static readonly TaxProfileDtoValidator TaxProfileValidator = new();
     private static readonly StrategyProfileDtoValidator StrategyProfileValidator = new();
+    private static readonly AllocationProfileDtoValidator AllocationProfileValidator = new();
     private static readonly LifecyclePhaseDtoValidator LifecyclePhaseValidator = new();
 
     /// <summary>
@@ -109,6 +110,16 @@ public static class ValidationRunner
     {
         ArgumentNullException.ThrowIfNull(dto);
         var result = StrategyProfileValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="AllocationProfileDto"/> (z. B. für das Allokationsprofil-Formular).
+    /// </summary>
+    public static ValidationResult Validate(AllocationProfileDto dto)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+        var result = AllocationProfileValidator.Validate(dto);
         return ToValidationResult(result);
     }
 

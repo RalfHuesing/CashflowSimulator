@@ -30,7 +30,8 @@ CashflowSimulator.Desktop/
     ├── CashflowEvents/                                    # Geplante Einnahmen/Ausgaben (MasterDetailView, optional Dynamisierung/Marktfaktor)
     ├── TaxProfiles/                                       # Steuer-Profile (MasterDetailView); KapESt, Freibetrag, ESt-Satz
     ├── StrategyProfiles/                                  # Strategie-Profile (MasterDetailView); Liquidität, Rebalancing, Lookahead
-    ├── LifecyclePhases/                                   # Lebensphasen (MasterDetailView); Startalter, Steuer-/Strategie-Profil
+    ├── AllocationProfiles/                                # Allokationsprofile (MasterDetailView); Soll-Gewichtungen pro Anlageklasse, Summe 100 %
+    ├── LifecyclePhases/                                   # Lebensphasen (MasterDetailView); Startalter, Steuer-/Strategie-/Allokationsprofil, Glidepath
     ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
     └── Cashflow/                                          # (später) ggf. weitere Cashflow-Themen
 ```
@@ -50,6 +51,7 @@ CashflowSimulator.Desktop/
 - `CashflowSimulator.Desktop.Features.CashflowEvents` – Geplante Cashflow-Events
 - `CashflowSimulator.Desktop.Features.TaxProfiles` – Steuer-Profile
 - `CashflowSimulator.Desktop.Features.StrategyProfiles` – Strategie-Profile
+- `CashflowSimulator.Desktop.Features.AllocationProfiles` – Allokationsprofile
 - `CashflowSimulator.Desktop.Features.LifecyclePhases` – Lebensphasen
 - `CashflowSimulator.Desktop.Features.Cashflow` – (später)
 
@@ -78,11 +80,12 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 
 ## Lifecycle & Strategie (Datenmodell)
 
-- **Lifecycle-Phasen:** Das Projekt enthält Lebensphasen (`LifecyclePhases`), die durch das Alter getriggert werden (z. B. Ansparphase ab aktuellem Alter, Rentenphase ab 67). Jede Phase hat eine eindeutige **Id** (`IIdentifiable`) für robustes CRUD in der UI. Jede Phase verweist auf ein **Steuer-Profil** (`TaxProfiles`) und ein **Strategie-Profil** (`StrategyProfiles`).
+- **Lifecycle-Phasen:** Das Projekt enthält Lebensphasen (`LifecyclePhases`), die durch das Alter getriggert werden (z. B. Ansparphase ab aktuellem Alter, Rentenphase ab 67). Jede Phase hat eine eindeutige **Id** (`IIdentifiable`) für robustes CRUD in der UI. Jede Phase verweist auf ein **Steuer-Profil** (`TaxProfiles`) und ein **Strategie-Profil** (`StrategyProfiles`); optional auf ein **Allokationsprofil** (`AllocationProfiles`) und **GlidepathMonths** (gleitender Übergang zur Zielallokation).
 - **Steuer-Profile (UI:** `Features/TaxProfiles/`): Master-Detail-View für CRUD. Pro Profil: Kapitalertragsteuer-Satz, Freibetrag, Einkommensteuer-Satz (nachgelagerte Besteuerung). Beim Löschen eines Profils werden Referenzen in Lebensphasen auf leer gesetzt.
 - **Strategie-Profile (UI:** `Features/StrategyProfiles/`): Master-Detail-View für CRUD. Pro Profil: Liquiditätsreserve (Monate), Rebalancing-Schwelle, Mindest-Transaktionsgröße (MinimumTransactionAmount), Lookahead (Monate). Beim Löschen werden Referenzen in Lebensphasen auf leer gesetzt.
-- **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil und Strategie-Profil (ComboBoxen).
-- Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer- und Strategie-Profil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“.
+- **Allokationsprofile (UI:** `Features/AllocationProfiles/`): Master-Detail-View für CRUD. Pro Profil: Name, Liste von Einträgen (Anlageklasse + Zielgewichtung). Summe der Gewichtungen muss 100 % ergeben. Werden von Lebensphasen referenziert; beim Löschen werden Referenzen in Lebensphasen auf leer gesetzt. Navigationseintrag: „Allokationsprofile“.
+- **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil, Strategie-Profil und optional Allokationsprofil (ComboBoxen), Glidepath (Monate).
+- Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer-, Strategie- und ggf. Allokationsprofil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“, jeweils mit Allokationsprofil und Glidepath (60 Monate für die Rentenphase).
 
 ## Erweiterung
 

@@ -47,6 +47,19 @@ public sealed class SimulationProjectValidator : AbstractValidator<SimulationPro
         RuleForEach(x => x.StrategyProfiles)
             .SetValidator(new StrategyProfileDtoValidator());
 
+        RuleForEach(x => x.AllocationProfiles)
+            .SetValidator(new AllocationProfileDtoValidator());
+
+        RuleForEach(x => x.AllocationProfiles)
+            .Must((project, profile) =>
+            {
+                if (profile.Entries is null)
+                    return true;
+                var assetClassIds = project.AssetClasses?.Select(c => c.Id).ToHashSet() ?? new HashSet<string>();
+                return profile.Entries.All(e => assetClassIds.Contains(e.AssetClassId));
+            })
+            .WithMessage("Jeder Eintrag eines Allokationsprofils muss auf eine existierende Anlageklasse verweisen (AssetClassId).");
+
         RuleForEach(x => x.LifecyclePhases)
             .SetValidator(new LifecyclePhaseDtoValidator());
 
@@ -58,6 +71,16 @@ public sealed class SimulationProjectValidator : AbstractValidator<SimulationPro
                 return taxIds.Contains(phase.TaxProfileId) && strategyIds.Contains(phase.StrategyProfileId);
             })
             .WithMessage("Jede Lebensphase muss auf existierende Steuer- und Strategie-Profile verweisen (TaxProfileId, StrategyProfileId).");
+
+        RuleForEach(x => x.LifecyclePhases)
+            .Must((project, phase) =>
+            {
+                if (string.IsNullOrEmpty(phase.AllocationProfileId))
+                    return true;
+                var profileIds = project.AllocationProfiles?.Select(p => p.Id).ToHashSet() ?? new HashSet<string>();
+                return profileIds.Contains(phase.AllocationProfileId);
+            })
+            .WithMessage("Wenn eine Lebensphase ein Allokationsprofil referenziert (AllocationProfileId), muss dieses Profil existieren.");
 
         RuleFor(x => x)
             .Must(project =>

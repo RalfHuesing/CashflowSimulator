@@ -27,6 +27,10 @@ public sealed class LifecyclePhaseDtoValidator : AbstractValidator<LifecyclePhas
             .NotEmpty()
             .WithMessage("Strategie-Profil (StrategyProfileId) muss angegeben werden.");
 
+        RuleFor(x => x.GlidepathMonths)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Glidepath (Monate) darf nicht negativ sein.");
+
         RuleForEach(x => x.AssetAllocationOverrides)
             .SetValidator(new AssetAllocationOverrideDtoValidator());
     }

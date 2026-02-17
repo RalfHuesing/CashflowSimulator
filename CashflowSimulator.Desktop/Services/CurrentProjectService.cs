@@ -172,6 +172,18 @@ public sealed class CurrentProjectService : ICurrentProjectService
     }
 
     /// <inheritdoc />
+    public void UpdateAllocationProfiles(IReadOnlyList<AllocationProfileDto> allocationProfiles)
+    {
+        WithLock(() =>
+        {
+            if (_current is null)
+                return;
+            _current = _current with { AllocationProfiles = allocationProfiles.ToList() };
+        });
+        OnProjectChanged();
+    }
+
+    /// <inheritdoc />
     public void UpdateLifecyclePhases(IReadOnlyList<LifecyclePhaseDto> lifecyclePhases)
     {
         WithLock(() =>

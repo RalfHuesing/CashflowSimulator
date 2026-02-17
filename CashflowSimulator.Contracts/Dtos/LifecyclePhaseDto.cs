@@ -31,4 +31,16 @@ public record LifecyclePhaseDto : IIdentifiable
     /// Leer = Basis-<see cref="AssetClassDto.TargetWeight"/> aus dem Projekt verwenden.
     /// </summary>
     public List<AssetAllocationOverrideDto> AssetAllocationOverrides { get; init; } = [];
+
+    /// <summary>
+    /// ID des <see cref="AllocationProfileDto"/>, das die Zielallokation in dieser Phase definiert.
+    /// Leer = Engine nutzt <see cref="AssetAllocationOverrides"/> bzw. globale <see cref="AssetClassDto.TargetWeight"/>.
+    /// </summary>
+    public string AllocationProfileId { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Anzahl Monate vor Start dieser Phase, in denen die Zielallokation gleitend (Glidepath) von der
+    /// Vorgängerphase auf dieses Profil umgeschichtet wird. 0 = sofortiger Wechsel beim Phasenstart.
+    /// </summary>
+    public int GlidepathMonths { get; init; }
 }

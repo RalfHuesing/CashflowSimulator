@@ -35,6 +35,7 @@ Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter i
 - Jede Allokation hat erwartete Rendite und Volatilität (für die Monte-Carlo-Simulation).
 - Pro Asset können mehrere Wertpapiere existieren (z.B. verschiedene MSCI-World-ETFs über die Jahre). Nur ein Wertpapier pro Asset ist ?aktiv? und wird beim **Kauf** (Sparplan) verwendet.
 - Beim **Verkauf** wird steueroptimiert entschieden (FIFO, Transaktionshistorie mit Kauf, Verkauf, Dividenden, Vorabpauschale). Getätigte Verkäufe fließen in die Akkumulation ein.
+- Die **Zielallokation** kann pro Lebensphase über ein **Allokationsprofil** definiert werden. Bei Phasenwechsel nutzt die Engine das zugehörige Profil. Optional kann ein **Glidepath** (Anzahl Monate vor Phasenstart) konfiguriert werden, sodass gleitend auf die neue Zielallokation umgeschichtet wird.
 
 **Rebalancing:**
 

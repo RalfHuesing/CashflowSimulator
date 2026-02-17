@@ -49,8 +49,27 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         ScheduleValidateAndSave();
     }
 
+    [ObservableProperty]
+    private string _allocationProfileId = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AllocationProfileId))]
+    private ProfileOption? _selectedAllocationProfile;
+
+    partial void OnSelectedAllocationProfileChanged(ProfileOption? value)
+    {
+        _allocationProfileId = value?.Id ?? string.Empty;
+        ScheduleValidateAndSave();
+    }
+
+    [ObservableProperty]
+    private int _glidepathMonths;
+
+    partial void OnGlidepathMonthsChanged(int value) => ScheduleValidateAndSave();
+
     public ObservableCollection<ProfileOption> TaxProfileOptions { get; } = [];
     public ObservableCollection<ProfileOption> StrategyProfileOptions { get; } = [];
+    public ObservableCollection<ProfileOption> AllocationProfileOptions { get; } = [];
 
     protected override string HelpKeyPrefix => "LifecyclePhases";
 
@@ -88,7 +107,9 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
             StartAge = StartAge,
             TaxProfileId = TaxProfileId?.Trim() ?? string.Empty,
             StrategyProfileId = StrategyProfileId?.Trim() ?? string.Empty,
-            AssetAllocationOverrides = []
+            AssetAllocationOverrides = [],
+            AllocationProfileId = AllocationProfileId?.Trim() ?? string.Empty,
+            GlidepathMonths = GlidepathMonths
         };
     }
 
@@ -98,8 +119,11 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         StartAge = dto.StartAge;
         TaxProfileId = dto.TaxProfileId;
         StrategyProfileId = dto.StrategyProfileId;
+        AllocationProfileId = dto.AllocationProfileId ?? string.Empty;
+        GlidepathMonths = dto.GlidepathMonths;
         SelectedTaxProfile = TaxProfileOptions.FirstOrDefault(o => o.Id == dto.TaxProfileId);
         SelectedStrategyProfile = StrategyProfileOptions.FirstOrDefault(o => o.Id == dto.StrategyProfileId);
+        SelectedAllocationProfile = AllocationProfileOptions.FirstOrDefault(o => o.Id == dto.AllocationProfileId);
     }
 
     /// <inheritdoc />
@@ -108,8 +132,11 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         StartAge = 0;
         TaxProfileId = string.Empty;
         StrategyProfileId = string.Empty;
+        AllocationProfileId = string.Empty;
+        GlidepathMonths = 0;
         SelectedTaxProfile = null;
         SelectedStrategyProfile = null;
+        SelectedAllocationProfile = null;
         ClearValidationErrors();
     }
 
@@ -134,11 +161,15 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         var current = CurrentProjectService.Current;
         TaxProfileOptions.Clear();
         StrategyProfileOptions.Clear();
+        AllocationProfileOptions.Clear();
         if (current is null)
             return;
         foreach (var t in current.TaxProfiles ?? [])
             TaxProfileOptions.Add(new ProfileOption(t.Id, t.Name));
         foreach (var s in current.StrategyProfiles ?? [])
             StrategyProfileOptions.Add(new ProfileOption(s.Id, s.Name));
+        AllocationProfileOptions.Add(new ProfileOption("", "—"));
+        foreach (var a in current.AllocationProfiles ?? [])
+            AllocationProfileOptions.Add(new ProfileOption(a.Id, a.Name));
     }
 }

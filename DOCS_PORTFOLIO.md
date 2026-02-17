@@ -76,8 +76,12 @@ Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der 
 |-----|--------|
 | **EconomicFactorDto** | Markt: Id, Name, Modell, Drift, Volatilität, Startwert. Keine Stückzahl, keine Transaktionen. |
 | **AssetClassDto** | Anlageklasse (Bucket): Id, Name, TargetWeight (Zielgewichtung 0–1), optional Color. Die Zielallokation wird über diese Liste gesteuert; Assets referenzieren eine Klasse über `AssetClassId`. |
+| **AllocationProfileDto** | Allokationsprofil (Soll-Struktur): Id, Name, Entries (Liste von AllocationProfileEntryDto). Wird von Lebensphasen referenziert; definiert die Zielgewichtung pro Anlageklasse in dieser Phase. Summe der Eintrags-Gewichte = 100 %. |
+| **AllocationProfileEntryDto** | Ein Eintrag in einem Allokationsprofil: AssetClassId (Referenz auf AssetClassDto), TargetWeight (0–1). |
 | **AssetDto** | Besitz: Id, Name, ISIN, **AssetType**, **AssetClassId**, **CurrentPrice**, EconomicFactorId, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue?, Transactions. |
 | **TransactionDto** | Einzelne Buchung: **Id** (eindeutig, Guid-String), Datum, Typ (Buy/Sell/Dividend/TaxPrepayment), Menge, Preis, Gesamtbetrag, Steueranteil. Die Id ermöglicht robustes Update/Löschen in der UI und eine eindeutige Zuordnung für die Engine (z. B. FIFO). |
 | **PortfolioDto** | Container: Liste aller Assets, optional Strategy (Rebalancing etc., später). |
 
-`SimulationProjectDto` enthält `EconomicFactors`, **AssetClasses** (Anlageklassen mit Zielgewichtung `TargetWeight`; Assets werden über `AssetClassId` einer Klasse zugeordnet), sowie `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen (Validierung in CashflowSimulator.Validation).
+**LifecyclePhaseDto** enthält optional **AllocationProfileId** (Referenz auf ein AllocationProfileDto) und **GlidepathMonths** (Anzahl Monate vor Phasenstart, in denen gleitend auf die neue Zielallokation umgeschichtet wird; 0 = sofortiger Wechsel).
+
+`SimulationProjectDto` enthält `EconomicFactors`, **AssetClasses**, **AllocationProfiles**, **LifecyclePhases** (mit optional AllocationProfileId und GlidepathMonths), sowie `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen; jede gesetzte `LifecyclePhaseDto.AllocationProfileId` muss auf ein Profil aus `AllocationProfiles` verweisen; jede in einem Profil-Eintrag referenzierte `AssetClassId` muss in `AssetClasses` existieren (Validierung in CashflowSimulator.Validation).

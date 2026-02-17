@@ -92,11 +92,19 @@ public sealed class HelpProvider : IHelpProvider
         ["StrategyProfiles.RebalancingThreshold"] = ("Rebalancing-Schwelle", "Abweichungsschwelle (z. B. 0,05 = 5 %), ab der umgeschichtet wird. Größere Werte = selteneres Rebalancing."),
         ["StrategyProfiles.MinimumTransactionAmount"] = ("Mindest-Transaktionsgröße", "Orders unter diesem Betrag werden beim Rebalancing nicht ausgeführt (Schutz vor Gebühren durch Mikro-Transaktionen)."),
         ["StrategyProfiles.LookaheadMonths"] = ("Lookahead (Monate)", "Wie viele Monate voraus auf geplante Events (Cashflow-Events) gespart wird. Relevant für Liquiditätsplanung."),
+        // Allokationsprofile (HelpKeyPrefix = "AllocationProfiles")
+        ["AllocationProfiles"] = ("Allokationsprofile", "Benannte Soll-Allokationen (z. B. Aufbau 70/30, Rente 60/40). Werden von Lebensphasen referenziert. Die Summe der Gewichtungen pro Profil muss 100 % ergeben."),
+        ["AllocationProfiles.Name"] = ("Name", "Anzeigename des Allokationsprofils (z. B. „Aufbau“ oder „Rente sicher“). Wird in Lebensphasen zur Auswahl angezeigt."),
+        ["AllocationProfiles.Entries"] = ("Zielgewichtungen", "Liste der Anlageklassen mit Zielgewichtung (0–100 %). Jede Anlageklasse kann einmal vorkommen. Die Summe aller Einträge muss exakt 100 % ergeben."),
+        ["AllocationProfiles.AssetClassId"] = ("Anlageklasse", "Welche Anlageklasse (z. B. Aktien Welt, Sicherheitsbaustein) mit welchem Zielanteil im Portfolio gewichtet wird."),
+        ["AllocationProfiles.TargetWeight"] = ("Zielgewichtung", "Anteil dieser Anlageklasse am Portfolio (0–100 %). Beispiel: 0,6 = 60 %. Die Summe aller Einträge im Profil muss 100 % ergeben."),
         // Lebensphasen (HelpKeyPrefix = "LifecyclePhases")
         ["LifecyclePhases"] = ("Lebensphasen", "Phasen ab Alter (z. B. Ansparphase ab Start, Rentenphase ab 67). Pro Phase: Steuer-Profil, Strategie-Profil und optionale Zielallokation."),
         ["LifecyclePhases.StartAge"] = ("Startalter", "Alter in Jahren, ab dem diese Phase aktiv ist. 0 = von Simulationsstart an. Die Engine wählt pro Monat die Phase anhand des Alters."),
         ["LifecyclePhases.TaxProfileId"] = ("Steuer-Profil", "Welches Steuer-Profil in dieser Phase gilt (Kapitalertragsteuer, Freibetrag, Einkommensteuer für Rente)."),
         ["LifecyclePhases.StrategyProfileId"] = ("Strategie-Profil", "Welches Strategie-Profil in dieser Phase gilt (Liquiditätsreserve, Rebalancing, Lookahead)."),
+        ["LifecyclePhases.AllocationProfileId"] = ("Allokationsprofil", "Optional: Welches Allokationsprofil die Zielgewichtung in dieser Phase definiert. Leer = Fallback auf Anlageklassen-Standard oder Overrides."),
+        ["LifecyclePhases.GlidepathMonths"] = ("Glidepath (Monate)", "Anzahl Monate vor Start dieser Phase, in denen gleitend auf die neue Zielallokation umgeschichtet wird. 0 = sofortiger Wechsel beim Phasenstart (z. B. 60 = 5 Jahre vor Rente)."),
     }.ToFrozenDictionary();
 
     /// <inheritdoc />

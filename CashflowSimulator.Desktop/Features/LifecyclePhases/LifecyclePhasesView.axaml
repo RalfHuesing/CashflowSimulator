@@ -73,11 +73,26 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Allokation" Width="*" SortMemberPath="AllocationProfileId">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource IdToNameConverter}">
+                                                <Binding Path="AllocationProfileId"/>
+                                                <Binding Path="DataContext.AllocationProfileOptions" ElementName="ThisView"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Glidepath (Monate)" Width="100" Binding="{Binding GlidepathMonths}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
-                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto">
+                <Grid ColumnDefinitions="200, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Startalter (Jahre)"
                                Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <NumericUpDown Grid.Row="0" Grid.Column="1" Classes="form-input"
@@ -103,11 +118,11 @@
                     </ComboBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Strategie-Profil"
-                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                     <ComboBox Grid.Row="2" Grid.Column="1" Classes="form-input"
                              ItemsSource="{Binding StrategyProfileOptions}"
                              SelectedItem="{Binding SelectedStrategyProfile}"
-                             Margin="{StaticResource FormInputMarginLast}"
+                             Margin="{StaticResource FormInputMargin}"
                              behaviors:FocusHelpBehavior.HelpKey="StrategyProfileId"
                              behaviors:FocusHelpBehavior.ErrorPropertyName="StrategyProfileId">
                         <ComboBox.ItemTemplate>
@@ -116,6 +131,30 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Allokationsprofil"
+                               Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" Classes="form-input"
+                             ItemsSource="{Binding AllocationProfileOptions}"
+                             SelectedItem="{Binding SelectedAllocationProfile}"
+                             Margin="{StaticResource FormInputMargin}"
+                             behaviors:FocusHelpBehavior.HelpKey="AllocationProfileId"
+                             behaviors:FocusHelpBehavior.ErrorPropertyName="AllocationProfileId">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:ProfileOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Glidepath (Monate)"
+                               Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                    <NumericUpDown Grid.Row="4" Grid.Column="1" Classes="form-input"
+                                  Value="{Binding GlidepathMonths}" Increment="12"
+                                  Minimum="0"
+                                  Margin="{StaticResource FormInputMarginLast}"
+                                  behaviors:FocusHelpBehavior.HelpKey="GlidepathMonths"
+                                  behaviors:FocusHelpBehavior.ErrorPropertyName="GlidepathMonths"/>
                 </Grid>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>
