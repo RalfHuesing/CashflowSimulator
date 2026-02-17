@@ -6,21 +6,25 @@
              xmlns:vm="using:CashflowSimulator.Desktop.Features.Main.Navigation"
              mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="400"
              x:Class="CashflowSimulator.Desktop.Features.Main.Navigation.NavigationView"
-             x:DataType="vm:NavigationViewModel">
+             x:DataType="vm:NavigationViewModel"
+             Classes="sidebar-navigation">
 
-    <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding Groups}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding Groups}"
+                      HorizontalAlignment="Stretch">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:NavGroupViewModel">
-                    <Expander IsExpanded="{Binding IsExpanded}"
-                               Margin="0,0,0,4">
+                    <Expander Classes="nav-group"
+                              IsExpanded="{Binding IsExpanded}"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,0,0,2">
                         <Expander.Header>
                             <TextBlock Text="{Binding DisplayName}"
-                                       Classes="nav-item-text"
-                                       FontWeight="SemiBold"/>
+                                       Classes="nav-group-header"/>
                         </Expander.Header>
                         <ItemsControl ItemsSource="{Binding Items}"
-                                      Margin="{StaticResource NavIconMargin},0,0,0">
+                                      Margin="12,0,0,0"
+                                      HorizontalAlignment="Stretch">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:NavItemViewModel">
                                     <Button Classes="ghost"

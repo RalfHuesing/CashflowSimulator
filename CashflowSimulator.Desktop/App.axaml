@@ -104,5 +104,6 @@
         <StyleInclude Source="/Common/Themes/FormStyles.axaml" />
         <StyleInclude Source="/Common/Themes/ErrorTrayStyles.axaml" />
         <StyleInclude Source="/Common/Themes/FeatureLayoutViewStyle.axaml" />
+        <StyleInclude Source="/Common/Themes/NavigationStyles.axaml" />
     </Application.Styles>
 </Application>

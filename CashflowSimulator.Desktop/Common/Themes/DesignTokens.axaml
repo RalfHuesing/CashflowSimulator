@@ -4,7 +4,10 @@
 
     <Styles.Resources>
         <!-- Warmes, seriöses Enterprise-Farbschema -->
-        <Color x:Key="SidebarBackgroundColor">#2C2A2E</Color>
+        <Color x:Key="SidebarBackgroundColor">#1E293B</Color>
+        <Color x:Key="SidebarNavGroupHeaderColor">#94A3B8</Color>
+        <Color x:Key="SidebarNavItemColor">#E2E8F0</Color>
+        <Color x:Key="SidebarNavItemHoverColor">#334155</Color>
         <Color x:Key="ContentBackgroundColor">#F5F3F0</Color>
         <Color x:Key="SurfaceColor">#FFFFFF</Color>
         <Color x:Key="PrimaryActionColor">#2563A0</Color>
@@ -15,6 +18,9 @@
         <Color x:Key="PlaceholderIconColor">#D4D2D0</Color>
 
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}" />
+        <SolidColorBrush x:Key="SidebarNavGroupHeaderBrush" Color="{StaticResource SidebarNavGroupHeaderColor}" />
+        <SolidColorBrush x:Key="SidebarNavItemBrush" Color="{StaticResource SidebarNavItemColor}" />
+        <SolidColorBrush x:Key="SidebarNavItemHoverBrush" Color="{StaticResource SidebarNavItemHoverColor}" />
         <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource ContentBackgroundColor}" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
         <SolidColorBrush x:Key="PrimaryActionBrush" Color="{StaticResource PrimaryActionColor}" />
