@@ -51,10 +51,8 @@ public sealed class HelpProvider : IHelpProvider
         ["Korrelationen.FactorIdB"] = ("Faktor B", "Zweiter Faktor des Paars. Muss von Faktor A verschieden und ein vorhandener Marktfaktor sein."),
         ["Korrelationen.Correlation"] = ("Korrelation", "Pearson-Korrelation zwischen -1 und 1. 0 = unkorreliert; 1 = perfekt positiv; -1 = perfekt negativ. Die Gesamtmatrix aller Faktoren muss positiv definit bleiben."),
         // Anlageklassen (HelpKeyPrefix = "AssetClasses")
-        ["AssetClasses"] = ("Anlageklassen", "Hier legen Sie Ihre strategische Zielallokation fest: Welche „Buckets“ (z. B. Aktien Welt, Anleihen) sollen wie stark gewichtet sein? Die Summe sollte 100 % ergeben."),
-        ["AssetClasses.Name"] = ("Name", "Was ist eine Anlageklasse? Eine Anlageklasse ist ein Oberbegriff für eine Gruppe von Anlagen, z. B. „Aktien Welt“ oder „Sicherheitsbaustein“. So behalten Sie Ihre Strategie im Blick."),
-        ["AssetClasses.TargetWeight"] = ("Zielgewichtung", "Anteil dieser Anlageklasse am Gesamtportfolio (0–100 %). Beispiel: 70 % Aktien Welt, 30 % Anleihen. Die Summe aller Klassen sollte 100 % ergeben."),
-        ["AssetClasses.Color"] = ("Farbe", "Optionale Hex-Farbe (z. B. #1E88E5) für Diagramme und Übersichten. Kann leer bleiben."),
+        ["AssetClasses"] = ("Anlageklassen", "Hier legen Sie die Kategorien (Buckets) für Ihr Portfolio fest, z. B. „Aktien Welt“, „Schwellenländer“, „Sicherheitsbaustein“. Die Zielgewichtung pro Kategorie wird in den Allokationsprofilen je Lebensphase definiert."),
+        ["AssetClasses.Name"] = ("Name", "Bezeichnung der Anlageklasse, z. B. „Aktien Welt“ oder „Sicherheitsbaustein“. Jedes Asset wird einer Anlageklasse zugeordnet; die Gewichtung legen Sie in den Allokationsprofilen fest."),
         // Vermögenswerte / Portfolio (HelpKeyPrefix = "Portfolio")
         ["Portfolio"] = ("Vermögenswerte", "Konkrete Produkte (ETFs, Konten): Hier pflegen Sie Stammdaten, aktuellen Kurs und die Zuordnung zu Anlageklasse und Marktfaktor. Transaktionen erfassen Sie im Bereich Transaktionen."),
         ["Portfolio.Name"] = ("Name", "Bezeichnung des Vermögenswerts, z. B. „Vanguard FTSE All-World“ oder „Tagesgeld Notgroschen“."),

@@ -7,7 +7,7 @@ namespace CashflowSimulator.Contracts.Dtos;
 public record AssetAllocationOverrideDto
 {
     /// <summary>
-    /// ID der Anlageklasse, deren <see cref="AssetClassDto.TargetWeight"/> überschrieben wird.
+    /// ID der Anlageklasse, deren Zielgewichtung in dieser Phase überschrieben wird.
     /// </summary>
     public string AssetClassId { get; init; } = string.Empty;
 

@@ -75,7 +75,7 @@ Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der 
 | DTO | Rolle |
 |-----|--------|
 | **EconomicFactorDto** | Markt: Id, Name, Modell, Drift, Volatilität, Startwert. Keine Stückzahl, keine Transaktionen. |
-| **AssetClassDto** | Anlageklasse (Bucket): Id, Name, TargetWeight (Zielgewichtung 0–1), optional Color. Die Zielallokation wird über diese Liste gesteuert; Assets referenzieren eine Klasse über `AssetClassId`. |
+| **AssetClassDto** | Anlageklasse (Bucket): Id, Name. Definiert nur die Kategorien; Zielgewichtungen stehen in den Allokationsprofilen pro Lebensphase. Assets referenzieren eine Klasse über `AssetClassId`. |
 | **AllocationProfileDto** | Allokationsprofil (Soll-Struktur): Id, Name, Entries (Liste von AllocationProfileEntryDto). Wird von Lebensphasen referenziert; definiert die Zielgewichtung pro Anlageklasse in dieser Phase. Summe der Eintrags-Gewichte = 100 %. |
 | **AllocationProfileEntryDto** | Ein Eintrag in einem Allokationsprofil: AssetClassId (Referenz auf AssetClassDto), TargetWeight (0–1). |
 | **AssetDto** | Besitz: Id, Name, ISIN, **AssetType**, **AssetClassId**, **CurrentPrice**, EconomicFactorId, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue?, Transactions. |

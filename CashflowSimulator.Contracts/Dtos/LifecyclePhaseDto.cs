@@ -28,13 +28,13 @@ public record LifecyclePhaseDto : IIdentifiable
 
     /// <summary>
     /// Optionale Überschreibungen der Zielallokation (AssetClassId → TargetWeight) in dieser Phase.
-    /// Leer = Basis-<see cref="AssetClassDto.TargetWeight"/> aus dem Projekt verwenden.
+    /// Leer = keine Overrides; dann ist <see cref="AllocationProfileId"/> maßgeblich.
     /// </summary>
     public List<AssetAllocationOverrideDto> AssetAllocationOverrides { get; init; } = [];
 
     /// <summary>
     /// ID des <see cref="AllocationProfileDto"/>, das die Zielallokation in dieser Phase definiert.
-    /// Leer = Engine nutzt <see cref="AssetAllocationOverrides"/> bzw. globale <see cref="AssetClassDto.TargetWeight"/>.
+    /// Leer = Engine nutzt <see cref="AssetAllocationOverrides"/> (falls vorhanden); sonst keine Zielallokation.
     /// </summary>
     public string AllocationProfileId { get; init; } = string.Empty;
 

@@ -17,9 +17,9 @@ public sealed class PortfolioDefaultService : IPortfolioDefaultService
     {
         return
         [
-            new AssetClassDto { Id = "Aktien_Welt", Name = "Aktien Welt", TargetWeight = 0.70, Color = "#1E88E5" },
-            new AssetClassDto { Id = "Schwellenlaender", Name = "Schwellenländer", TargetWeight = 0.10, Color = "#43A047" },
-            new AssetClassDto { Id = "Sicherheitsbaustein", Name = "Sicherheitsbaustein", TargetWeight = 0.20, Color = "#FB8C00" }
+            new AssetClassDto { Id = "Aktien_Welt", Name = "Aktien Welt" },
+            new AssetClassDto { Id = "Schwellenlaender", Name = "Schwellenländer" },
+            new AssetClassDto { Id = "Sicherheitsbaustein", Name = "Sicherheitsbaustein" }
         ];
     }
 

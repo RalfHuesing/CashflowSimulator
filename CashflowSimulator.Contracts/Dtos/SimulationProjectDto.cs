@@ -18,7 +18,8 @@ public record SimulationProjectDto
     public List<EconomicFactorDto> EconomicFactors { get; init; } = [];
 
     /// <summary>
-    /// Anlageklassen (Buckets) für die strategische Zielallokation (z. B. "Aktien Welt 70 %", "Anleihen 30 %").
+    /// Anlageklassen (Buckets) für die strategische Zielallokation (z. B. "Aktien Welt", "Anleihen").
+    /// Zielgewichtungen werden in <see cref="AllocationProfiles"/> pro Lebensphase definiert.
     /// Vermögenswerte werden über <see cref="AssetDto.AssetClassId"/> einer Klasse zugeordnet.
     /// </summary>
     public List<AssetClassDto> AssetClasses { get; init; } = [];
