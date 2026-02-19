@@ -19,6 +19,13 @@
         <Style Selector="^ /template/ ContentPresenter#PART_ContentSite">
             <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
         </Style>
+        <!-- Hover: Hauptbereich dunkel lassen, nur Chevron-Box hellgrau -->
+        <Style Selector="^ /template/ ToggleButton#ExpanderHeader:pointerover /template/ Border#ToggleButtonBackground">
+            <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
+        </Style>
+        <Style Selector="^ /template/ ToggleButton#ExpanderHeader:pointerover /template/ Border#ExpandCollapseChevronBorder">
+            <Setter Property="Background" Value="{StaticResource SidebarNavChevronHoverBackgroundBrush}" />
+        </Style>
     </Style>
 
     <!-- Gruppen-Header-Text: gut lesbar (Bright Silver), mit Teal-Akzent in der View -->
