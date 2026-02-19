@@ -19,9 +19,7 @@
                               HorizontalAlignment="Stretch"
                               Margin="0,0,0,2">
                         <Expander.Header>
-                            <Border BorderBrush="{StaticResource SidebarNavAccentBrush}"
-                                    BorderThickness="2,0,0,0"
-                                    Padding="8,6,0,6"
+                            <Border Padding="8,6,0,6"
                                     HorizontalAlignment="Stretch">
                                 <TextBlock Text="{Binding DisplayName}"
                                            Classes="nav-group-header"/>

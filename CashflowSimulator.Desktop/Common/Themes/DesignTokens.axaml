@@ -9,7 +9,7 @@
         <Color x:Key="SidebarNavGroupHeaderColor">#E0E0E0</Color>
         <Color x:Key="SidebarNavItemColor">#E2E8F0</Color>
         <Color x:Key="SidebarNavItemHoverColor">#3D4554</Color>
-        <Color x:Key="SidebarNavGroupBackgroundColor">#252A35</Color>
+        <Color x:Key="SidebarNavGroupBackgroundColor">#1E2229</Color>
         <Color x:Key="SidebarNavAccentColor">#00BFA5</Color>
         <Color x:Key="ContentBackgroundColor">#F5F3F0</Color>
         <Color x:Key="SurfaceColor">#FFFFFF</Color>
