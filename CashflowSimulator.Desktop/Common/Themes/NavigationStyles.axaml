@@ -9,7 +9,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0,2,0,8" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Style Selector="^ /template/ ToggleButton#PART_ExpanderToggle">
+        <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
             <Setter Property="Background" Value="{StaticResource SidebarNavGroupBackgroundBrush}" />
             <Setter Property="Foreground" Value="{StaticResource SidebarNavGroupHeaderBrush}" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
