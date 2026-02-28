@@ -10,4 +10,5 @@
   <Project Path="CashflowSimulator.Validation/CashflowSimulator.Validation.csproj" />
   <Project Path="CashflowSimulator.Desktop.Tests/CashflowSimulator.Desktop.Tests.csproj" />
   <Project Path="CashflowSimulator.Validation.Tests/CashflowSimulator.Validation.Tests.csproj" />
+  <Project Path="CashflowSimulator.Engine.Tests/CashflowSimulator.Engine.Tests.csproj" />
 </Solution>
