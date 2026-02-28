@@ -287,4 +287,62 @@ public sealed class SimulationRunnerTests
         foreach (var m in result.MonthlyResults)
             Assert.Equal(m.CashBalance, m.TotalAssets);
     }
+
+    [Fact]
+    public void RunSimulation_WithPortfolioAndEconomicFactor_TotalAssetsIncludesGrownPortfolio()
+    {
+        const string factorId = "MSCI_World";
+        var project = new SimulationProjectDto
+        {
+            Parameters = new SimulationParametersDto
+            {
+                SimulationStart = new DateOnly(2020, 1, 1),
+                SimulationEnd = new DateOnly(2020, 12, 1),
+                DateOfBirth = new DateOnly(1985, 6, 15),
+                InitialLiquidCash = 1000m,
+                InitialLossCarryforwardGeneral = 0,
+                InitialLossCarryforwardStocks = 0
+            },
+            Streams = [],
+            EconomicFactors =
+            [
+                new EconomicFactorDto
+                {
+                    Id = factorId,
+                    Name = "MSCI World",
+                    ModelType = StochasticModelType.GeometricBrownianMotion,
+                    ExpectedReturn = 0.06,
+                    Volatility = 0.18,
+                    InitialValue = 100.0
+                }
+            ],
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "asset1",
+                        Name = "ETF",
+                        EconomicFactorId = factorId,
+                        CurrentPrice = 100m,
+                        CurrentQuantity = 10m,
+                        CurrentValue = 1000m
+                    }
+                ]
+            }
+        };
+        var runner = CreateRunner();
+
+        var result = runner.RunSimulation(project);
+
+        Assert.Equal(12, result.MonthlyResults.Count);
+        var firstMonth = result.MonthlyResults[0];
+        Assert.Equal(1000m, firstMonth.CashBalance);
+        Assert.True(firstMonth.TotalAssets > 1000m, "TotalAssets soll Cash + gewachsenes Depot sein (1010 bei 1% Monatswachstum).");
+
+        var lastMonth = result.MonthlyResults[11];
+        Assert.True(lastMonth.TotalAssets > lastMonth.CashBalance, "Nach 12 Monaten Wachstum: TotalAssets > Cash.");
+        Assert.True(lastMonth.TotalAssets >= 2060m, "~6% p.a. über 12 Monate: Depotwert wächst von 1000 auf ca. 1062; TotalAssets mind. 2060.");
+    }
 }
