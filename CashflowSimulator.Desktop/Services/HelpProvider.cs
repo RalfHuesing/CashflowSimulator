@@ -63,6 +63,7 @@ public sealed class HelpProvider : IHelpProvider
         ["Portfolio.CurrentPrice"] = ("Aktueller Kurs", "Warum brauche ich den aktuellen Kurs? Der Stückpreis ist der Startwert für die Simulation und die Basis für die Anzeige des Gesamtwerts (Kurs × Stückzahl). Pflegen Sie hier den letzten bekannten Kurs."),
         ["Portfolio.TaxType"] = ("Steuerart", "Was bewirkt die Teilfreistellung? Bei Aktienfonds gilt in Deutschland eine 30%ige Teilfreistellung auf Veräußerungsgewinn und Ausschüttung. Anleihenfonds haben keine Teilfreistellung. Wählen Sie die passende Kategorie."),
         ["Portfolio.IsActiveSavingsInstrument"] = ("Aktiv bespart", "Nur ein Asset pro Sparlogik sollte „aktiv bespart“ sein: Neue Sparraten fließen in dieses Produkt. Altbestände, die nicht mehr bespart werden, haben „nein“."),
+        ["Portfolio.Tranches"] = ("Tranchen (FIFO-Bestand)", "Kauf-Tranchen für die FIFO-Steuerberechnung: je Kauf eine Zeile mit Kaufdatum, Menge und Anschaffungspreis. Wird bei Simulation und bei manuellen Käufen (Transaktionen) gefüllt. Älteste Tranche wird bei Verkauf zuerst verbraucht."),
         // Transaktionen (HelpKeyPrefix = "Transactions")
         ["Transactions"] = ("Transaktionen", "Zentrales Journal aller Käufe und Verkäufe über alle Vermögenswerte. Hier erfassen Sie jede Buchung am richtigen Asset. Sortierung: neueste zuerst."),
         ["Transactions.AssetId"] = ("Vermögenswert", "Zu welchem Produkt (ETF, Konto) gehört diese Transaktion? Wählen Sie das passende Asset aus der Liste."),

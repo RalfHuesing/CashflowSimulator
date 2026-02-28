@@ -38,7 +38,7 @@ public sealed class SimulationRunner : ISimulationRunner
             TotalAssets = parameters.InitialLiquidCash,
             Portfolio = new PortfolioDto
             {
-                Assets = portfolio.Assets.Select(a => a with { }).ToList(),
+                Assets = portfolio.Assets.Select(CloneAssetForSimulation).ToList(),
                 Strategy = portfolio.Strategy
             }
         };
@@ -77,5 +77,33 @@ public sealed class SimulationRunner : ISimulationRunner
     {
         var totalDays = (currentDate.ToDateTime(TimeOnly.MinValue) - dateOfBirth.ToDateTime(TimeOnly.MinValue)).TotalDays;
         return totalDays / 365.25;
+    }
+
+    /// <summary>
+    /// Klont ein Asset mit tiefer Kopie von Transactions und Tranches.
+    /// Wenn Tranches leer sind, werden sie aus Buy-Transaktionen abgeleitet (eine Tranche pro Kauf).
+    /// </summary>
+    private static AssetDto CloneAssetForSimulation(AssetDto a)
+    {
+        var transactions = (a.Transactions ?? []).ToList();
+        var tranches = (a.Tranches ?? []).ToList();
+        if (tranches.Count == 0 && transactions.Count > 0)
+        {
+            tranches = transactions
+                .Where(t => t.Type == TransactionType.Buy)
+                .OrderBy(t => t.Date)
+                .Select(t => new AssetTrancheDto
+                {
+                    PurchaseDate = t.Date,
+                    Quantity = t.Quantity,
+                    AcquisitionPricePerUnit = t.PricePerUnit
+                })
+                .ToList();
+        }
+        return a with
+        {
+            Transactions = transactions,
+            Tranches = tranches
+        };
     }
 }

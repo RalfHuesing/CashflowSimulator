@@ -252,6 +252,7 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
         var current = CurrentProjectService.Current;
         var existing = current?.Portfolio?.Assets?.FirstOrDefault(a => a.Id == EditingId);
         var transactions = existing?.Transactions ?? [];
+        var tranches = existing?.Tranches ?? [];
         var quantity = existing?.CurrentQuantity ?? 0;
         var totalValue = CurrentPrice * quantity;
         return new AssetDto
@@ -267,7 +268,8 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
             TaxType = TaxType,
             CurrentQuantity = quantity,
             CurrentValue = totalValue,
-            Transactions = transactions
+            Transactions = transactions,
+            Tranches = tranches
         };
     }
 
@@ -313,8 +315,7 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
 
     protected override ValidationResult ValidateDto(AssetDto dto)
     {
-        // Momentan gibt es keinen AssetDtoValidator; bei Bedarf erweitern
-        return ValidationResult.Success();
+        return ValidationRunner.Validate(dto);
     }
 
     protected override void OnProjectChanged(object? sender, EventArgs e)

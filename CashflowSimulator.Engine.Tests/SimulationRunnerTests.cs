@@ -345,4 +345,80 @@ public sealed class SimulationRunnerTests
         Assert.True(lastMonth.TotalAssets > lastMonth.CashBalance, "Nach 12 Monaten Wachstum: TotalAssets > Cash.");
         Assert.True(lastMonth.TotalAssets >= 2060m, "~6% p.a. über 12 Monate: Depotwert wächst von 1000 auf ca. 1062; TotalAssets mind. 2060.");
     }
+
+    [Fact]
+    public void RunSimulation_ClonesPortfolio_DoesNotMutateProjectTranchesOrTransactions()
+    {
+        var tranches = new List<AssetTrancheDto> { new() { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 10m, AcquisitionPricePerUnit = 100m } };
+        var transactions = new List<TransactionDto> { new() { Date = new DateOnly(2020, 1, 1), Type = TransactionType.Buy, Quantity = 10m, PricePerUnit = 100m, TotalAmount = 1000m } };
+        var project = MinimalProject(
+            start: new DateOnly(2020, 1, 1),
+            end: new DateOnly(2020, 2, 1),
+            initialCash: 0m);
+        project = project with
+        {
+            EconomicFactors = [new EconomicFactorDto { Id = "f1", Name = "F", ModelType = StochasticModelType.GeometricBrownianMotion, ExpectedReturn = 0, Volatility = 0.1, InitialValue = 100 }],
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "a1",
+                        Name = "ETF",
+                        EconomicFactorId = "f1",
+                        CurrentPrice = 100m,
+                        CurrentQuantity = 10m,
+                        CurrentValue = 1000m,
+                        Tranches = tranches,
+                        Transactions = transactions
+                    }
+                ]
+            }
+        };
+
+        var runner = CreateRunner();
+        runner.RunSimulation(project);
+
+        Assert.Same(tranches, project.Portfolio.Assets[0].Tranches);
+        Assert.Same(transactions, project.Portfolio.Assets[0].Transactions);
+    }
+
+    [Fact]
+    public void RunSimulation_EmptyTranchesAndBuyTransactions_CompletesWithoutError()
+    {
+        var transactions = new List<TransactionDto>
+        {
+            new() { Date = new DateOnly(2020, 1, 15), Type = TransactionType.Buy, Quantity = 5m, PricePerUnit = 90m, TotalAmount = 450m },
+            new() { Date = new DateOnly(2020, 2, 10), Type = TransactionType.Buy, Quantity = 3m, PricePerUnit = 100m, TotalAmount = 300m }
+        };
+        var project = MinimalProject(start: new DateOnly(2020, 1, 1), end: new DateOnly(2020, 3, 1), initialCash: 0m);
+        project = project with
+        {
+            EconomicFactors = [new EconomicFactorDto { Id = "f1", Name = "F", ModelType = StochasticModelType.GeometricBrownianMotion, ExpectedReturn = 0, Volatility = 0.1, InitialValue = 100 }],
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "a1",
+                        Name = "ETF",
+                        EconomicFactorId = "f1",
+                        CurrentPrice = 100m,
+                        CurrentQuantity = 8m,
+                        CurrentValue = 800m,
+                        Tranches = [],
+                        Transactions = transactions
+                    }
+                ]
+            }
+        };
+        var runner = CreateRunner();
+        var result = runner.RunSimulation(project);
+
+        Assert.NotNull(result);
+        Assert.Equal(3, result.MonthlyResults.Count);
+        Assert.True(result.MonthlyResults[0].TotalAssets >= 800m);
+    }
 }

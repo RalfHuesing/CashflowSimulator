@@ -87,7 +87,7 @@
             </controls:MasterDetailView.MasterContent>
             <controls:MasterDetailView.DetailContent>
                 <StackPanel Spacing="16">
-                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+                    <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"
                                    Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                         <TextBox Grid.Row="0" Grid.Column="1" Classes="form-input"
@@ -185,9 +185,23 @@
                                    VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
 
                         <TextBlock Grid.Row="9" Grid.Column="0" Text="Aktueller Gesamtwert"
-                                   Classes="form-label" Margin="{StaticResource FormLabelMarginLast}"/>
+                                   Classes="form-label" Margin="{StaticResource FormLabelMargin}"/>
                         <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding DisplayTotalValue, StringFormat='{}{0:C}'}"
                                    VerticalAlignment="Center" FontWeight="SemiBold"/>
+
+                        <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Text="Tranchen (FIFO-Bestand)"
+                                   Classes="form-label" Margin="0,16,0,4"/>
+                        <DataGrid Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
+                                  ItemsSource="{Binding SelectedItem.Tranches}"
+                                  IsReadOnly="True"
+                                  MaxHeight="180"
+                                  Margin="0,0,0,0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Kaufdatum" Width="110" Binding="{Binding PurchaseDate}"/>
+                                <DataGridTextColumn Header="Menge" Width="80" Binding="{Binding Quantity, StringFormat='{}{0:N2}'}"/>
+                                <DataGridTextColumn Header="Anschaffungspreis (pro Stück)" Width="*" Binding="{Binding AcquisitionPricePerUnit, StringFormat='{}{0:C}'}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
                 </StackPanel>
             </controls:MasterDetailView.DetailContent>

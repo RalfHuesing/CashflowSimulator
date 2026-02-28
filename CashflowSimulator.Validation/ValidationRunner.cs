@@ -22,6 +22,7 @@ public static class ValidationRunner
     private static readonly StrategyProfileDtoValidator StrategyProfileValidator = new();
     private static readonly AllocationProfileDtoValidator AllocationProfileValidator = new();
     private static readonly LifecyclePhaseDtoValidator LifecyclePhaseValidator = new();
+    private static readonly AssetDtoValidator AssetValidator = new();
 
     /// <summary>
     /// Validiert <see cref="SimulationParametersDto"/> (z. B. für Eckdaten-Apply).
@@ -130,6 +131,16 @@ public static class ValidationRunner
     {
         ArgumentNullException.ThrowIfNull(dto);
         var result = LifecyclePhaseValidator.Validate(dto);
+        return ToValidationResult(result);
+    }
+
+    /// <summary>
+    /// Validiert <see cref="AssetDto"/> (z. B. für das Vermögenswerte-Formular).
+    /// </summary>
+    public static ValidationResult Validate(AssetDto dto)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+        var result = AssetValidator.Validate(dto);
         return ToValidationResult(result);
     }
 

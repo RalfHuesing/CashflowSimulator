@@ -94,15 +94,21 @@ public sealed class SimulationProjectValidator : AbstractValidator<SimulationPro
             })
             .WithMessage("Es muss mindestens eine Lebensphase geben, die zum Simulationsstart aktiv ist (StartAge 0 oder StartAge ≤ Alter zum Start).");
 
-        RuleForEach(x => x.Portfolio.Assets)
-            .Must((project, asset) =>
-            {
-                if (string.IsNullOrEmpty(asset.EconomicFactorId))
-                    return false;
-                var factorIds = project.EconomicFactors?.Select(f => f.Id).ToHashSet() ?? new HashSet<string>();
-                return factorIds.Contains(asset.EconomicFactorId);
-            })
-            .WithMessage("Jedes Asset muss auf einen existierenden Marktfaktor verweisen (EconomicFactorId).");
+        When(x => x.Portfolio != null, () =>
+        {
+            RuleForEach(x => x.Portfolio!.Assets)
+                .SetValidator(new AssetDtoValidator());
+
+            RuleForEach(x => x.Portfolio!.Assets)
+                .Must((project, asset) =>
+                {
+                    if (string.IsNullOrEmpty(asset.EconomicFactorId))
+                        return false;
+                    var factorIds = project.EconomicFactors?.Select(f => f.Id).ToHashSet() ?? new HashSet<string>();
+                    return factorIds.Contains(asset.EconomicFactorId);
+                })
+                .WithMessage("Jedes Asset muss auf einen existierenden Marktfaktor verweisen (EconomicFactorId).");
+        });
     }
 
     private static int GetAgeInYears(DateOnly dateOfBirth, DateOnly atDate)

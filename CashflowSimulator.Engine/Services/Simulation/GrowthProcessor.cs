@@ -29,6 +29,17 @@ public sealed class GrowthProcessor : ISimulationProcessor
         var updatedAssets = new List<AssetDto>(assets.Count);
         foreach (var asset in assets)
         {
+            if (asset.Tranches is { Count: > 0 })
+            {
+                var trancheSum = asset.Tranches.Sum(t => t.Quantity);
+                if (Math.Abs(trancheSum - asset.CurrentQuantity) > 0.0001m)
+                {
+                    _logger?.LogWarning(
+                        "Asset '{AssetName}': CurrentQuantity ({Qty}) weicht von Tranchen-Summe ({TrancheSum}) ab.",
+                        asset.Name, asset.CurrentQuantity, trancheSum);
+                }
+            }
+
             var factor = project.EconomicFactors?.FirstOrDefault(f => f.Id == asset.EconomicFactorId);
             if (factor == null)
             {

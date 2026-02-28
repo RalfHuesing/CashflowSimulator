@@ -86,4 +86,10 @@ public record AssetDto : IIdentifiable
     /// Bestandsentwicklung. Chronologisch sortiert (älteste zuerst) empfohlen.
     /// </summary>
     public List<TransactionDto> Transactions { get; init; } = [];
+
+    /// <summary>
+    /// FIFO-Bestand: Kauf-Tranchen (Kaufdatum, Menge, Anschaffungspreis). Chronologisch (älteste zuerst).
+    /// Invariante: CurrentQuantity sollte der Summe der Tranchen-Mengen entsprechen.
+    /// </summary>
+    public List<AssetTrancheDto> Tranches { get; init; } = [];
 }

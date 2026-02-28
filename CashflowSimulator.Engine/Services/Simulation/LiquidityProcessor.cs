@@ -83,16 +83,25 @@ public sealed class LiquidityProcessor : ISimulationProcessor
                 TaxAmount = 0m
             };
 
+            var newTranche = new AssetTrancheDto
+            {
+                PurchaseDate = currentDate,
+                Quantity = quantity,
+                AcquisitionPricePerUnit = candidate.CurrentPrice
+            };
+
             var existingAsset = updates.TryGetValue(assets.IndexOf(candidate), out var prev) ? prev : candidate;
             var newQuantity = existingAsset.CurrentQuantity + quantity;
             var newValue = existingAsset.CurrentPrice * newQuantity;
             var newTransactions = existingAsset.Transactions.Append(newTransaction).ToList();
+            var newTranches = (existingAsset.Tranches ?? []).Append(newTranche).ToList();
 
             var updatedAsset = existingAsset with
             {
                 CurrentQuantity = newQuantity,
                 CurrentValue = newValue,
-                Transactions = newTransactions
+                Transactions = newTransactions,
+                Tranches = newTranches
             };
 
             updates[assets.IndexOf(candidate)] = updatedAsset;
@@ -154,12 +163,14 @@ public sealed class LiquidityProcessor : ISimulationProcessor
             var newQuantity = Asset.CurrentQuantity - quantityToSell;
             var newValue = Asset.CurrentPrice * newQuantity;
             var newTransactions = Asset.Transactions.Append(newTransaction).ToList();
+            var newTranches = ConsumeTranchesFifo(Asset.Tranches ?? [], quantityToSell);
 
             var updatedAsset = Asset with
             {
                 CurrentQuantity = newQuantity,
                 CurrentValue = newValue,
-                Transactions = newTransactions
+                Transactions = newTransactions,
+                Tranches = newTranches
             };
 
             updates[assets.IndexOf(Asset)] = updatedAsset;
@@ -171,6 +182,37 @@ public sealed class LiquidityProcessor : ISimulationProcessor
         state.Cash += totalProceeds;
         var updatedAssets = assets.Select((a, i) => updates.TryGetValue(i, out var u) ? u : a).ToList();
         state.Portfolio = state.Portfolio with { Assets = updatedAssets };
+    }
+
+    /// <summary>
+    /// Verbraucht quantityToSell aus den Tranchen nach FIFO (älteste zuerst).
+    /// Gibt die neue, immutable Tranchenliste zurück.
+    /// </summary>
+    private static List<AssetTrancheDto> ConsumeTranchesFifo(List<AssetTrancheDto> tranches, decimal quantityToSell)
+    {
+        if (tranches.Count == 0 || quantityToSell <= 0)
+            return tranches.ToList();
+
+        var remainingToSell = quantityToSell;
+        var result = new List<AssetTrancheDto>();
+
+        foreach (var t in tranches)
+        {
+            if (remainingToSell <= 0)
+            {
+                result.Add(t);
+                continue;
+            }
+            if (t.Quantity <= remainingToSell)
+            {
+                remainingToSell -= t.Quantity;
+                continue;
+            }
+            result.Add(t with { Quantity = t.Quantity - remainingToSell });
+            remainingToSell = 0;
+        }
+
+        return result;
     }
 
     private static void UpdateTotalAssets(SimulationState state)

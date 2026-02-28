@@ -179,4 +179,49 @@ public sealed class GrowthProcessorTests
         Assert.Equal(500m, state.Portfolio.Assets[0].CurrentValue);
         Assert.Equal(1500m, state.TotalAssets);
     }
+
+    [Fact]
+    public void ProcessMonth_AssetWithTranches_LeavesTranchesUnchanged()
+    {
+        var processor = new GrowthProcessor();
+        var project = ProjectWithFactor(expectedReturn: 0.12);
+        var tranches = new List<AssetTrancheDto>
+        {
+            new() { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 3m, AcquisitionPricePerUnit = 95m },
+            new() { PurchaseDate = new DateOnly(2020, 2, 1), Quantity = 2m, AcquisitionPricePerUnit = 105m }
+        };
+        var state = new SimulationState
+        {
+            Cash = 0m,
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "a1",
+                        Name = "ETF",
+                        EconomicFactorId = FactorId,
+                        CurrentPrice = 100m,
+                        CurrentQuantity = 5m,
+                        CurrentValue = 500m,
+                        Tranches = tranches
+                    }
+                ]
+            }
+        };
+
+        processor.ProcessMonth(project, state, new DateOnly(2020, 3, 1));
+
+        var asset = state.Portfolio.Assets[0];
+        Assert.Equal(101m, asset.CurrentPrice);
+        Assert.Equal(505m, asset.CurrentValue);
+        Assert.Equal(2, asset.Tranches.Count);
+        Assert.Equal(new DateOnly(2020, 1, 1), asset.Tranches[0].PurchaseDate);
+        Assert.Equal(3m, asset.Tranches[0].Quantity);
+        Assert.Equal(95m, asset.Tranches[0].AcquisitionPricePerUnit);
+        Assert.Equal(new DateOnly(2020, 2, 1), asset.Tranches[1].PurchaseDate);
+        Assert.Equal(2m, asset.Tranches[1].Quantity);
+        Assert.Equal(105m, asset.Tranches[1].AcquisitionPricePerUnit);
+    }
 }

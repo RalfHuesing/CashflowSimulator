@@ -202,7 +202,17 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
             var asset = assets[assetIndex];
             var newTransactions = asset.Transactions.ToList();
             newTransactions.Add(dto);
-            assets[assetIndex] = asset with { Transactions = newTransactions };
+            var newTranches = (asset.Tranches ?? []).ToList();
+            if (dto.Type == TransactionType.Buy)
+            {
+                newTranches.Add(new AssetTrancheDto
+                {
+                    PurchaseDate = dto.Date,
+                    Quantity = dto.Quantity,
+                    AcquisitionPricePerUnit = dto.PricePerUnit
+                });
+            }
+            assets[assetIndex] = asset with { Transactions = newTransactions, Tranches = newTranches };
         }
         else
         {
