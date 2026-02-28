@@ -57,7 +57,7 @@ Wenn du dir den Code ansehen oder beim Aufbau helfen möchtest:
 
 3.  **Projekt bauen:**
     ```bash
-    dotnet build
+    dotnet build CashflowSimulator.Desktop/CashflowSimulator.Desktop.csproj
     ```
 
 4.  **Starten (Desktop):**
@@ -70,14 +70,17 @@ Wenn du dir den Code ansehen oder beim Aufbau helfen möchtest:
 
 ## 🛠 Technologie-Stack
 
-Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Clean Architecture):
+Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Clean Architecture / Schichtentrennung):
 
 * **Core:** C# / .NET 9
 * **UI Framework:** [Avalonia UI](https://avaloniaui.net/) (für Cross-Platform Desktop Support)
 * **Architektur:**
-    * `CashflowSimulator.Engine`: Die reine Rechenlogik (Steuern, Simulation).
-    * `CashflowSimulator.Contracts`: Datendefinitionen und Schnittstellen.
-    * `CashflowSimulator.Desktop`: Die MVVM-basierte Benutzeroberfläche.
+    * `CashflowSimulator.Contracts`: Datendefinitionen, DTOs und fachliche Schnittstellen.
+    * `CashflowSimulator.Validation`: FluentValidation-Validatoren (Single Source of Truth für Regeln).
+    * `CashflowSimulator.Engine`: Reine Rechenlogik (Simulation, Wachstumsmodelle; keine UI, keine I/O).
+    * `CashflowSimulator.Infrastructure`: Persistenz (Laden/Speichern), Kursdaten, Implementierungen für Contracts-Interfaces.
+    * `CashflowSimulator.Desktop`: Avalonia-UI, Composition Root, MVVM.
+    * `CashflowSimulator.Shared`: Gemeinsame Hilfen (derzeit Placeholder). Test-Projekte: Engine.Tests, Desktop.Tests, Validation.Tests.
 * **Testing:** xUnit
 
 ---
@@ -90,7 +93,7 @@ Wir arbeiten aktuell an folgenden Meilensteinen:
 - [x] Lifecycle-Phasen-Modell (Steuer-/Strategie-Profile, Validierung, Defaults)
 - [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale)
 - [x] Validierungslogik für Eingaben
-- [ ] Aufbau der Benutzeroberfläche (Avalonia XAML)
+- [x] Grundaufbau der Benutzeroberfläche (Avalonia XAML, Shell, Navigation, Feature-Bereiche)
 - [x] Persistierung (Speichern/Laden von Projekten)
 - [ ] Erste lauffähige Beta-Version
 

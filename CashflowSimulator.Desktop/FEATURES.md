@@ -33,6 +33,7 @@ CashflowSimulator.Desktop/
     ├── AllocationProfiles/                                # Allokationsprofile (MasterDetailView); Soll-Gewichtungen pro Anlageklasse, Summe 100 %
     ├── LifecyclePhases/                                   # Lebensphasen (MasterDetailView); Startalter, Steuer-/Strategie-/Allokationsprofil, Glidepath
     ├── Settings/                                          # Einstellungen (SettingsView*, SettingsViewModel)
+    ├── SimulationResult/                                 # Anzeige Simulationsergebnis (SimulationResultView*, SimulationResultViewModel)
     └── Cashflow/                                          # (später) ggf. weitere Cashflow-Themen
 ```
 
@@ -53,6 +54,7 @@ CashflowSimulator.Desktop/
 - `CashflowSimulator.Desktop.Features.StrategyProfiles` – Strategie-Profile
 - `CashflowSimulator.Desktop.Features.AllocationProfiles` – Allokationsprofile
 - `CashflowSimulator.Desktop.Features.LifecyclePhases` – Lebensphasen
+- `CashflowSimulator.Desktop.Features.SimulationResult` – Anzeige Simulationsergebnis
 - `CashflowSimulator.Desktop.Features.Cashflow` – (später)
 
 ## Pattern für neue Feature-Bereiche (wie Eckdaten, Einstellungen)

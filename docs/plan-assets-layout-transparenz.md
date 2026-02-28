@@ -1,5 +1,7 @@
 # Plan: Assets/ETFs – Transparenz, Slider, Scroll (Fix)
 
+**Status:** Schritt 1 (Background auf Border Grid.Row="2") ist umgesetzt (`ContentBackgroundBrush` in MasterDetailView.axaml). Schritte 2 (ScrollViewer optional) und 3 (Test) ggf. noch prüfen; zentrales Suchfeld siehe TODO.md.
+
 **Ausgangslage (aus TODO.md):** Beim Schieben des Sliders (MasterDetailView) wird die Eingabemaske unten transparent, schiebt sich über die Liste, und die Transaktionen/Liste lassen sich nicht scrollen. Bei anderen Bereichen (z. B. laufende Posten) tritt das nicht auf – Assets/Transaktionen sollen gleich behandelt werden wie andere Listen.
 
 ---

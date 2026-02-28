@@ -17,7 +17,10 @@ CashflowSimulator.Desktop/
 ├── CompositionRoot.cs                                  # Zugriff auf ServiceProvider (gesetzt in Program.Main)
 ├── Common/
 │   ├── Themes/*.axaml                                  # DesignTokens, DataGridStyles, ButtonStyles, TypographyStyles, FormStyles, ErrorTrayStyles, FeatureLayoutViewStyle – keine Hardcodes in Views
-│   └── Controls/                                       # Wiederverwendbare UserControls (FeatureLayoutView, MasterDetailView)
+│   ├── Controls/                                       # Wiederverwendbare UserControls (FeatureLayoutView, MasterDetailView)
+│   ├── Behaviors/                                      # FocusHelpBehavior
+│   ├── Converters/                                     # IdToNameConverter, EnumDescriptionConverter, DateOnlyConverter
+│   └── Extensions/                                     # EnumExtensions
 ├── Services/                                            # App-weite UI-Dienste (plattformunabhängig)
 │   ├── IFileDialogService.cs                           # Öffnen/Speichern (Avalonia StorageProvider)
 │   └── AvaloniaFileDialogService.cs
@@ -31,6 +34,7 @@ CashflowSimulator.Desktop/
     ├── CashflowStreams/, CashflowEvents/                # Laufende und geplante Cashflows
     ├── TaxProfiles/, StrategyProfiles/, LifecyclePhases/ # Steuer-, Strategie-Profile, Lebensphasen
     ├── Settings/                                        # Einstellungen
+    ├── SimulationResult/                               # Anzeige Simulationsergebnis (monatliche Ergebnisse)
     └── Cashflow/                                        # (später) ggf. weitere Cashflow-Themen
 ```
 
