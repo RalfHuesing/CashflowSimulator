@@ -6,6 +6,7 @@ using CashflowSimulator.Desktop.Common.Extensions;
 using CashflowSimulator.Desktop.ViewModels;
 using CashflowSimulator.Validation;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CashflowSimulator.Desktop.Features.Portfolio;
 
@@ -113,15 +114,112 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
 
     protected override string HelpKeyPrefix => "Portfolio";
 
+    private readonly IStockPriceService _stockPriceService;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UpdatePricesCommand))]
+    private bool _isUpdatingPrices;
+
+    [ObservableProperty]
+    private string _updateStatus = string.Empty;
+
     public PortfolioViewModel(
         ICurrentProjectService currentProjectService,
-        IHelpProvider helpProvider)
+        IHelpProvider helpProvider,
+        IStockPriceService stockPriceService)
         : base(currentProjectService, helpProvider)
     {
+        _stockPriceService = stockPriceService;
         PageHelpKey = "Portfolio";
         RefreshFactorOptions();
         RefreshAssetClassOptions();
         RefreshAndFilterAssets();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUpdatePrices))]
+    private async Task UpdatePricesAsync()
+    {
+        if (IsUpdatingPrices)
+            return;
+
+        IsUpdatingPrices = true;
+        UpdateStatus = "Kurse werden aktualisiert...";
+        
+        try
+        {
+            var assets = LoadItems().ToList();
+            if (!assets.Any())
+            {
+                UpdateStatus = "Keine Assets zum Aktualisieren gefunden.";
+                return;
+            }
+
+            var updatedCount = 0;
+            var errorCount = 0;
+
+            foreach (var asset in assets)
+            {
+                // Verwende ISIN als Symbol für die Kursabfrage
+                var symbol = asset.Isin;
+                if (string.IsNullOrWhiteSpace(symbol))
+                {
+                    // Fallback: Name als Symbol verwenden
+                    symbol = asset.Name;
+                }
+
+                if (string.IsNullOrWhiteSpace(symbol))
+                {
+                    continue;
+                }
+
+                var result = await _stockPriceService.GetStockPriceAsync(symbol);
+                if (result.Success)
+                {
+                    // Aktualisiere das Asset mit neuem Kurs
+                    await UpdateAssetPriceAsync(asset, result.Price);
+                    updatedCount++;
+                }
+                else
+                {
+                    errorCount++;
+                }
+            }
+
+            UpdateStatus = $"Aktualisierung abgeschlossen: {updatedCount} Kurse aktualisiert, {errorCount} Fehler.";
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus = $"Fehler bei der Kursaktualisierung: {ex.Message}";
+        }
+        finally
+        {
+            IsUpdatingPrices = false;
+        }
+    }
+
+    private bool CanUpdatePrices() => !IsUpdatingPrices;
+
+    private async Task UpdateAssetPriceAsync(AssetDto asset, decimal newPrice)
+    {
+        // Erstelle eine aktualisierte Version des Assets (CurrentValue = Stückzahl × neuer Kurs)
+        var newTotalValue = asset.CurrentQuantity * newPrice;
+        var updatedAsset = asset with { CurrentPrice = newPrice, CurrentValue = newTotalValue };
+        
+        // Aktualisiere das Asset im Projekt
+        var current = CurrentProjectService.Current;
+        if (current?.Portfolio is null)
+            return;
+
+        var assets = current.Portfolio.Assets.Select(a => 
+            a.Id == asset.Id ? updatedAsset : a).ToList();
+        
+        CurrentProjectService.UpdatePortfolio(current.Portfolio with { Assets = assets });
+        
+        // Wenn das aktuell ausgewählte Asset aktualisiert wurde, aktualisiere die Form
+        if (SelectedItem?.Id == asset.Id)
+        {
+            CurrentPrice = newPrice;
+        }
     }
 
     partial void OnSearchTextChanged(string value)

@@ -33,8 +33,16 @@
                         <TextBlock Text="Löschen" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
+                <Button Classes="toolbar-button" Command="{Binding UpdatePricesCommand}" 
+                        IsEnabled="{Binding !IsUpdatingPrices}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <fi:SymbolIcon Symbol="ArrowSync" FontSize="16"/>
+                        <TextBlock Text="Kurse aktualisieren" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </controls:FeatureLayoutView.ActionContent>
+        <StackPanel>
         <controls:MasterDetailView>
             <controls:MasterDetailView.MasterContent>
                 <StackPanel Spacing="8">
@@ -184,5 +192,15 @@
                 </StackPanel>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>
+        <!-- Status-Anzeige für Kursaktualisierung -->
+        <StackPanel Margin="0,12,0,0" Spacing="4">
+            <TextBlock Text="{Binding UpdateStatus}" 
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+            <ProgressBar IsIndeterminate="True" 
+                         IsVisible="{Binding IsUpdatingPrices}"
+                         Height="4"/>
+        </StackPanel>
+        </StackPanel>
     </controls:FeatureLayoutView>
 </UserControl>
