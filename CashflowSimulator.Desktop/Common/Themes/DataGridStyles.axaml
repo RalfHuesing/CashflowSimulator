@@ -26,6 +26,16 @@
         <Setter Property="Foreground" Value="{StaticResource TextOnDarkBrush}" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Padding" Value="{StaticResource DataGridHeaderPadding}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Zellen: vertikale Zentrierung für einheitliches Erscheinungsbild (Text + Template-Inhalt) -->
+    <Style Selector="DataGridCell">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="DataGridCell TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">

@@ -65,6 +65,8 @@
         <SolidColorBrush x:Key="FormInputBorderBrush" Color="{StaticResource FormInputBorderColor}" />
         <SolidColorBrush x:Key="FormInputErrorBorderBrush" Color="{StaticResource FormInputErrorBorderColor}" />
         <SolidColorBrush x:Key="FormInputErrorIconBrush" Color="{StaticResource FormInputErrorIconColor}" />
+        <sys:Double x:Key="FormInputMinHeight">32</sys:Double>
+        <Thickness x:Key="FormInputPadding">6,6</Thickness>
         <sys:Double x:Key="FormLabelWidth">180</sys:Double>
         <sys:Double x:Key="FormInputWidth">220</sys:Double>
         <sys:Double x:Key="FormRowSpacing">16</sys:Double>
