@@ -182,4 +182,33 @@ public sealed class CashflowStreamDtoValidatorTests
 
         Assert.True(result.IsValid);
     }
+
+    [Fact]
+    public void Validate_StartAgeOutOfRange_ReturnsError()
+    {
+        var dto = ValidDto() with { StartAge = 121 };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "StartAge" && e.Message.Contains("120"));
+    }
+
+    [Fact]
+    public void Validate_EndAgeBeforeStartAge_ReturnsError()
+    {
+        var dto = ValidDto() with { StartAge = 67, EndAge = 60 };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("Endalter"));
+    }
+
+    [Fact]
+    public void Validate_StartAgeAndEndAgeValid_ReturnsIsValid()
+    {
+        var dto = ValidDto() with { StartAge = 67, EndAge = 90 };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.True(result.IsValid);
+    }
 }

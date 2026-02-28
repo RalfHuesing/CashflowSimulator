@@ -20,9 +20,10 @@ public sealed class CashflowProcessor : ISimulationProcessor
     {
         ArgumentNullException.ThrowIfNull(project.Streams);
 
+        var dateOfBirth = project.Parameters?.DateOfBirth;
         foreach (var stream in project.Streams)
         {
-            if (!IsStreamActive(stream, currentDate))
+            if (!IsStreamActive(stream, currentDate, dateOfBirth))
                 continue;
 
             if (!IsIntervalApplicable(stream.Interval, currentDate))
@@ -51,13 +52,28 @@ public sealed class CashflowProcessor : ISimulationProcessor
         }
     }
 
-    private static bool IsStreamActive(CashflowStreamDto stream, DateOnly currentDate)
+    private static bool IsStreamActive(CashflowStreamDto stream, DateOnly currentDate, DateOnly? dateOfBirth)
     {
-        if (stream.StartDate > currentDate)
+        if (stream.StartAge is int startAge || stream.EndAge is int endAge)
+        {
+            if (!dateOfBirth.HasValue || dateOfBirth.Value == default)
+                return false;
+            var ageInYears = (int)((currentDate.ToDateTime(TimeOnly.MinValue) - dateOfBirth.Value.ToDateTime(TimeOnly.MinValue)).TotalDays / 365.25);
+            if (stream.StartAge is int sa && ageInYears < sa)
+                return false;
+            if (stream.EndAge is int ea && ageInYears > ea)
+                return false;
+        }
+        if (!stream.StartAge.HasValue && stream.StartDate > currentDate)
             return false;
-        if (stream.EndDate is null)
-            return true;
-        return currentDate <= stream.EndDate.Value;
+        if (!stream.EndAge.HasValue)
+        {
+            if (stream.EndDate is null)
+                return true;
+            if (currentDate > stream.EndDate.Value)
+                return false;
+        }
+        return true;
     }
 
     private static bool IsIntervalApplicable(CashflowInterval interval, DateOnly currentDate)

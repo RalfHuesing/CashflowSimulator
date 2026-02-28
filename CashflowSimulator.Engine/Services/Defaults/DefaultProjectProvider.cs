@@ -22,7 +22,7 @@ public sealed class DefaultProjectProvider(
         var simulationStart = parameters.SimulationStart;
         var simulationEnd = parameters.SimulationEnd;
 
-        List<CashflowStreamDto> streams = cashflowDefaultService.GetStreams(simulationStart, simulationEnd);
+        List<CashflowStreamDto> streams = cashflowDefaultService.GetStreams(simulationStart, simulationEnd, parameters.DateOfBirth);
         List<CashflowEventDto> events = cashflowDefaultService.GetEvents(simulationStart, simulationEnd);
         List<EconomicFactorDto> economicFactors = marketDataService.GetEconomicFactors();
         List<CorrelationEntryDto> correlations = marketDataService.GetCorrelations(economicFactors);

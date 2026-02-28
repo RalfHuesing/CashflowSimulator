@@ -9,11 +9,11 @@ namespace CashflowSimulator.Engine.Services.Defaults;
 public sealed class CashflowDefaultService : ICashflowDefaultService
 {
     /// <inheritdoc />
-    public List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd)
+    public List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd, DateOnly dateOfBirth)
     {
         List<CashflowStreamDto> streams =
         [
-            .. GetIncomeStreams(simulationStart, simulationEnd),
+            .. GetIncomeStreams(simulationStart, simulationEnd, dateOfBirth),
             .. GetLivingExpenses(simulationStart),
             .. GetMobilityAndSubscriptions(simulationStart),
             .. GetYearlyExpenses(simulationStart, simulationEnd)
@@ -89,8 +89,9 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
         ];
     }
 
-    private IEnumerable<CashflowStreamDto> GetIncomeStreams(DateOnly start, DateOnly simulationEnd)
+    private IEnumerable<CashflowStreamDto> GetIncomeStreams(DateOnly start, DateOnly simulationEnd, DateOnly dateOfBirth)
     {
+        var pensionStartDate = new DateOnly(dateOfBirth.Year + 67, dateOfBirth.Month, 1);
         return
         [
             new()
@@ -110,8 +111,9 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Type = CashflowType.Income,
                 Amount = 1950m,
                 Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
+                StartDate = pensionStartDate,
+                EndDate = null,
+                StartAge = 67
             }
         ];
     }

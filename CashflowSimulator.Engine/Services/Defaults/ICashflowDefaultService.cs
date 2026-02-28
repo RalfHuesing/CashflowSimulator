@@ -10,9 +10,9 @@ public interface ICashflowDefaultService
 {
     /// <summary>
     /// Liefert alle Standard-Streams (Gehalt, Rente, Wohnen, Mobilität, Versicherungen, etc.)
-    /// in Abhängigkeit von Simulationsstart und -ende.
+    /// in Abhängigkeit von Simulationsstart, -ende und Geburtsdatum (für Rente ab 67).
     /// </summary>
-    List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd);
+    List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd, DateOnly dateOfBirth);
 
     /// <summary>
     /// Liefert die Standard-Lebensereignisse (einmalige Ausgaben/Einnahmen)

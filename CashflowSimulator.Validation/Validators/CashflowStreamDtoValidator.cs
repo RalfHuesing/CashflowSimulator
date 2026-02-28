@@ -11,6 +11,7 @@ public sealed class CashflowStreamDtoValidator : AbstractValidator<CashflowStrea
     private const int NameMaxLength = 200;
     private const int DateMinYear = 1900;
     private const int DateMaxYear = 2100;
+    private const int MaxAge = 120;
 
     public CashflowStreamDtoValidator()
     {
@@ -46,5 +47,20 @@ public sealed class CashflowStreamDtoValidator : AbstractValidator<CashflowStrea
             .Must(dto => !dto.EndDate.HasValue || dto.EndDate >= dto.StartDate)
             .When(x => x.StartDate != default && x.EndDate.HasValue)
             .WithMessage("Enddatum darf nicht vor dem Startdatum liegen.");
+
+        RuleFor(x => x.StartAge)
+            .InclusiveBetween(0, MaxAge)
+            .When(x => x.StartAge.HasValue)
+            .WithMessage($"Startalter muss zwischen 0 und {MaxAge} liegen.");
+
+        RuleFor(x => x.EndAge)
+            .InclusiveBetween(0, MaxAge)
+            .When(x => x.EndAge.HasValue)
+            .WithMessage($"Endalter muss zwischen 0 und {MaxAge} liegen.");
+
+        RuleFor(x => x)
+            .Must(dto => !dto.StartAge.HasValue || !dto.EndAge.HasValue || dto.EndAge >= dto.StartAge)
+            .When(x => x.StartAge.HasValue && x.EndAge.HasValue)
+            .WithMessage("Endalter darf nicht vor Startalter liegen.");
     }
 }

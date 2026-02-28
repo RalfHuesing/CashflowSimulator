@@ -199,4 +199,113 @@ public sealed class CashflowProcessorTests
         Assert.Equal(1700m, state.Cash);
         Assert.Equal(2, state.CurrentMonthSnapshots.Count);
     }
+
+    [Fact]
+    public void ProcessMonth_PensionStreamWithStartAge67_NotAppliedBefore67()
+    {
+        var processor = new CashflowProcessor();
+        var parameters = new SimulationParametersDto
+        {
+            SimulationStart = new DateOnly(2020, 1, 1),
+            SimulationEnd = new DateOnly(2030, 12, 1),
+            DateOfBirth = new DateOnly(1954, 1, 1),
+            InitialLiquidCash = 0m,
+            InitialLossCarryforwardGeneral = 0,
+            InitialLossCarryforwardStocks = 0
+        };
+        var project = Project(
+        [
+            new CashflowStreamDto
+            {
+                Name = "Rente",
+                Type = CashflowType.Income,
+                Amount = 2000m,
+                Interval = CashflowInterval.Monthly,
+                StartDate = new DateOnly(2020, 1, 1),
+                EndDate = null,
+                StartAge = 67
+            }
+        ], parameters);
+        var state = new SimulationState { Cash = 100m };
+
+        processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
+
+        Assert.Equal(100m, state.Cash);
+        Assert.Empty(state.CurrentMonthSnapshots);
+    }
+
+    [Fact]
+    public void ProcessMonth_PensionStreamWithStartAge67_AppliedFrom67()
+    {
+        var processor = new CashflowProcessor();
+        var parameters = new SimulationParametersDto
+        {
+            SimulationStart = new DateOnly(2020, 1, 1),
+            SimulationEnd = new DateOnly(2030, 12, 1),
+            DateOfBirth = new DateOnly(1954, 1, 1),
+            InitialLiquidCash = 0m,
+            InitialLossCarryforwardGeneral = 0,
+            InitialLossCarryforwardStocks = 0
+        };
+        var project = Project(
+        [
+            new CashflowStreamDto
+            {
+                Name = "Rente",
+                Type = CashflowType.Income,
+                Amount = 2000m,
+                Interval = CashflowInterval.Monthly,
+                StartDate = new DateOnly(2020, 1, 1),
+                EndDate = null,
+                StartAge = 67
+            }
+        ], parameters);
+        var state = new SimulationState { Cash = 100m };
+
+        processor.ProcessMonth(project, state, new DateOnly(2021, 1, 1));
+
+        Assert.Equal(2100m, state.Cash);
+        Assert.Single(state.CurrentMonthSnapshots);
+        Assert.Equal("Rente", state.CurrentMonthSnapshots[0].Name);
+        Assert.Equal(2000m, state.CurrentMonthSnapshots[0].Amount);
+    }
+
+    [Fact]
+    public void ProcessMonth_StreamWithEndAge70_NotAppliedAfter70()
+    {
+        var processor = new CashflowProcessor();
+        var parameters = new SimulationParametersDto
+        {
+            SimulationStart = new DateOnly(2020, 1, 1),
+            SimulationEnd = new DateOnly(2030, 12, 1),
+            DateOfBirth = new DateOnly(1950, 1, 1),
+            InitialLiquidCash = 0m,
+            InitialLossCarryforwardGeneral = 0,
+            InitialLossCarryforwardStocks = 0
+        };
+        var project = Project(
+        [
+            new CashflowStreamDto
+            {
+                Name = "Temp",
+                Type = CashflowType.Income,
+                Amount = 500m,
+                Interval = CashflowInterval.Monthly,
+                StartDate = new DateOnly(2020, 1, 1),
+                EndDate = null,
+                StartAge = 65,
+                EndAge = 70
+            }
+        ], parameters);
+        var state = new SimulationState { Cash = 0m };
+
+        processor.ProcessMonth(project, state, new DateOnly(2016, 1, 1)); // Alter 66: aktiv
+        Assert.Equal(500m, state.Cash);
+        state.Cash = 0m;
+        state.CurrentMonthSnapshots.Clear();
+
+        processor.ProcessMonth(project, state, new DateOnly(2021, 1, 1)); // Alter 71: inaktiv
+        Assert.Equal(0m, state.Cash);
+        Assert.Empty(state.CurrentMonthSnapshots);
+    }
 }
