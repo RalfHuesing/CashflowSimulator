@@ -75,11 +75,11 @@ Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Cl
 * **Core:** C# / .NET 9
 * **UI Framework:** [Avalonia UI](https://avaloniaui.net/) (für Cross-Platform Desktop Support)
 * **Architektur:**
-    * `CashflowSimulator.Contracts`: Datendefinitionen, DTOs und fachliche Schnittstellen.
+    * `CashflowSimulator.Contracts`: Datendefinitionen, DTOs und fachliche Schnittstellen (z. B. `ISimulationRunner`, `IStockPriceService`).
     * `CashflowSimulator.Validation`: FluentValidation-Validatoren (Single Source of Truth für Regeln).
-    * `CashflowSimulator.Engine`: Reine Rechenlogik (Simulation, Wachstumsmodelle; keine UI, keine I/O).
-    * `CashflowSimulator.Infrastructure`: Persistenz (Laden/Speichern), Kursdaten, Implementierungen für Contracts-Interfaces.
-    * `CashflowSimulator.Desktop`: Avalonia-UI, Composition Root, MVVM.
+    * `CashflowSimulator.Engine`: Reine Rechenlogik: `SimulationRunner` (monatliche Pipeline) mit `ISimulationProcessor`-Kette (CashflowProcessor, GrowthProcessor, LiquidityProcessor, InflationProcessor); keine UI, keine I/O.
+    * `CashflowSimulator.Infrastructure`: Persistenz (Laden/Speichern), Kursdaten (`DummyStockPriceProvider` für `IStockPriceService`), Implementierungen für Contracts-Interfaces.
+    * `CashflowSimulator.Desktop`: Avalonia-UI, Composition Root, MVVM; Feature „Simulation starten“ und Anzeige der monatlichen Ergebnisse.
     * `CashflowSimulator.Shared`: Gemeinsame Hilfen (derzeit Placeholder). Test-Projekte: Engine.Tests, Desktop.Tests, Validation.Tests.
 * **Testing:** xUnit
 
@@ -91,11 +91,14 @@ Wir arbeiten aktuell an folgenden Meilensteinen:
 
 - [x] Grundlegende Architektur & Datenmodelle (`Contracts`)
 - [x] Lifecycle-Phasen-Modell (Steuer-/Strategie-Profile, Validierung, Defaults)
-- [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale)
+- [x] Monatliche Simulations-Pipeline (Engine: `SimulationRunner` mit Cashflow-, Growth-, Liquidity-, InflationProcessor)
+- [x] Anzeige Simulationsergebnis (Desktop: „Simulation starten“, monatliche Ergebnisse)
+- [x] Kursabfrage-Basis (`IStockPriceService`, `DummyStockPriceProvider`, Button „Kurs aktualisieren“ im Portfolio)
+- [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale) – **geplant**
 - [x] Validierungslogik für Eingaben
 - [x] Grundaufbau der Benutzeroberfläche (Avalonia XAML, Shell, Navigation, Feature-Bereiche)
 - [x] Persistierung (Speichern/Laden von Projekten)
-- [ ] Erste lauffähige Beta-Version
+- [ ] Erste lauffähige Beta-Version – **geplant**
 
 ---
 

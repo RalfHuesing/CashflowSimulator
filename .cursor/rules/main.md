@@ -14,10 +14,10 @@ Du bist ein Senior .NET Entwickler mit Fokus auf pragmatische Enterprise-Archite
 
 | Projekt | Verantwortung |
 | --- | --- |
-| **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. IPriceProvider), ValidationError/ValidationResult. |
+| **CashflowSimulator.Contracts** | Single Source of Truth – SimulationProjectDto, Enums, fachliche Interfaces (z. B. ISimulationRunner, IStockPriceService), ValidationError/ValidationResult. |
 | **CashflowSimulator.Validation** | FluentValidation-Validatoren für DTOs (SimulationParametersDto, MetaDto, SimulationProjectDto); Single Source of Truth für fachliche Regeln. |
-| **CashflowSimulator.Engine** | Stateless Mathematik – SimulationEngine, Wachstumsmodelle, Steuerlogik; keine UI, keine I/O. |
-| **CashflowSimulator.Infrastructure** | Außenwelt – Persistenz (Laden/Speichern Szenarien), Kursdaten (z. B. StockPriceEngine/Cache), Implementierungen für Contracts-Interfaces. |
+| **CashflowSimulator.Engine** | Stateless Mathematik – SimulationRunner (monatliche Pipeline mit ISimulationProcessor: CashflowProcessor, GrowthProcessor, LiquidityProcessor, InflationProcessor), Wachstumsmodelle; Steuerlogik (FIFO, Vorabpauschale) in Planung; keine UI, keine I/O. |
+| **CashflowSimulator.Infrastructure** | Außenwelt – Persistenz (Laden/Speichern Szenarien), Kursdaten (IStockPriceService-Implementierung, z. B. DummyStockPriceProvider), Implementierungen für Contracts-Interfaces. |
 | **CashflowSimulator.Desktop** | Avalonia-UI; Einstiegspunkt, Composition Root; ViewModels wrappen DTOs aus Contracts; keine Business-Logik in Engine nachbauen. |
 
 Keine separaten „Feature“-Projekte; klare Schichtentrennung reicht. **CashflowSimulator.Shared** ist in der Solution enthalten (derzeit Placeholder für spätere gemeinsame Hilfen).
@@ -47,8 +47,8 @@ flowchart TB
 ## Coding Standards (.NET 9 / C#)
 
 - **C#:** Moderne Features nutzen – Primary Constructors, Collection Expressions, Pattern Matching.
-- **Async durchgängig:** CPU-intensive Arbeit (z. B. Simulation) in Libraries mit `Task.Run`/Parallelisierung; öffentliche Engine-API async (z. B. `RunSimulationAsync`); in allen Non-UI-Libraries `ConfigureAwait(false)`.
-- **SimulationEngine:** Alle Kerne nutzen (z. B. `Parallel.ForEach` über Monte-Carlo-Iterationen), API trotzdem async, damit die UI nicht blockiert.
+- **Async durchgängig:** CPU-intensive Arbeit (z. B. Simulation) in Libraries mit `Task.Run`/Parallelisierung; öffentliche Engine-API kann async sein (z. B. zukünftig `RunSimulationAsync`); in allen Non-UI-Libraries `ConfigureAwait(false)`. Aktuell: `ISimulationRunner.RunSimulation` ist synchron.
+- **SimulationRunner:** Führt die monatliche Pipeline (ISimulationProcessor-Kette) aus. Zukünftige Monte-Carlo-Erweiterung: parallele Iterationen, dann API async, damit die UI nicht blockiert.
 - **Result-Pattern:** Für erwartbare Fehler (Validierung, Laden/Speichern, fehlgeschlagene Services) `Result`/`Result<T>` verwenden; Exceptions für unerwartete Programmfehler. Implementierung in Engine oder kleine Hilfsklasse.
 - Boilerplate vermeiden: zentrale Extension Methods, keine Duplikate.
 

@@ -96,4 +96,4 @@ Um die Realitätsnähe über die Standard-Normalverteilung (GBM) hinaus zu erhö
 - **Krisen-Korrelation:** Dynamische Anpassung der Korrelationsmatrix in Stressphasen (Asset-Klassen korrelieren in Krisen oft stärker gegen 1,0).
 ---
 
-*Stand: Spezifikation für die Engine-Implementierung; DTOs und Enums sind in CashflowSimulator.Contracts definiert.*
+*Stand: Spezifikation für die Engine-Implementierung; DTOs und Enums sind in CashflowSimulator.Contracts definiert. Die monatliche Simulations-Pipeline (SimulationRunner, ISimulationProcessor: CashflowProcessor, GrowthProcessor, LiquidityProcessor, InflationProcessor) ist unabhängig von der Monte-Carlo-Engine und bereits im Code implementiert.*

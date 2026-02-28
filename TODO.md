@@ -8,11 +8,9 @@ Sammlung von To-dos und Ideen für den CashflowSimulator.
 
 - **Navigation:** Die Würfel (Cubes) und Expander in der Navigation – die Farbe ist unpassend (aktuell hellgrau, wirkt schlecht). Müssen überarbeitet werden.
 
-- **Kurs-Abfrage (Engine):**
-  - In der Engine eine einfache Schnittstelle zum Abfragen von Kursen einbauen.
-  - Kurse laufen nicht zwingend über ISIN, sondern über **Symbole** → ggf. DTO anpassen/erweitern, damit Symbole gespeichert werden können.
-  - Oberfläche: Button „Kurs aktualisieren“. Ablauf: Symbol suchen → wenn nicht vorhanden, Symbol ermitteln (über Kurs-Engine) → wenn Symbol da ist, Kurs abfragen.
-  - **Provider-agnostisch** umsetzen: Die eigentliche Abfrage muss bewusst über austauschbare Provider laufen (verschiedene Anbieter möglich). Gegebenenfalls Websites parsen, wenn Provider wechseln oder etwas schiefgeht.
+- **Kurs-Abfrage:**
+  - **Bereits umgesetzt (Phase 1):** `IStockPriceService` (Contracts), `DummyStockPriceProvider` (Infrastructure), Button „Kurs aktualisieren“ im Portfolio (Desktop). Kursabfrage läuft über Symbol.
+  - **Offen:** Symbol-Suche / Ermittlung wenn nicht vorhanden; **provider-agnostisch** (austauschbare Provider, verschiedene Anbieter); ggf. Anbindung in der Engine für Simulation. Kurse/ISIN vs. Symbole: DTO ggf. erweitern, damit Symbole gespeichert werden können.
 
 - **Allokationsprofile / Zielrichtung:**
   - Die neuen Allokationsprofile mit der Zielrichtung darunter sind grundsätzlich überarbeitungsbedürftig (unklar, ob das Konzept so bleiben soll).
