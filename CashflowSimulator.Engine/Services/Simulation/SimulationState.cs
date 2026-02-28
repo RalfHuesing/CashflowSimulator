@@ -19,4 +19,10 @@ public sealed class SimulationState
 
     /// <summary>Cashflow-Snapshots des aktuellen Monats; nach Übertrag ins MonthlyResultDto leeren.</summary>
     public List<CashflowSnapshotEntryDto> CurrentMonthSnapshots { get; } = [];
+
+    /// <summary>
+    /// Inflationsindexierte Beträge pro Stream (Schlüssel = <see cref="CashflowStreamDto.Id"/>).
+    /// Wird vom InflationProcessor initialisiert und zum Jahreswechsel angepasst; CashflowProcessor liest von hier, falls vorhanden.
+    /// </summary>
+    public Dictionary<string, decimal> IndexedStreamAmounts { get; set; } = new();
 }

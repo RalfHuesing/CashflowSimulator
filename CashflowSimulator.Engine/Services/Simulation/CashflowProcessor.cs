@@ -29,7 +29,9 @@ public sealed class CashflowProcessor : ISimulationProcessor
             if (!IsIntervalApplicable(stream.Interval, currentDate))
                 continue;
 
-            var amount = stream.Amount;
+            var amount = state.IndexedStreamAmounts.TryGetValue(stream.Id, out var indexedAmount)
+                ? indexedAmount
+                : stream.Amount;
             state.CurrentMonthSnapshots.Add(new CashflowSnapshotEntryDto
             {
                 Name = stream.Name,
