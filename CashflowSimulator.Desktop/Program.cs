@@ -20,6 +20,7 @@ using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services.Defaults;
+using CashflowSimulator.Infrastructure.Services;
 using CashflowSimulator.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -84,10 +85,14 @@ namespace CashflowSimulator.Desktop
                 services.AddTransient<AllocationProfilesViewModel>();
                 services.AddTransient<LifecyclePhasesViewModel>();
                 services.AddTransient<SettingsViewModel>();
-                
+
                 // Shell & Main Window
                 services.AddTransient<MainShellViewModel>();
                 services.AddTransient<MainWindow>();
+
+                // Register HttpClient and IStockPriceService
+                services.AddHttpClient();
+                services.AddSingleton<IStockPriceService, DummyStockPriceProvider>();
 
                 var serviceProvider = services.BuildServiceProvider();
                 CompositionRoot.Services = serviceProvider;
