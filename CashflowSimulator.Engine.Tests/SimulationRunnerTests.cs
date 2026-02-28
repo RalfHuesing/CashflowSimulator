@@ -1,4 +1,5 @@
 using CashflowSimulator.Contracts.Dtos;
+using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Engine.Services.Simulation;
 using Xunit;
 
@@ -6,6 +7,9 @@ namespace CashflowSimulator.Engine.Tests;
 
 public sealed class SimulationRunnerTests
 {
+    private static ISimulationRunner CreateRunner() =>
+        new SimulationRunner([new CashflowProcessor(), new GrowthProcessor()]);
+
     private static SimulationProjectDto MinimalProject(
         DateOnly? start = null,
         DateOnly? end = null,
@@ -32,7 +36,7 @@ public sealed class SimulationRunnerTests
     [Fact]
     public void RunSimulation_Throws_WhenProjectIsNull()
     {
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
         Assert.Throws<ArgumentNullException>(() => runner.RunSimulation(null!));
     }
 
@@ -42,7 +46,7 @@ public sealed class SimulationRunnerTests
         var project = MinimalProject(
             start: new DateOnly(2020, 12, 1),
             end: new DateOnly(2020, 1, 1));
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -57,7 +61,7 @@ public sealed class SimulationRunnerTests
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 1, 1),
             initialCash: 15_000m);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -76,7 +80,7 @@ public sealed class SimulationRunnerTests
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 12, 1),
             initialCash: 20_000m);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -104,7 +108,7 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -140,7 +144,7 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -168,7 +172,7 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -197,7 +201,7 @@ public sealed class SimulationRunnerTests
                     EndDate = new DateOnly(2020, 2, 1)
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -226,7 +230,7 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -245,7 +249,7 @@ public sealed class SimulationRunnerTests
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 12, 1));
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 
@@ -276,7 +280,7 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = new SimulationRunner();
+        var runner = CreateRunner();
 
         var result = runner.RunSimulation(project);
 

@@ -4,10 +4,18 @@ using CashflowSimulator.Contracts.Interfaces;
 namespace CashflowSimulator.Engine.Services.Simulation;
 
 /// <summary>
-/// Führt die monatliche Simulations-Pipeline aus (Slice 1: nur Cashflow; keine Steuern, keine Inflation, kein Depot).
+/// Führt die monatliche Simulations-Pipeline aus (Processors: Cashflow, Growth; erweiterbar um Steuern, Inflation).
 /// </summary>
 public sealed class SimulationRunner : ISimulationRunner
 {
+    private readonly IEnumerable<ISimulationProcessor> _processors;
+
+    public SimulationRunner(IEnumerable<ISimulationProcessor> processors)
+    {
+        ArgumentNullException.ThrowIfNull(processors);
+        _processors = processors;
+    }
+
     /// <inheritdoc />
     public SimulationResultDto RunSimulation(SimulationProjectDto project)
     {
@@ -23,20 +31,27 @@ public sealed class SimulationRunner : ISimulationRunner
         if (monthCount <= 0)
             return new SimulationResultDto { MonthlyResults = [] };
 
-        var monthlyResults = new List<MonthlyResultDto>(monthCount);
+        var portfolio = project.Portfolio ?? new PortfolioDto();
         var state = new SimulationState
         {
             Cash = parameters.InitialLiquidCash,
-            TotalAssets = parameters.InitialLiquidCash
+            TotalAssets = parameters.InitialLiquidCash,
+            Portfolio = new PortfolioDto
+            {
+                Assets = portfolio.Assets.Select(a => a with { }).ToList(),
+                Strategy = portfolio.Strategy
+            }
         };
+
+        var monthlyResults = new List<MonthlyResultDto>(monthCount);
 
         for (var monthIndex = 0; monthIndex < monthCount; monthIndex++)
         {
             var currentDate = start.AddMonths(monthIndex);
             var age = CalculateAge(parameters.DateOfBirth, currentDate);
 
-            var snapshots = ProcessCashflowStreams(project.Streams, currentDate, state);
-            state.TotalAssets = state.Cash;
+            foreach (var processor in _processors)
+                processor.ProcessMonth(project, state, currentDate);
 
             monthlyResults.Add(new MonthlyResultDto
             {
@@ -44,8 +59,9 @@ public sealed class SimulationRunner : ISimulationRunner
                 MonthIndex = monthIndex,
                 CashBalance = state.Cash,
                 TotalAssets = state.TotalAssets,
-                CashflowSnapshots = snapshots
+                CashflowSnapshots = state.CurrentMonthSnapshots.ToList()
             });
+            state.CurrentMonthSnapshots.Clear();
         }
 
         return new SimulationResultDto { MonthlyResults = monthlyResults };
@@ -61,56 +77,5 @@ public sealed class SimulationRunner : ISimulationRunner
     {
         var totalDays = (currentDate.ToDateTime(TimeOnly.MinValue) - dateOfBirth.ToDateTime(TimeOnly.MinValue)).TotalDays;
         return totalDays / 365.25;
-    }
-
-    private static List<CashflowSnapshotEntryDto> ProcessCashflowStreams(
-        List<CashflowStreamDto> streams,
-        DateOnly currentDate,
-        SimulationState state)
-    {
-        var snapshots = new List<CashflowSnapshotEntryDto>();
-
-        foreach (var stream in streams)
-        {
-            if (!IsStreamActive(stream, currentDate))
-                continue;
-
-            if (!IsIntervalApplicable(stream.Interval, currentDate))
-                continue;
-
-            var amount = stream.Amount;
-            snapshots.Add(new CashflowSnapshotEntryDto
-            {
-                Name = stream.Name,
-                CashflowType = stream.Type,
-                Amount = amount
-            });
-
-            if (stream.Type == CashflowType.Income)
-                state.Cash += amount;
-            else
-                state.Cash -= amount;
-        }
-
-        return snapshots;
-    }
-
-    private static bool IsStreamActive(CashflowStreamDto stream, DateOnly currentDate)
-    {
-        if (stream.StartDate > currentDate)
-            return false;
-        if (stream.EndDate is null)
-            return true;
-        return currentDate <= stream.EndDate.Value;
-    }
-
-    private static bool IsIntervalApplicable(CashflowInterval interval, DateOnly currentDate)
-    {
-        return interval switch
-        {
-            CashflowInterval.Monthly => true,
-            CashflowInterval.Yearly => currentDate.Month == 1,
-            _ => true
-        };
     }
 }
