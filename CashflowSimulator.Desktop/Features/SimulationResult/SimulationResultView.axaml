@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CashflowSimulator.Desktop.Features.SimulationResult"
+             xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+             x:Class="CashflowSimulator.Desktop.Features.SimulationResult.SimulationResultView"
+             x:DataType="vm:SimulationResultViewModel">
+
+    <controls:FeatureLayoutView Title="Simulationsergebnis"
+                                Description="Monatliche Cash- und Vermögenswerte (Slice 1: nur Cashflow, kein Depot).">
+        <Grid RowDefinitions="Auto, *">
+            <DataGrid Grid.Row="0"
+                      ItemsSource="{Binding MonthlyResults}"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      MinHeight="200">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Monat" Width="80" Binding="{Binding MonthIndex}"/>
+                    <DataGridTemplateColumn Header="Alter" Width="90" SortMemberPath="Age">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Age, StringFormat='{}{0:F2}'}"
+                                           TextAlignment="Right"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Liquidität" Width="120" SortMemberPath="CashBalance">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CashBalance, StringFormat='{}{0:N2}'}"
+                                           TextAlignment="Right"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Gesamtvermögen" Width="120" SortMemberPath="TotalAssets">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalAssets, StringFormat='{}{0:N2}'}"
+                                           TextAlignment="Right"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Cashflows (diesen Monat)" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding CashflowSnapshots}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Amount, StringFormat='{}{0:N2}'}"/>
+                                                <TextBlock Text="{Binding CashflowType, Converter={StaticResource EnumDescriptionConverter}}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </controls:FeatureLayoutView>
+</UserControl>

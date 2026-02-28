@@ -18,7 +18,9 @@ using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
 using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
+using CashflowSimulator.Desktop.Features.SimulationResult;
 using CashflowSimulator.Desktop.Services;
+using CashflowSimulator.Engine.Services.Simulation;
 using CashflowSimulator.Engine.Services.Defaults;
 using CashflowSimulator.Infrastructure.Services;
 using CashflowSimulator.Infrastructure.Storage;
@@ -67,6 +69,7 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IDefaultProjectProvider, DefaultProjectProvider>();
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
                 services.AddSingleton<IHelpProvider, HelpProvider>();
+                services.AddSingleton<ISimulationRunner, SimulationRunner>();
 
                 // Navigation Service
                 services.AddSingleton<INavigationService, NavigationService>();
@@ -84,6 +87,7 @@ namespace CashflowSimulator.Desktop
                 services.AddTransient<StrategyProfilesViewModel>();
                 services.AddTransient<AllocationProfilesViewModel>();
                 services.AddTransient<LifecyclePhasesViewModel>();
+                services.AddTransient<SimulationResultViewModel>();
                 services.AddTransient<SettingsViewModel>();
 
                 // Shell & Main Window

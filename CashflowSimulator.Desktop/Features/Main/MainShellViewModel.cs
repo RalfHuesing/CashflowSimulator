@@ -9,6 +9,7 @@ using CashflowSimulator.Desktop.Features.Korrelationen;
 using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
+using CashflowSimulator.Desktop.Features.SimulationResult;
 using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
 using CashflowSimulator.Desktop.Features.AllocationProfiles;
@@ -33,6 +34,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
     private readonly INavigationService _navigationService;
+    private readonly ISimulationRunner _simulationRunner;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
@@ -40,6 +42,7 @@ public partial class MainShellViewModel : ObservableObject
         IStorageService<SimulationProjectDto> storageService,
         ICurrentProjectService currentProjectService,
         INavigationService navigationService,
+        ISimulationRunner simulationRunner,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
@@ -47,6 +50,7 @@ public partial class MainShellViewModel : ObservableObject
         _storageService = storageService;
         _currentProjectService = currentProjectService;
         _navigationService = navigationService;
+        _simulationRunner = simulationRunner;
         _logger = logger;
         Navigation = navigationViewModel;
 
@@ -69,6 +73,7 @@ public partial class MainShellViewModel : ObservableObject
         OpenStrategieprofileCommand.NotifyCanExecuteChanged();
         OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
         OpenLebensphasenCommand.NotifyCanExecuteChanged();
+        StartSimulationCommand.NotifyCanExecuteChanged();
     }
 
     public NavigationViewModel Navigation { get; }
@@ -121,6 +126,7 @@ public partial class MainShellViewModel : ObservableObject
         OpenStrategieprofileCommand.NotifyCanExecuteChanged();
         OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
         OpenLebensphasenCommand.NotifyCanExecuteChanged();
+        StartSimulationCommand.NotifyCanExecuteChanged();
     }
 
     private string GetCurrentProjectTitle()
@@ -353,6 +359,25 @@ public partial class MainShellViewModel : ObservableObject
     }
 
     private bool CanSave() => _currentProjectService.Current is not null;
+
+    [RelayCommand(CanExecute = nameof(CanSave))]
+    private void StartSimulation()
+    {
+        var project = _currentProjectService.Current;
+        if (project is null) return;
+
+        try
+        {
+            var result = _simulationRunner.RunSimulation(project);
+            var resultViewModel = _navigationService.Create<SimulationResultViewModel>(result);
+            CurrentContentViewModel = resultViewModel;
+            _logger.LogInformation("Simulation abgeschlossen: {Count} Monate", result.MonthlyResults.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Simulation fehlgeschlagen.");
+        }
+    }
 
     [RelayCommand(CanExecute = nameof(CanOpenSzenario))]
     private void OpenSzenario()

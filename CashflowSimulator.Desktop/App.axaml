@@ -13,6 +13,7 @@
              xmlns:strategyProfiles="clr-namespace:CashflowSimulator.Desktop.Features.StrategyProfiles;assembly=CashflowSimulator.Desktop"
              xmlns:allocationProfiles="clr-namespace:CashflowSimulator.Desktop.Features.AllocationProfiles;assembly=CashflowSimulator.Desktop"
              xmlns:lifecyclePhases="clr-namespace:CashflowSimulator.Desktop.Features.LifecyclePhases;assembly=CashflowSimulator.Desktop"
+             xmlns:simulationResult="clr-namespace:CashflowSimulator.Desktop.Features.SimulationResult;assembly=CashflowSimulator.Desktop"
              x:Class="CashflowSimulator.Desktop.App"
              RequestedThemeVariant="Light">
     <Application.Resources>
@@ -90,6 +91,11 @@
             <lifecyclePhases:LifecyclePhasesView DataContext="{Binding}"
                                                 HorizontalAlignment="Stretch"
                                                 VerticalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate DataType="simulationResult:SimulationResultViewModel">
+            <simulationResult:SimulationResultView DataContext="{Binding}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Stretch"/>
         </DataTemplate>
     </Application.DataTemplates>
 

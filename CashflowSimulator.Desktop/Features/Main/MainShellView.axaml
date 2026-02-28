@@ -43,6 +43,13 @@
                             <TextBlock Text="Speichern" />
                         </StackPanel>
                     </Button>
+
+                    <Button Classes="ghost" Command="{Binding StartSimulationCommand}" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <fi:SymbolIcon Symbol="Play" />
+                            <TextBlock Text="Simulation starten" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
