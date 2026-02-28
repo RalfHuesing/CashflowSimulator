@@ -8,7 +8,7 @@ namespace CashflowSimulator.Engine.Tests;
 public sealed class SimulationRunnerTests
 {
     private static ISimulationRunner CreateRunner() =>
-        new SimulationRunner([new CashflowProcessor(), new GrowthProcessor()]);
+        new SimulationRunner([new CashflowProcessor(), new LiquidityProcessor(), new GrowthProcessor()]);
 
     private static SimulationProjectDto MinimalProject(
         DateOnly? start = null,

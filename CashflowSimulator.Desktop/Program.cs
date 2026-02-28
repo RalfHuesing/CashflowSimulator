@@ -70,6 +70,7 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<ICurrentProjectService, CurrentProjectService>();
                 services.AddSingleton<IHelpProvider, HelpProvider>();
                 services.AddSingleton<ISimulationProcessor, CashflowProcessor>();
+                services.AddSingleton<ISimulationProcessor, LiquidityProcessor>();
                 services.AddSingleton<ISimulationProcessor, GrowthProcessor>();
                 services.AddSingleton<ISimulationRunner, SimulationRunner>();
 
