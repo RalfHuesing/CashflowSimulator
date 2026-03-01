@@ -102,7 +102,7 @@ public sealed class CashflowDefaultService : ICashflowDefaultService
                 Amount = 2850m,
                 Interval = CashflowInterval.Monthly,
                 StartDate = start,
-                EndDate = simulationEnd
+                EndDate = pensionStartDate.AddDays(-1)
             },
             new()
             {
