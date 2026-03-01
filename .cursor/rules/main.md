@@ -137,6 +137,7 @@ Für Feature-ViewModels mit CRUD-Funktionalität (Create, Read, Update, Delete) 
 - **Naming:** Testnamen folgen dem Muster `MethodName_StateUnderTest_ExpectedBehavior`.
 - **Mocking:** Interfaces aus Contracts mocken (z. B. IPriceProvider, IStorage); handgeschriebene Mocks oder NSubstitute/Moq.
 - Unit-Tests für Engine (SimulationEngine, Steuerlogik) und sinnvolle Infrastruktur-Szenarien; UI-Tests optional später.
+- **Test-Struktur und Spezifikationstests:** Siehe [.cursor/rules/testing.md](.cursor/rules/testing.md) (wo welche Tests liegen, [Theory] als Agent-Spezifikation).
 
 ## Clean Code und SOLID
 

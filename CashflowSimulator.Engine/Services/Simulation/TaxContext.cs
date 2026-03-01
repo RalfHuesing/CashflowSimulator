@@ -24,4 +24,24 @@ public sealed class TaxContext
         LossCarryforwardGeneral = parameters.InitialLossCarryforwardGeneral;
         LossCarryforwardStocks = parameters.InitialLossCarryforwardStocks;
     }
+
+    /// <summary>
+    /// Verrechnet einen sonstigen Gewinn mit dem allgemeinen Verlusttopf. Der Topf wird um den Gewinn reduziert (Minimum 0).
+    /// Wird von der Steuerlogik aufgerufen (z. B. bei Jahresabschluss).
+    /// </summary>
+    public void ApplyGeneralGain(decimal gain)
+    {
+        if (gain <= 0) return;
+        LossCarryforwardGeneral = Math.Max(0, LossCarryforwardGeneral - gain);
+    }
+
+    /// <summary>
+    /// Verrechnet einen Aktiengewinn mit dem Aktienverlusttopf. Der Topf wird um den Gewinn reduziert (Minimum 0).
+    /// Wird von der Steuerlogik aufgerufen (z. B. bei Jahresabschluss).
+    /// </summary>
+    public void ApplyStocksGain(decimal gain)
+    {
+        if (gain <= 0) return;
+        LossCarryforwardStocks = Math.Max(0, LossCarryforwardStocks - gain);
+    }
 }

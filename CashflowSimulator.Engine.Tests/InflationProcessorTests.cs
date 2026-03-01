@@ -262,6 +262,44 @@ public sealed class InflationProcessorTests
         Assert.Equal(1000m, state.IndexedStreamAmounts["s1"]);
     }
 
+    /// <summary>
+    /// Spezifikation für Agents: Inflationsformel amount_after = amount_initial * e^(annualRate * months/12).
+    /// Erster Monat (SimStart) initialisiert nur; danach wird jeden Monat mit e^(rate/12) multipliziert.
+    /// </summary>
+    [Theory]
+    [InlineData(1000, 0.02, 12, 1020.201)]
+    [InlineData(500, 0.05, 6, 512.66)]
+    [InlineData(2000, 0, 12, 2000)]
+    [InlineData(100, 0.10, 1, 100.84)]
+    public void ProcessMonth_InflationFormula_AmountAfterMonths_MatchesSpec(
+        decimal initialAmount,
+        double annualRate,
+        int monthsAfterInit,
+        decimal expectedApprox)
+    {
+        var processor = new InflationProcessor();
+        var stream = new CashflowStreamDto
+        {
+            Id = "s1",
+            Name = "Stream",
+            Amount = initialAmount,
+            EconomicFactorId = InflationFactorId
+        };
+        var project = Project(
+            [stream],
+            [new EconomicFactorDto { Id = InflationFactorId, ExpectedReturn = annualRate }]);
+        var state = new SimulationState();
+
+        processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
+        for (var i = 1; i <= monthsAfterInit; i++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1).AddMonths(i));
+
+        var actual = state.IndexedStreamAmounts["s1"];
+        var tolerance = 0.02m;
+        Assert.True(Math.Abs(actual - expectedApprox) <= tolerance,
+            $"Expected ~{expectedApprox}, got {actual}. Formula: amount * e^(rate*{monthsAfterInit}/12) = {initialAmount * (decimal)Math.Exp(annualRate * monthsAfterInit / 12.0)}");
+    }
+
     [Fact]
     public async Task SimulationRunner_WithInflationProcessor_SecondYearSnapshotAmountHigher()
     {

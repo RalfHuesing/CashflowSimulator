@@ -214,6 +214,52 @@ public sealed class GrowthProcessorTests
         Assert.Equal(1500m, state.TotalAssets);
     }
 
+    /// <summary>
+    /// Spezifikation für Agents: Wachstumsformel price_after = price_initial * e^(annualReturn * months/12).
+    /// Stetige Verzinsung pro Monat: Faktor e^(mu/12).
+    /// </summary>
+    [Theory]
+    [InlineData(100, 0.06, 12, 106.183)]
+    [InlineData(50, 0.12, 1, 50.50)]
+    [InlineData(1000, 0, 12, 1000)]
+    [InlineData(100, 0.06, 1, 100.50)]
+    public void ProcessMonth_GrowthFormula_PriceAfterMonths_MatchesSpec(
+        decimal initialPrice,
+        double annualReturn,
+        int months,
+        decimal expectedApprox)
+    {
+        var processor = new GrowthProcessor();
+        var project = ProjectWithFactor(expectedReturn: annualReturn);
+        var state = new SimulationState
+        {
+            Cash = 0m,
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "a1",
+                        Name = "ETF",
+                        EconomicFactorId = FactorId,
+                        CurrentPrice = initialPrice,
+                        CurrentQuantity = 1m,
+                        CurrentValue = initialPrice
+                    }
+                ]
+            }
+        };
+
+        for (var i = 0; i < months; i++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1).AddMonths(i));
+
+        var actual = state.Portfolio.Assets[0].CurrentPrice;
+        var tolerance = 0.01m;
+        Assert.True(Math.Abs(actual - expectedApprox) <= tolerance,
+            $"Expected ~{expectedApprox}, got {actual}. Formula: price * e^(mu*{months}/12) = {initialPrice * (decimal)Math.Exp(annualReturn * months / 12.0)}");
+    }
+
     [Fact]
     public void ProcessMonth_AssetWithTranches_LeavesTranchesUnchanged()
     {

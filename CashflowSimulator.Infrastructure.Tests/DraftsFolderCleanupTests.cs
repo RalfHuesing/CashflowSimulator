@@ -40,6 +40,36 @@ public sealed class DraftsFolderCleanupTests
         DraftsFolderCleanup.KeepNewest(nonExistent, 5);
     }
 
+    [Fact]
+    public void KeepNewest_WhenSameTimestamp_SortsByFullNameDescending_KeepsTwoNewest()
+    {
+        using var temp = new TempDirectory();
+        var baseName = "20250101-120000";
+        Directory.CreateDirectory(Path.Combine(temp.Path, baseName + "_1"));
+        Directory.CreateDirectory(Path.Combine(temp.Path, baseName + "_2"));
+        Directory.CreateDirectory(Path.Combine(temp.Path, baseName + "_3"));
+
+        DraftsFolderCleanup.KeepNewest(temp.Path, 2);
+
+        var remaining = Directory.GetDirectories(temp.Path).Select(Path.GetFileName).OrderBy(x => x).ToList();
+        Assert.Equal(2, remaining.Count);
+        Assert.Contains(baseName + "_3", remaining);
+        Assert.Contains(baseName + "_2", remaining);
+        Assert.DoesNotContain(remaining, x => x == baseName + "_1");
+    }
+
+    [Fact]
+    public void KeepNewest_WhenExactlyKeepCountFolders_LeavesAll()
+    {
+        using var temp = new TempDirectory();
+        for (var i = 1; i <= 5; i++)
+            Directory.CreateDirectory(Path.Combine(temp.Path, $"2025010{i}-12000{i}_{i}"));
+
+        DraftsFolderCleanup.KeepNewest(temp.Path, 5);
+
+        Assert.Equal(5, Directory.GetDirectories(temp.Path).Length);
+    }
+
     private sealed class TempDirectory : IDisposable
     {
         public string Path { get; } = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CashflowSimulator_CleanupTest_" + Guid.NewGuid().ToString("N"));
