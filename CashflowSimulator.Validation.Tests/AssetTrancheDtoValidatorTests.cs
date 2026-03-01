@@ -47,4 +47,16 @@ public sealed class AssetTrancheDtoValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName.StartsWith("Tranches") && e.Message.Contains("Anschaffungspreis"));
     }
+
+    [Fact]
+    public void Validate_TrancheWithPurchaseDateInFuture_ReturnsError()
+    {
+        var futureDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+        var asset = AssetWithTranches(
+            new AssetTrancheDto { PurchaseDate = futureDate, Quantity = 1m, AcquisitionPricePerUnit = 100m });
+        var result = ValidationRunner.Validate(asset);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PurchaseDate") && e.Message.Contains("Zukunft"));
+    }
 }

@@ -48,11 +48,10 @@ public sealed class GrowthProcessor : ISimulationProcessor
                 continue;
             }
 
-            var mu = factor.ExpectedReturn; // annualisierte Rendite (double)
-            var monthlyFactor = 1.0 + (mu / 12.0);
-            var oldPrice = (double)asset.CurrentPrice;
-            var newPriceDouble = oldPrice * monthlyFactor;
-            var newPrice = (decimal)newPriceDouble;
+            // Stetige Verzinsung: monatlicher Faktor = e^(μ/12); Geldwerte bleiben decimal
+            var mu = factor.ExpectedReturn;
+            var monthlyFactor = (decimal)Math.Exp(mu / 12.0);
+            var newPrice = asset.CurrentPrice * monthlyFactor;
             var currentValue = newPrice * asset.CurrentQuantity;
 
             updatedAssets.Add(asset with

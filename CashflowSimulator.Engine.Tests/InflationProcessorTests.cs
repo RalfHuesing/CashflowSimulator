@@ -94,14 +94,17 @@ public sealed class InflationProcessorTests
         var state = new SimulationState();
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
+        for (var m = 2; m <= 12; m++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, m, 1));
         processor.ProcessMonth(project, state, new DateOnly(2021, 1, 1));
 
-        Assert.Equal(1020m, state.IndexedStreamAmounts["linked"]);
+        var expectedLinked = 1000m * (decimal)Math.Exp(0.02);
+        Assert.True(Math.Abs(state.IndexedStreamAmounts["linked"] - expectedLinked) < 0.01m);
         Assert.Equal(500m, state.IndexedStreamAmounts["unlinked"]);
     }
 
     [Fact]
-    public void ProcessMonth_NonJanuary_DoesNotChangeIndexedAmounts()
+    public void ProcessMonth_EveryMonthAfterSimStart_AppliesMonthlyInflation()
     {
         var processor = new InflationProcessor();
         var stream = new CashflowStreamDto
@@ -115,11 +118,33 @@ public sealed class InflationProcessorTests
         var state = new SimulationState();
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
-        var afterJan = state.IndexedStreamAmounts["s1"];
+        Assert.Equal(1000m, state.IndexedStreamAmounts["s1"]);
         processor.ProcessMonth(project, state, new DateOnly(2020, 2, 1));
-        processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
+        var expectedOneMonth = 1000m * (decimal)Math.Exp(0.10 / 12.0);
+        Assert.True(Math.Abs(state.IndexedStreamAmounts["s1"] - expectedOneMonth) < 0.01m);
+    }
 
-        Assert.Equal(afterJan, state.IndexedStreamAmounts["s1"]);
+    [Fact]
+    public void ProcessMonth_TwelveMonths_MatchesAnnualContinuousInflation()
+    {
+        var processor = new InflationProcessor();
+        var stream = new CashflowStreamDto
+        {
+            Id = "s1",
+            Name = "Gehalt",
+            Amount = 1000m,
+            EconomicFactorId = InflationFactorId
+        };
+        var project = Project([stream], [new EconomicFactorDto { Id = InflationFactorId, ExpectedReturn = 0.02 }]);
+        var state = new SimulationState();
+
+        processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
+        for (var m = 2; m <= 12; m++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, m, 1));
+        processor.ProcessMonth(project, state, new DateOnly(2021, 1, 1));
+
+        var expected = 1000m * (decimal)Math.Exp(0.02);
+        Assert.True(Math.Abs(state.IndexedStreamAmounts["s1"] - expected) < 0.01m);
     }
 
     [Fact]
@@ -144,7 +169,7 @@ public sealed class InflationProcessorTests
     }
 
     [Fact]
-    public void ProcessMonth_TwoConsecutiveJanuaries_CompoundsInflation()
+    public void ProcessMonth_TwentyFourMonths_CompoundsInflation()
     {
         var processor = new InflationProcessor();
         var stream = new CashflowStreamDto
@@ -160,11 +185,11 @@ public sealed class InflationProcessorTests
         processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
         Assert.Equal(1000m, state.IndexedStreamAmounts["s1"]);
 
-        processor.ProcessMonth(project, state, new DateOnly(2021, 1, 1));
-        Assert.Equal(1100m, state.IndexedStreamAmounts["s1"]);
+        for (var i = 0; i < 24; i++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1).AddMonths(i + 1));
 
-        processor.ProcessMonth(project, state, new DateOnly(2022, 1, 1));
-        Assert.Equal(1210m, state.IndexedStreamAmounts["s1"]);
+        var expected = 1000m * (decimal)Math.Exp(0.10 * 2);
+        Assert.True(Math.Abs(state.IndexedStreamAmounts["s1"] - expected) < 0.01m);
     }
 
     [Fact]
@@ -291,6 +316,7 @@ public sealed class InflationProcessorTests
         Assert.NotNull(salarySnapshot2020);
         Assert.NotNull(salarySnapshot2021);
         Assert.Equal(3000m, salarySnapshot2020.Amount);
-        Assert.Equal(3060m, salarySnapshot2021.Amount);
+        var expectedSalary2021 = 3000m * (decimal)Math.Exp(0.02);
+        Assert.True(Math.Abs(salarySnapshot2021.Amount - expectedSalary2021) < 0.01m);
     }
 }

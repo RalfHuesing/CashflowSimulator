@@ -155,4 +155,37 @@ public sealed class LifecyclePhaseDtoValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName.Contains("TargetWeight") || e.PropertyName.Contains("AssetAllocationOverrides"));
     }
+
+    [Fact]
+    public void Validate_AssetAllocationOverridesSumExceedsOne_ReturnsError()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 0.6m },
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 0.6m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("Summe") || e.Message.Contains("100 %"));
+    }
+
+    [Fact]
+    public void Validate_AssetAllocationOverridesSumEqualsOne_ReturnsIsValid()
+    {
+        var dto = ValidDto() with
+        {
+            AssetAllocationOverrides =
+            [
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 0.5m },
+                new AssetAllocationOverrideDto { AssetClassId = Guid.NewGuid().ToString(), TargetWeight = 0.5m }
+            ]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.True(result.IsValid);
+    }
 }

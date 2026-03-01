@@ -4,8 +4,9 @@ using Microsoft.Extensions.Logging;
 namespace CashflowSimulator.Engine.Services.Simulation;
 
 /// <summary>
-/// Prozessor für Kaufkraftverlust und Gehaltsdynamik: wendet zum Jahreswechsel (Monat 1) die Inflationsraten
-/// aus <see cref="EconomicFactors"/> auf die indexierten Stream-Beträge in <see cref="SimulationState.IndexedStreamAmounts"/> an.
+/// Prozessor für Kaufkraftverlust und Gehaltsdynamik: wendet in jedem Simulationsmonat die Inflationsraten
+/// aus <see cref="EconomicFactors"/> monatlich geglättet (stetige Verzinsung e^(rate/12)) auf die indexierten
+/// Stream-Beträge in <see cref="SimulationState.IndexedStreamAmounts"/> an.
 /// Das Projekt-DTO bleibt unverändert; der CashflowProcessor liest die angepassten Beträge aus dem State.
 /// </summary>
 public sealed class InflationProcessor : ISimulationProcessor
@@ -23,9 +24,6 @@ public sealed class InflationProcessor : ISimulationProcessor
         ArgumentNullException.ThrowIfNull(project.Streams);
 
         EnsureIndexedStreamAmountsInitialized(project, state);
-
-        if (currentDate.Month != 1)
-            return;
 
         var parameters = project.Parameters;
         var simStart = parameters?.SimulationStart ?? default;
@@ -50,9 +48,9 @@ public sealed class InflationProcessor : ISimulationProcessor
                 continue;
             }
 
-            var rate = (decimal)factor.ExpectedReturn;
-            var newAmount = currentAmount * (1 + rate);
-            state.IndexedStreamAmounts[stream.Id] = newAmount;
+            var rate = factor.ExpectedReturn;
+            var monthlyFactor = (decimal)Math.Exp(rate / 12.0);
+            state.IndexedStreamAmounts[stream.Id] = currentAmount * monthlyFactor;
         }
     }
 

@@ -82,6 +82,16 @@ public sealed class SimulationProjectValidator : AbstractValidator<SimulationPro
             })
             .WithMessage("Wenn eine Lebensphase ein Allokationsprofil referenziert (AllocationProfileId), muss dieses Profil existieren.");
 
+        RuleForEach(x => x.LifecyclePhases)
+            .Must((project, phase) =>
+            {
+                if (project.Parameters is null || project.Parameters.SimulationEnd == default || project.Parameters.DateOfBirth == default)
+                    return true;
+                var maxAge = GetAgeInYears(project.Parameters.DateOfBirth, project.Parameters.SimulationEnd);
+                return phase.StartAge <= maxAge;
+            })
+            .WithMessage("Das Startalter einer Lebensphase darf das Alter zum Simulationsende nicht überschreiten.");
+
         RuleFor(x => x)
             .Must(project =>
             {

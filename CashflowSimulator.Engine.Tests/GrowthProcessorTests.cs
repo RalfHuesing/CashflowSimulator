@@ -50,7 +50,7 @@ public sealed class GrowthProcessorTests
     public void ProcessMonth_OneAsset_AppliesDeterministicGrowth()
     {
         var processor = new GrowthProcessor();
-        var project = ProjectWithFactor(expectedReturn: 0.12); // 12 % p.a. => 1 % pro Monat
+        var project = ProjectWithFactor(expectedReturn: 0.12); // 12 % p.a., stetige Verzinsung: e^(0.12/12) pro Monat
         var state = new SimulationState
         {
             Cash = 0m,
@@ -73,12 +73,12 @@ public sealed class GrowthProcessorTests
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 1, 1));
 
-        // newPrice = 100 * (1 + 0.12/12) = 101
+        var expectedPrice = 100m * (decimal)Math.Exp(0.12 / 12.0);
         Assert.Single(state.Portfolio.Assets);
         var asset = state.Portfolio.Assets[0];
-        Assert.Equal(101m, asset.CurrentPrice);
-        Assert.Equal(1010m, asset.CurrentValue);
-        Assert.Equal(1010m, state.TotalAssets);
+        Assert.True(Math.Abs(asset.CurrentPrice - expectedPrice) < 0.0001m);
+        Assert.True(Math.Abs((asset.CurrentValue ?? 0) - expectedPrice * 10m) < 0.001m);
+        Assert.True(Math.Abs(state.TotalAssets - expectedPrice * 10m) < 0.001m);
     }
 
     [Fact]
@@ -111,8 +111,42 @@ public sealed class GrowthProcessorTests
         processor.ProcessMonth(project, state, new DateOnly(2020, 2, 1));
         var afterMonth2 = state.Portfolio.Assets[0].CurrentPrice;
 
-        Assert.Equal(101m, afterMonth1);
-        Assert.True(afterMonth2 > 101m && afterMonth2 < 103m); // 101 * 1.01 ≈ 102.01
+        var expectedAfter1 = 100m * (decimal)Math.Exp(0.12 / 12.0);
+        var expectedAfter2 = 100m * (decimal)Math.Exp(0.12 * 2 / 12.0);
+        Assert.True(Math.Abs(afterMonth1 - expectedAfter1) < 0.0001m, $"After month 1: expected ~{expectedAfter1}, got {afterMonth1}");
+        Assert.True(Math.Abs(afterMonth2 - expectedAfter2) < 0.0001m, $"After month 2: expected ~{expectedAfter2}, got {afterMonth2}");
+    }
+
+    [Fact]
+    public void ProcessMonth_TwelveMonths_MatchesAnnualContinuousGrowth()
+    {
+        var processor = new GrowthProcessor();
+        var project = ProjectWithFactor(expectedReturn: 0.12);
+        var state = new SimulationState
+        {
+            Cash = 0m,
+            Portfolio = new PortfolioDto
+            {
+                Assets =
+                [
+                    new AssetDto
+                    {
+                        Id = "a1",
+                        Name = "ETF",
+                        EconomicFactorId = FactorId,
+                        CurrentPrice = 100m,
+                        CurrentQuantity = 1m,
+                        CurrentValue = 100m
+                    }
+                ]
+            }
+        };
+
+        for (var month = 1; month <= 12; month++)
+            processor.ProcessMonth(project, state, new DateOnly(2020, month, 1));
+
+        var expectedAfter12Months = 100m * (decimal)Math.Exp(0.12);
+        Assert.True(Math.Abs(state.Portfolio.Assets[0].CurrentPrice - expectedAfter12Months) < 0.0001m);
     }
 
     [Fact]
@@ -213,9 +247,10 @@ public sealed class GrowthProcessorTests
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 3, 1));
 
+        var expectedPrice = 100m * (decimal)Math.Exp(0.12 / 12.0);
         var asset = state.Portfolio.Assets[0];
-        Assert.Equal(101m, asset.CurrentPrice);
-        Assert.Equal(505m, asset.CurrentValue);
+        Assert.True(Math.Abs(asset.CurrentPrice - expectedPrice) < 0.0001m);
+        Assert.True(Math.Abs((asset.CurrentValue ?? 0) - expectedPrice * 5m) < 0.001m);
         Assert.Equal(2, asset.Tranches.Count);
         Assert.Equal(new DateOnly(2020, 1, 1), asset.Tranches[0].PurchaseDate);
         Assert.Equal(3m, asset.Tranches[0].Quantity);

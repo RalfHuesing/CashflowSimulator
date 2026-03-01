@@ -197,4 +197,33 @@ public sealed class SimulationProjectValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.Message.Contains("existierenden Marktfaktor") || e.Message.Contains("EconomicFactorId"));
     }
+
+    [Fact]
+    public void Validate_LifecyclePhaseStartAgeExceedsAgeAtSimulationEnd_ReturnsError()
+    {
+        var parameters = new SimulationParametersDtoBuilder()
+            .WithDateOfBirth(new DateOnly(1930, 1, 1))
+            .WithSimulationEnd(new DateOnly(2025, 1, 1))
+            .Build();
+        var taxId = Guid.NewGuid().ToString();
+        var strategyId = Guid.NewGuid().ToString();
+        var dto = new SimulationProjectDtoBuilder()
+            .WithParameters(parameters)
+            .WithValidLifecycle()
+            .Build();
+        dto = dto with
+        {
+            LifecyclePhases =
+            [
+                new LifecyclePhaseDto { StartAge = 0, TaxProfileId = taxId, StrategyProfileId = strategyId, AssetAllocationOverrides = [] },
+                new LifecyclePhaseDto { StartAge = 120, TaxProfileId = taxId, StrategyProfileId = strategyId, AssetAllocationOverrides = [] }
+            ],
+            TaxProfiles = [new TaxProfileDto { Id = taxId, Name = "T", CapitalGainsTaxRate = 0.26m, TaxFreeAllowance = 1000m, IncomeTaxRate = 0.35m }],
+            StrategyProfiles = [new StrategyProfileDto { Id = strategyId, Name = "S", CashReserveMonths = 3, RebalancingThreshold = 0.05m, LookaheadMonths = 24 }]
+        };
+        var result = ValidationRunner.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.Message.Contains("Startalter") && e.Message.Contains("Simulationsende"));
+    }
 }

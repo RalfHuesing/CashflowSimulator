@@ -17,5 +17,9 @@ public sealed class AssetTrancheDtoValidator : AbstractValidator<AssetTrancheDto
         RuleFor(x => x.AcquisitionPricePerUnit)
             .GreaterThanOrEqualTo(0)
             .WithMessage("Der Anschaffungspreis pro Stück darf nicht negativ sein.");
+
+        RuleFor(x => x.PurchaseDate)
+            .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
+            .WithMessage("Das Kaufdatum einer Tranche darf nicht in der Zukunft liegen.");
     }
 }

@@ -31,6 +31,10 @@ public sealed class LifecyclePhaseDtoValidator : AbstractValidator<LifecyclePhas
             .GreaterThanOrEqualTo(0)
             .WithMessage("Glidepath (Monate) darf nicht negativ sein.");
 
+        RuleFor(x => x.AssetAllocationOverrides)
+            .Must(overrides => (overrides?.Sum(o => o.TargetWeight) ?? 0) <= 1.0m)
+            .WithMessage("Die Summe der Zielgewichtungen in den AssetAllocationOverrides darf 100 % nicht überschreiten.");
+
         RuleForEach(x => x.AssetAllocationOverrides)
             .SetValidator(new AssetAllocationOverrideDtoValidator());
     }
