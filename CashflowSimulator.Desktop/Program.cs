@@ -77,6 +77,7 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<ISimulationResultRepository, SqliteSimulationResultRepository>();
                 services.AddSingleton<IScenarioSnapshotWriter, ScenarioSnapshotWriter>();
                 services.AddSingleton<IResultAnalysisService, ResultAnalysisService>();
+                services.AddSingleton<IDiagnosticExportService, DiagnosticExportService>();
                 services.AddSingleton<ISimulationRunner, SimulationRunner>();
 
                 // Navigation Service

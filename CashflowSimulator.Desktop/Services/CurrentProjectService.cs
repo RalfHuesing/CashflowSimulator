@@ -15,6 +15,7 @@ public sealed class CurrentProjectService : ICurrentProjectService
     private SimulationProjectDto? _current;
     private string? _currentFilePath;
     private long? _lastRunId;
+    private string? _lastRunFolderPath;
 
     public CurrentProjectService()
     {
@@ -30,9 +31,16 @@ public sealed class CurrentProjectService : ICurrentProjectService
     public long? LastRunId => WithLock(() => _lastRunId);
 
     /// <inheritdoc />
-    public void SetLastRunId(long runId)
+    public string? LastRunFolderPath => WithLock(() => _lastRunFolderPath);
+
+    /// <inheritdoc />
+    public void SetLastRunId(long runId, string? resultFolderPath = null)
     {
-        WithLock(() => _lastRunId = runId);
+        WithLock(() =>
+        {
+            _lastRunId = runId;
+            _lastRunFolderPath = resultFolderPath;
+        });
     }
 
     /// <inheritdoc />

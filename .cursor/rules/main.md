@@ -95,6 +95,7 @@ Neue Feature-Bereiche, die wie Eckdaten/Einstellungen funktionieren, folgen dies
 - **Strict MVVM:** Logik im ViewModel; Code-Behind nur für `InitializeComponent` und UI-Events, die nicht per Binding abbildbar sind.
 - **ViewModels:** CommunityToolkit.Mvvm verwenden – `[RelayCommand]`, `[ObservableProperty]`, `ObservableObject`; keine handgeschriebenen ICommand- oder INotifyPropertyChanged-Implementierungen. ViewModels als `partial class` für Source Generators.
 - **Fehlerbehandlung in der UI:** State of the Art – z. B. Toasts oder zentrale Fehleranzeige; Fehler aus Result/Exceptions dem Nutzer klar und verständlich (Deutsch) anzeigen.
+- **Diagnose-Export:** ViewModels von Analyse-Views können **IDiagnosticExport** implementieren. Beim Wechsel zu einem solchen View wird automatisch ein JSON-Snapshot in das aktuelle Run-Verzeichnis (`Diagnostics/`) geschrieben, sofern eine Simulation aktiv ist. Export läuft im Hintergrund (blockiert die UI nicht).
 
 ### CRUD-ViewModels (Master-Detail-Pattern)
 

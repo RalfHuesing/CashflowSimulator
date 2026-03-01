@@ -25,9 +25,17 @@ public interface ICurrentProjectService
     long? LastRunId { get; }
 
     /// <summary>
-    /// Setzt die Run-Id der zuletzt durchgeführten Simulation (z. B. nach Simulation-Start).
+    /// Pfad zum Run-Ordner der zuletzt durchgeführten Simulation (null wenn noch keine oder In-Memory-Persistenz).
+    /// Wird für Diagnose-Snapshots (Diagnostics/) benötigt.
     /// </summary>
-    void SetLastRunId(long runId);
+    string? LastRunFolderPath { get; }
+
+    /// <summary>
+    /// Setzt die Run-Id und optional den Ergebnisordner-Pfad (z. B. nach Simulation-Start).
+    /// </summary>
+    /// <param name="runId">Run-Id der Simulation.</param>
+    /// <param name="resultFolderPath">Optional: Pfad zum Run-Ordner (z. B. Drafts/yyyyMMdd-HHmmss_RunId).</param>
+    void SetLastRunId(long runId, string? resultFolderPath = null);
 
     /// <summary>
     /// Setzt das aktuelle Projekt und optional den Dateipfad (z. B. nach Load oder Save).

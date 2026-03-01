@@ -11,7 +11,7 @@ namespace CashflowSimulator.Desktop.Features.Analysis;
 /// <summary>
 /// ViewModel für das Analyse-Dashboard: jährliche Aggregation, Plausibilitäts-Journal (Master-Detail) und Gesamtvermögens-Chart.
 /// </summary>
-public partial class AnalysisDashboardViewModel : ObservableObject
+public partial class AnalysisDashboardViewModel : ObservableObject, IDiagnosticExport
 {
     private readonly long _runId;
     private readonly IResultAnalysisService? _resultAnalysisService;
@@ -135,4 +135,21 @@ public partial class AnalysisDashboardViewModel : ObservableObject
             Fill = null
         });
     }
+
+    /// <inheritdoc />
+    public object GetExportData() => new AnalysisDashboardDiagnosticDto(
+        _runId,
+        [.. YearlySummaries],
+        _allMonths);
+
+    /// <inheritdoc />
+    public string ExportFileName => "analysis-dashboard.json";
 }
+
+/// <summary>
+/// DTO für den Diagnose-Snapshot des Analyse-Dashboards.
+/// </summary>
+internal sealed record AnalysisDashboardDiagnosticDto(
+    long RunId,
+    List<YearlySummaryItem> YearlySummaries,
+    List<MonthlyResultDto> MonthlyResults);

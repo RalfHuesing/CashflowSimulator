@@ -89,6 +89,14 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 - **Lebensphasen (UI:** `Features/LifecyclePhases/`): Master-Detail-View auf Basis von **CrudViewModelBase**; Phasen werden per Id identifiziert. Pro Phase: Startalter, Auswahl Steuer-Profil, Strategie-Profil und optional Allokationsprofil (ComboBoxen), Glidepath (Monate).
 - Die **Engine** (später) wählt pro Simulationsmonat die aktive Phase anhand des Alters und wendet das zugehörige Steuer-, Strategie- und ggf. Allokationsprofil an. Das Default-Projekt (DefaultProjectProvider) enthält zwei Phasen: „Anspar“ und „Rente“, jeweils mit Allokationsprofil und Glidepath (60 Monate für die Rentenphase).
 
+## Diagnostic State Snapshots
+
+- Beim Wechsel in einen **Analyse-View** (z. B. Simulationsergebnis, Analyse-Dashboard), der **IDiagnosticExport** implementiert, wird automatisch ein JSON-Snapshot des aktuellen View-Zustands geschrieben – sofern eine Simulation aktiv ist (Run-Ordner vorhanden).
+- **Ziel:** `{Run-Ordner}/Diagnostics/{ExportFileName}` (z. B. `simulation-result.json`, `analysis-dashboard.json`). Der Run-Ordner ist derselbe wie für `simulation.db` (Drafts/yyyyMMdd-HHmmss_RunId).
+- **Zweck:** KI- und nutzergestützte Fehleranalyse der Berechnungslogik ohne manuelles Ablesen der SQLite-DB; „What You See Is What You Get“-Datenbasis.
+- **Ablauf:** MainShellViewModel löst beim Setzen von CurrentContentViewModel den Export per **IDiagnosticExportService** aus (Fire-and-Forget); der Export läuft in einem Hintergrund-Task und blockiert die UI nicht. Serieller Zugriff (Semaphore) verhindert IOException bei schnellem View-Wechsel.
+- **Neue Analyse-Views:** ViewModel implementiert **IDiagnosticExport** (GetExportData, ExportFileName); keine weiteren Änderungen nötig.
+
 ## Erweiterung
 
 - Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen, Portfolio/Anlageklassen/Assets) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).

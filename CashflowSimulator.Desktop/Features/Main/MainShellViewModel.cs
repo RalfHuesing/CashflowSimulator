@@ -37,6 +37,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly INavigationService _navigationService;
     private readonly ISimulationRunner _simulationRunner;
     private readonly IResultAnalysisService _resultAnalysisService;
+    private readonly IDiagnosticExportService _diagnosticExportService;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
@@ -46,6 +47,7 @@ public partial class MainShellViewModel : ObservableObject
         INavigationService navigationService,
         ISimulationRunner simulationRunner,
         IResultAnalysisService resultAnalysisService,
+        IDiagnosticExportService diagnosticExportService,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
@@ -55,6 +57,7 @@ public partial class MainShellViewModel : ObservableObject
         _navigationService = navigationService;
         _simulationRunner = simulationRunner;
         _resultAnalysisService = resultAnalysisService;
+        _diagnosticExportService = diagnosticExportService;
         _logger = logger;
         Navigation = navigationViewModel;
 
@@ -92,7 +95,11 @@ public partial class MainShellViewModel : ObservableObject
         set
         {
             if (SetProperty(ref _currentContentViewModel, value))
+            {
                 OnPropertyChanged(nameof(IsContentPlaceholderVisible));
+                if (value is IDiagnosticExport export && !string.IsNullOrWhiteSpace(_currentProjectService.LastRunFolderPath))
+                    _ = _diagnosticExportService.ExportAsync(export);
+            }
         }
     }
 
@@ -386,7 +393,7 @@ public partial class MainShellViewModel : ObservableObject
         {
             var result = await _simulationRunner.RunSimulationAsync(project).ConfigureAwait(true);
             var runId = result.RunId ?? 0L;
-            _currentProjectService.SetLastRunId(runId);
+            _currentProjectService.SetLastRunId(runId, result.ResultFolderPath);
             var resultViewModel = _navigationService.Create<SimulationResultViewModel>(runId);
             await resultViewModel.LoadAsync().ConfigureAwait(true);
             CurrentContentViewModel = resultViewModel;
