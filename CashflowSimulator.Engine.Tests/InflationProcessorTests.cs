@@ -265,13 +265,15 @@ public sealed class InflationProcessorTests
     [Fact]
     public void SimulationRunner_WithInflationProcessor_SecondYearSnapshotAmountHigher()
     {
+        var repo = new InMemorySimulationResultRepository();
         ISimulationRunner runner = new SimulationRunner(
         [
             new InflationProcessor(),
             new CashflowProcessor(),
             new LiquidityProcessor(),
             new GrowthProcessor()
-        ]);
+        ],
+            repo);
         var stream = new CashflowStreamDto
         {
             Id = "salary",
@@ -308,8 +310,9 @@ public sealed class InflationProcessorTests
 
         var result = runner.RunSimulation(project);
 
-        var jan2020 = result.MonthlyResults[0];
-        var jan2021 = result.MonthlyResults[12];
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var jan2020 = monthly[0];
+        var jan2021 = monthly[12];
         var salarySnapshot2020 = jan2020.CashflowSnapshots.FirstOrDefault(s => s.Name == "Gehalt");
         var salarySnapshot2021 = jan2021.CashflowSnapshots.FirstOrDefault(s => s.Name == "Gehalt");
 

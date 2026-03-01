@@ -1,4 +1,5 @@
 using CashflowSimulator.Contracts.Dtos;
+using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.SimulationResult;
 using Xunit;
 
@@ -7,20 +8,20 @@ namespace CashflowSimulator.Desktop.Tests;
 public sealed class SimulationResultViewModelTests
 {
     [Fact]
-    public void Constructor_StoresResultAndExposesMonthlyResults()
+    public void Constructor_LoadsMonthlyResultsFromService()
     {
-        var result = new SimulationResultDto
+        const long runId = 42;
+        var monthly = new List<MonthlyResultDto>
         {
-            MonthlyResults =
-            [
-                new MonthlyResultDto { MonthIndex = 0, Age = 35.0, CashBalance = 10_000m, TotalAssets = 10_000m, CashflowSnapshots = [] },
-                new MonthlyResultDto { MonthIndex = 1, Age = 35.08, CashBalance = 11_500m, TotalAssets = 11_500m, CashflowSnapshots = [new CashflowSnapshotEntryDto { Name = "Gehalt", CashflowType = CashflowType.Income, Amount = 1500m }] }
-            ]
+            new() { MonthIndex = 0, Age = 35.0, CashBalance = 10_000m, TotalAssets = 10_000m, CashflowSnapshots = [] },
+            new() { MonthIndex = 1, Age = 35.08, CashBalance = 11_500m, TotalAssets = 11_500m, CashflowSnapshots = [new CashflowSnapshotEntryDto { Name = "Gehalt", CashflowType = CashflowType.Income, Amount = 1500m }] }
         };
+        IResultAnalysisService service = new FakeResultAnalysisService(monthly);
 
-        var vm = new SimulationResultViewModel(result);
+        var vm = new SimulationResultViewModel(runId, service);
 
-        Assert.Same(result, vm.Result);
+        Assert.Equal(runId, vm.RunId);
+        Assert.Equal(runId, vm.Result.RunId);
         Assert.Equal(2, vm.MonthlyResults.Count);
         Assert.Equal(0, vm.MonthlyResults[0].MonthIndex);
         Assert.Equal(10_000m, vm.MonthlyResults[0].CashBalance);
@@ -29,8 +30,18 @@ public sealed class SimulationResultViewModelTests
     }
 
     [Fact]
-    public void Constructor_ThrowsWhenResultIsNull()
+    public void Constructor_WithNullService_TreatsAsEmptyResults()
     {
-        Assert.Throws<ArgumentNullException>(() => new SimulationResultViewModel(null!));
+        var vm = new SimulationResultViewModel(1, null!);
+        Assert.Empty(vm.MonthlyResults);
+    }
+
+    private sealed class FakeResultAnalysisService : IResultAnalysisService
+    {
+        private readonly IReadOnlyList<MonthlyResultDto> _list;
+
+        public FakeResultAnalysisService(IReadOnlyList<MonthlyResultDto> list) => _list = list;
+
+        public IReadOnlyList<MonthlyResultDto> GetMonthlyResults(long runId) => _list;
     }
 }

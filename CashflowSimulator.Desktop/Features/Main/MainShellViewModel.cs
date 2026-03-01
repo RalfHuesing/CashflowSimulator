@@ -35,6 +35,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly ICurrentProjectService _currentProjectService;
     private readonly INavigationService _navigationService;
     private readonly ISimulationRunner _simulationRunner;
+    private readonly IResultAnalysisService _resultAnalysisService;
     private readonly ILogger<MainShellViewModel> _logger;
 
     public MainShellViewModel(
@@ -43,6 +44,7 @@ public partial class MainShellViewModel : ObservableObject
         ICurrentProjectService currentProjectService,
         INavigationService navigationService,
         ISimulationRunner simulationRunner,
+        IResultAnalysisService resultAnalysisService,
         NavigationViewModel navigationViewModel,
         ILogger<MainShellViewModel> logger)
     {
@@ -51,6 +53,7 @@ public partial class MainShellViewModel : ObservableObject
         _currentProjectService = currentProjectService;
         _navigationService = navigationService;
         _simulationRunner = simulationRunner;
+        _resultAnalysisService = resultAnalysisService;
         _logger = logger;
         Navigation = navigationViewModel;
 
@@ -369,9 +372,11 @@ public partial class MainShellViewModel : ObservableObject
         try
         {
             var result = _simulationRunner.RunSimulation(project);
-            var resultViewModel = _navigationService.Create<SimulationResultViewModel>(result);
+            var runId = result.RunId ?? 0L;
+            var resultViewModel = _navigationService.Create<SimulationResultViewModel>(runId);
             CurrentContentViewModel = resultViewModel;
-            _logger.LogInformation("Simulation abgeschlossen: {Count} Monate", result.MonthlyResults.Count);
+            var count = result.RunId is null ? 0 : _resultAnalysisService.GetMonthlyResults(runId).Count;
+            _logger.LogInformation("Simulation abgeschlossen: {Count} Monate", count);
         }
         catch (Exception ex)
         {

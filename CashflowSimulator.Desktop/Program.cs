@@ -73,6 +73,8 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<ISimulationProcessor, CashflowProcessor>();
                 services.AddSingleton<ISimulationProcessor, LiquidityProcessor>();
                 services.AddSingleton<ISimulationProcessor, GrowthProcessor>();
+                services.AddSingleton<ISimulationResultRepository, SqliteSimulationResultRepository>();
+                services.AddSingleton<IResultAnalysisService, ResultAnalysisService>();
                 services.AddSingleton<ISimulationRunner, SimulationRunner>();
 
                 // Navigation Service

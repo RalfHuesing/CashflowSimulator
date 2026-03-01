@@ -5,15 +5,21 @@ namespace CashflowSimulator.Engine.Services.Simulation;
 
 /// <summary>
 /// Führt die monatliche Simulations-Pipeline aus (Processors: Cashflow, Growth; erweiterbar um Steuern, Inflation).
+/// Schreibt Ergebnisse monatlich ins <see cref="ISimulationResultRepository"/>; Rückgabe enthält nur RunId.
 /// </summary>
 public sealed class SimulationRunner : ISimulationRunner
 {
     private readonly IEnumerable<ISimulationProcessor> _processors;
+    private readonly ISimulationResultRepository _repository;
 
-    public SimulationRunner(IEnumerable<ISimulationProcessor> processors)
+    public SimulationRunner(
+        IEnumerable<ISimulationProcessor> processors,
+        ISimulationResultRepository repository)
     {
         ArgumentNullException.ThrowIfNull(processors);
+        ArgumentNullException.ThrowIfNull(repository);
         _processors = processors;
+        _repository = repository;
     }
 
     /// <inheritdoc />
@@ -31,6 +37,8 @@ public sealed class SimulationRunner : ISimulationRunner
         if (monthCount <= 0)
             return new SimulationResultDto { MonthlyResults = [] };
 
+        var runId = _repository.StartRun();
+
         var portfolio = project.Portfolio ?? new PortfolioDto();
         var state = new SimulationState
         {
@@ -43,8 +51,6 @@ public sealed class SimulationRunner : ISimulationRunner
             }
         };
 
-        var monthlyResults = new List<MonthlyResultDto>(monthCount);
-
         for (var monthIndex = 0; monthIndex < monthCount; monthIndex++)
         {
             var currentDate = start.AddMonths(monthIndex);
@@ -53,18 +59,20 @@ public sealed class SimulationRunner : ISimulationRunner
             foreach (var processor in _processors)
                 processor.ProcessMonth(project, state, currentDate);
 
-            monthlyResults.Add(new MonthlyResultDto
+            var entry = new MonthlyResultDto
             {
                 Age = age,
                 MonthIndex = monthIndex,
                 CashBalance = state.Cash,
                 TotalAssets = state.TotalAssets,
                 CashflowSnapshots = state.CurrentMonthSnapshots.ToList()
-            });
+            };
+            _repository.WriteMonthlyResult(runId, entry);
             state.CurrentMonthSnapshots.Clear();
         }
 
-        return new SimulationResultDto { MonthlyResults = monthlyResults };
+        _repository.CompleteRun(runId);
+        return new SimulationResultDto { RunId = runId, MonthlyResults = [] };
     }
 
     private static int GetMonthCount(DateOnly start, DateOnly end)

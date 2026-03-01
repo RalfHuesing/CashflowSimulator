@@ -7,8 +7,14 @@ namespace CashflowSimulator.Engine.Tests;
 
 public sealed class SimulationRunnerTests
 {
-    private static ISimulationRunner CreateRunner() =>
-        new SimulationRunner([new CashflowProcessor(), new LiquidityProcessor(), new GrowthProcessor()]);
+    private static (ISimulationRunner Runner, InMemorySimulationResultRepository Repository) CreateRunnerWithRepository()
+    {
+        var repo = new InMemorySimulationResultRepository();
+        var runner = new SimulationRunner(
+            [new CashflowProcessor(), new LiquidityProcessor(), new GrowthProcessor()],
+            repo);
+        return (runner, repo);
+    }
 
     private static SimulationProjectDto MinimalProject(
         DateOnly? start = null,
@@ -36,7 +42,7 @@ public sealed class SimulationRunnerTests
     [Fact]
     public void RunSimulation_Throws_WhenProjectIsNull()
     {
-        var runner = CreateRunner();
+        var (runner, _) = CreateRunnerWithRepository();
         Assert.Throws<ArgumentNullException>(() => runner.RunSimulation(null!));
     }
 
@@ -46,10 +52,11 @@ public sealed class SimulationRunnerTests
         var project = MinimalProject(
             start: new DateOnly(2020, 12, 1),
             end: new DateOnly(2020, 1, 1));
-        var runner = CreateRunner();
+        var (runner, _) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
+        Assert.Null(result.RunId);
         Assert.NotNull(result.MonthlyResults);
         Assert.Empty(result.MonthlyResults);
     }
@@ -61,12 +68,14 @@ public sealed class SimulationRunnerTests
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 1, 1),
             initialCash: 15_000m);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Single(result.MonthlyResults);
-        var month = result.MonthlyResults[0];
+        Assert.NotNull(result.RunId);
+        var monthly = repo.GetMonthlyResults(result.RunId.Value);
+        Assert.Single(monthly);
+        var month = monthly[0];
         Assert.Equal(0, month.MonthIndex);
         Assert.Equal(15_000m, month.CashBalance);
         Assert.Equal(15_000m, month.TotalAssets);
@@ -80,12 +89,13 @@ public sealed class SimulationRunnerTests
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 12, 1),
             initialCash: 20_000m);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(12, result.MonthlyResults.Count);
-        foreach (var m in result.MonthlyResults)
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(12, monthly.Count);
+        foreach (var m in monthly)
             Assert.Equal(20_000m, m.CashBalance);
     }
 
@@ -108,15 +118,16 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(3, result.MonthlyResults.Count);
-        Assert.Equal(1500m, result.MonthlyResults[0].CashBalance);  // 1000 + 500
-        Assert.Equal(2000m, result.MonthlyResults[1].CashBalance);
-        Assert.Equal(2500m, result.MonthlyResults[2].CashBalance);
-        foreach (var m in result.MonthlyResults)
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(3, monthly.Count);
+        Assert.Equal(1500m, monthly[0].CashBalance);  // 1000 + 500
+        Assert.Equal(2000m, monthly[1].CashBalance);
+        Assert.Equal(2500m, monthly[2].CashBalance);
+        foreach (var m in monthly)
         {
             Assert.Single(m.CashflowSnapshots);
             Assert.Equal("Gehalt", m.CashflowSnapshots[0].Name);
@@ -144,13 +155,14 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(2, result.MonthlyResults.Count);
-        Assert.Equal(3800m, result.MonthlyResults[0].CashBalance);
-        Assert.Equal(2600m, result.MonthlyResults[1].CashBalance);
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(2, monthly.Count);
+        Assert.Equal(3800m, monthly[0].CashBalance);
+        Assert.Equal(2600m, monthly[1].CashBalance);
     }
 
     [Fact]
@@ -172,14 +184,15 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(0m, result.MonthlyResults[0].CashBalance);
-        Assert.Empty(result.MonthlyResults[0].CashflowSnapshots);
-        Assert.Equal(100m, result.MonthlyResults[1].CashBalance);
-        Assert.Equal(200m, result.MonthlyResults[2].CashBalance);
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(0m, monthly[0].CashBalance);
+        Assert.Empty(monthly[0].CashflowSnapshots);
+        Assert.Equal(100m, monthly[1].CashBalance);
+        Assert.Equal(200m, monthly[2].CashBalance);
     }
 
     [Fact]
@@ -201,14 +214,15 @@ public sealed class SimulationRunnerTests
                     EndDate = new DateOnly(2020, 2, 1)
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(50m, result.MonthlyResults[0].CashBalance);
-        Assert.Equal(100m, result.MonthlyResults[1].CashBalance);
-        Assert.Equal(100m, result.MonthlyResults[2].CashBalance);
-        Assert.Equal(100m, result.MonthlyResults[3].CashBalance);
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(50m, monthly[0].CashBalance);
+        Assert.Equal(100m, monthly[1].CashBalance);
+        Assert.Equal(100m, monthly[2].CashBalance);
+        Assert.Equal(100m, monthly[3].CashBalance);
     }
 
     [Fact]
@@ -230,17 +244,18 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(12, result.MonthlyResults.Count);
-        Assert.Equal(1200m, result.MonthlyResults[0].CashBalance);
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(12, monthly.Count);
+        Assert.Equal(1200m, monthly[0].CashBalance);
         for (var i = 1; i < 12; i++)
-            Assert.Equal(1200m, result.MonthlyResults[i].CashBalance);
-        Assert.Single(result.MonthlyResults[0].CashflowSnapshots);
+            Assert.Equal(1200m, monthly[i].CashBalance);
+        Assert.Single(monthly[0].CashflowSnapshots);
         for (var i = 1; i < 12; i++)
-            Assert.Empty(result.MonthlyResults[i].CashflowSnapshots);
+            Assert.Empty(monthly[i].CashflowSnapshots);
     }
 
     [Fact]
@@ -249,13 +264,14 @@ public sealed class SimulationRunnerTests
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 12, 1));
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(12, result.MonthlyResults.Count);
-        var age0 = result.MonthlyResults[0].Age;
-        var age11 = result.MonthlyResults[11].Age;
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(12, monthly.Count);
+        var age0 = monthly[0].Age;
+        var age11 = monthly[11].Age;
         Assert.True(age11 > age0);
         Assert.True(age0 >= 34 && age0 < 35);
         Assert.True(age11 >= 34 && age11 < 36);
@@ -280,11 +296,12 @@ public sealed class SimulationRunnerTests
                     EndDate = null
                 }
             ]);
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        foreach (var m in result.MonthlyResults)
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        foreach (var m in monthly)
             Assert.Equal(m.CashBalance, m.TotalAssets);
     }
 
@@ -332,16 +349,17 @@ public sealed class SimulationRunnerTests
                 ]
             }
         };
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
 
         var result = runner.RunSimulation(project);
 
-        Assert.Equal(12, result.MonthlyResults.Count);
-        var firstMonth = result.MonthlyResults[0];
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(12, monthly.Count);
+        var firstMonth = monthly[0];
         Assert.Equal(1000m, firstMonth.CashBalance);
         Assert.True(firstMonth.TotalAssets > 1000m, "TotalAssets soll Cash + gewachsenes Depot sein (1010 bei 1% Monatswachstum).");
 
-        var lastMonth = result.MonthlyResults[11];
+        var lastMonth = monthly[11];
         Assert.True(lastMonth.TotalAssets > lastMonth.CashBalance, "Nach 12 Monaten Wachstum: TotalAssets > Cash.");
         Assert.True(lastMonth.TotalAssets >= 2060m, "~6% p.a. über 12 Monate: Depotwert wächst von 1000 auf ca. 1062; TotalAssets mind. 2060.");
     }
@@ -377,10 +395,10 @@ public sealed class SimulationRunnerTests
             }
         };
 
-        var runner = CreateRunner();
+        var (runner, _) = CreateRunnerWithRepository();
         runner.RunSimulation(project);
 
-        Assert.Same(tranches, project.Portfolio.Assets[0].Tranches);
+        Assert.Same(tranches, project.Portfolio!.Assets[0].Tranches);
         Assert.Same(transactions, project.Portfolio.Assets[0].Transactions);
     }
 
@@ -414,11 +432,12 @@ public sealed class SimulationRunnerTests
                 ]
             }
         };
-        var runner = CreateRunner();
+        var (runner, repo) = CreateRunnerWithRepository();
         var result = runner.RunSimulation(project);
 
         Assert.NotNull(result);
-        Assert.Equal(3, result.MonthlyResults.Count);
-        Assert.True(result.MonthlyResults[0].TotalAssets >= 800m);
+        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        Assert.Equal(3, monthly.Count);
+        Assert.True(monthly[0].TotalAssets >= 800m);
     }
 }
