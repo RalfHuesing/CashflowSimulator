@@ -10,5 +10,7 @@ public interface IResultAnalysisService
     /// <summary>
     /// Liefert die monatlichen Ergebnisse eines Runs in Reihenfolge.
     /// </summary>
-    IReadOnlyList<MonthlyResultDto> GetMonthlyResults(long runId);
+    /// <param name="runId">Run-Id.</param>
+    /// <param name="cancellationToken">Abbruchtoken.</param>
+    Task<IReadOnlyList<MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default);
 }

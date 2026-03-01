@@ -5,7 +5,7 @@ namespace CashflowSimulator.Engine.Services.Simulation;
 
 /// <summary>
 /// Führt die monatliche Simulations-Pipeline aus (Processors: Cashflow, Growth; erweiterbar um Steuern, Inflation).
-/// Schreibt Ergebnisse monatlich ins <see cref="ISimulationResultRepository"/>; Rückgabe enthält nur RunId.
+/// Schreibt alle Monatsergebnisse per Batch ins <see cref="ISimulationResultRepository"/>; Rückgabe enthält RunId.
 /// </summary>
 public sealed class SimulationRunner : ISimulationRunner
 {
@@ -23,7 +23,7 @@ public sealed class SimulationRunner : ISimulationRunner
     }
 
     /// <inheritdoc />
-    public SimulationResultDto RunSimulation(SimulationProjectDto project)
+    public async Task<SimulationResultDto> RunSimulationAsync(SimulationProjectDto project, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(project.Parameters);
@@ -37,7 +37,7 @@ public sealed class SimulationRunner : ISimulationRunner
         if (monthCount <= 0)
             return new SimulationResultDto { MonthlyResults = [] };
 
-        var runId = _repository.StartRun();
+        var runId = await _repository.StartRunAsync(cancellationToken).ConfigureAwait(false);
 
         var portfolio = project.Portfolio ?? new PortfolioDto();
         var state = new SimulationState
@@ -51,8 +51,11 @@ public sealed class SimulationRunner : ISimulationRunner
             }
         };
 
+        var monthlyEntries = new List<MonthlyResultDto>(monthCount);
         for (var monthIndex = 0; monthIndex < monthCount; monthIndex++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var currentDate = start.AddMonths(monthIndex);
             var age = CalculateAge(parameters.DateOfBirth, currentDate);
 
@@ -67,11 +70,13 @@ public sealed class SimulationRunner : ISimulationRunner
                 TotalAssets = state.TotalAssets,
                 CashflowSnapshots = state.CurrentMonthSnapshots.ToList()
             };
-            _repository.WriteMonthlyResult(runId, entry);
+            monthlyEntries.Add(entry);
             state.CurrentMonthSnapshots.Clear();
         }
 
-        _repository.CompleteRun(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, monthlyEntries, cancellationToken).ConfigureAwait(false);
+        await _repository.CompleteRunAsync(runId, cancellationToken).ConfigureAwait(false);
+
         return new SimulationResultDto { RunId = runId, MonthlyResults = [] };
     }
 

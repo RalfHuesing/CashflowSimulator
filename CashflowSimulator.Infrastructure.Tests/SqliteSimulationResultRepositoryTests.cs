@@ -9,16 +9,16 @@ public sealed class SqliteSimulationResultRepositoryTests
     private readonly SqliteSimulationResultRepository _repository = new();
 
     [Fact]
-    public void StartRun_ReturnsPositiveRunId()
+    public async Task StartRunAsync_ReturnsPositiveRunId()
     {
-        var runId = _repository.StartRun();
+        var runId = await _repository.StartRunAsync();
         Assert.True(runId > 0);
     }
 
     [Fact]
-    public void WriteMonthlyResult_And_GetMonthlyResults_Roundtrip()
+    public async Task WriteMonthlyResultsAsync_And_GetMonthlyResultsAsync_Roundtrip()
     {
-        var runId = _repository.StartRun();
+        var runId = await _repository.StartRunAsync();
         var entry = new MonthlyResultDto
         {
             MonthIndex = 0,
@@ -31,10 +31,10 @@ public sealed class SqliteSimulationResultRepositoryTests
                 new CashflowSnapshotEntryDto { Name = "Miete", CashflowType = CashflowType.Expense, Amount = 800m }
             ]
         };
-        _repository.WriteMonthlyResult(runId, entry);
-        _repository.CompleteRun(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, [entry]);
+        await _repository.CompleteRunAsync(runId);
 
-        var results = _repository.GetMonthlyResults(runId);
+        var results = await _repository.GetMonthlyResultsAsync(runId);
         Assert.Single(results);
         var m = results[0];
         Assert.Equal(0, m.MonthIndex);
@@ -51,12 +51,13 @@ public sealed class SqliteSimulationResultRepositoryTests
     }
 
     [Fact]
-    public void MultipleMonths_StoredInOrder()
+    public async Task WriteMonthlyResultsAsync_MultipleMonths_StoredInOrder()
     {
-        var runId = _repository.StartRun();
+        var runId = await _repository.StartRunAsync();
+        var entries = new List<MonthlyResultDto>();
         for (var i = 0; i < 3; i++)
         {
-            _repository.WriteMonthlyResult(runId, new MonthlyResultDto
+            entries.Add(new MonthlyResultDto
             {
                 MonthIndex = i,
                 Age = 34 + i * 0.08,
@@ -65,9 +66,10 @@ public sealed class SqliteSimulationResultRepositoryTests
                 CashflowSnapshots = []
             });
         }
-        _repository.CompleteRun(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, entries);
+        await _repository.CompleteRunAsync(runId);
 
-        var results = _repository.GetMonthlyResults(runId);
+        var results = await _repository.GetMonthlyResultsAsync(runId);
         Assert.Equal(3, results.Count);
         Assert.Equal(0, results[0].MonthIndex);
         Assert.Equal(1000m, results[0].CashBalance);
@@ -78,26 +80,55 @@ public sealed class SqliteSimulationResultRepositoryTests
     }
 
     [Fact]
-    public void GetMonthlyResults_UnknownRunId_ReturnsEmpty()
+    public async Task GetMonthlyResultsAsync_UnknownRunId_ReturnsEmpty()
     {
-        var results = _repository.GetMonthlyResults(999_999);
+        var results = await _repository.GetMonthlyResultsAsync(999_999);
         Assert.NotNull(results);
         Assert.Empty(results);
     }
 
     [Fact]
-    public void StartRun_ClearsPreviousRunFiles_SecondRunUsesFreshDb()
+    public async Task StartRunAsync_ClearsPreviousRunFiles_SecondRunUsesFreshDb()
     {
-        var runId1 = _repository.StartRun();
-        _repository.WriteMonthlyResult(runId1, new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m });
-        _repository.CompleteRun(runId1);
+        var runId1 = await _repository.StartRunAsync();
+        await _repository.WriteMonthlyResultsAsync(runId1, [new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m }]);
+        await _repository.CompleteRunAsync(runId1);
 
-        var runId2 = _repository.StartRun();
+        var runId2 = await _repository.StartRunAsync();
         Assert.True(runId2 > 0);
-        var fromRun2 = _repository.GetMonthlyResults(runId2);
+        var fromRun2 = await _repository.GetMonthlyResultsAsync(runId2);
         Assert.Empty(fromRun2);
 
-        var fromRun1 = _repository.GetMonthlyResults(runId1);
+        var fromRun1 = await _repository.GetMonthlyResultsAsync(runId1);
         Assert.Empty(fromRun1);
+    }
+
+    [Fact]
+    public async Task WriteMonthlyResultsAsync_LargeBatch_360Months_Roundtrip()
+    {
+        var runId = await _repository.StartRunAsync();
+        var entries = new List<MonthlyResultDto>(360);
+        for (var i = 0; i < 360; i++)
+        {
+            entries.Add(new MonthlyResultDto
+            {
+                MonthIndex = i,
+                Age = 30 + i / 12.0,
+                CashBalance = 50_000m + i * 100m,
+                TotalAssets = 100_000m + i * 200m,
+                CashflowSnapshots = i % 12 == 0 ? [new CashflowSnapshotEntryDto { Name = "Bonus", CashflowType = CashflowType.Income, Amount = 5000m }] : []
+            });
+        }
+        await _repository.WriteMonthlyResultsAsync(runId, entries);
+        await _repository.CompleteRunAsync(runId);
+
+        var results = await _repository.GetMonthlyResultsAsync(runId);
+        Assert.Equal(360, results.Count);
+        Assert.Equal(0, results[0].MonthIndex);
+        Assert.Equal(359, results[359].MonthIndex);
+        Assert.Equal(50_000m, results[0].CashBalance);
+        Assert.Equal(50_000m + 359 * 100m, results[359].CashBalance);
+        Assert.Single(results[0].CashflowSnapshots);
+        Assert.Empty(results[1].CashflowSnapshots);
     }
 }

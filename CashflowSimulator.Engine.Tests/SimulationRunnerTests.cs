@@ -40,21 +40,21 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_Throws_WhenProjectIsNull()
+    public async Task RunSimulationAsync_Throws_WhenProjectIsNull()
     {
         var (runner, _) = CreateRunnerWithRepository();
-        Assert.Throws<ArgumentNullException>(() => runner.RunSimulation(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await runner.RunSimulationAsync(null!));
     }
 
     [Fact]
-    public void RunSimulation_EmptyDateRange_ReturnsEmptyMonthlyResults()
+    public async Task RunSimulationAsync_EmptyDateRange_ReturnsEmptyMonthlyResults()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 12, 1),
             end: new DateOnly(2020, 1, 1));
         var (runner, _) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
         Assert.Null(result.RunId);
         Assert.NotNull(result.MonthlyResults);
@@ -62,7 +62,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_OneMonth_NoStreams_ReturnsOneResultWithInitialCash()
+    public async Task RunSimulationAsync_OneMonth_NoStreams_ReturnsOneResultWithInitialCash()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -70,10 +70,10 @@ public sealed class SimulationRunnerTests
             initialCash: 15_000m);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
         Assert.NotNull(result.RunId);
-        var monthly = repo.GetMonthlyResults(result.RunId.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId.Value);
         Assert.Single(monthly);
         var month = monthly[0];
         Assert.Equal(0, month.MonthIndex);
@@ -83,7 +83,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_TwelveMonths_NoStreams_ReturnsTwelveResults_SameCash()
+    public async Task RunSimulationAsync_TwelveMonths_NoStreams_ReturnsTwelveResults_SameCash()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -91,16 +91,16 @@ public sealed class SimulationRunnerTests
             initialCash: 20_000m);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(12, monthly.Count);
         foreach (var m in monthly)
             Assert.Equal(20_000m, m.CashBalance);
     }
 
     [Fact]
-    public void RunSimulation_MonthlyIncome_IncreasesCash()
+    public async Task RunSimulationAsync_MonthlyIncome_IncreasesCash()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -120,9 +120,9 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(3, monthly.Count);
         Assert.Equal(1500m, monthly[0].CashBalance);  // 1000 + 500
         Assert.Equal(2000m, monthly[1].CashBalance);
@@ -137,7 +137,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_MonthlyExpense_DecreasesCash()
+    public async Task RunSimulationAsync_MonthlyExpense_DecreasesCash()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -157,16 +157,16 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(2, monthly.Count);
         Assert.Equal(3800m, monthly[0].CashBalance);
         Assert.Equal(2600m, monthly[1].CashBalance);
     }
 
     [Fact]
-    public void RunSimulation_StreamActiveOnlyAfterStartDate_AppliedFromStart()
+    public async Task RunSimulationAsync_StreamActiveOnlyAfterStartDate_AppliedFromStart()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -186,9 +186,9 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(0m, monthly[0].CashBalance);
         Assert.Empty(monthly[0].CashflowSnapshots);
         Assert.Equal(100m, monthly[1].CashBalance);
@@ -196,7 +196,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_StreamEndDate_StopsAfterEnd()
+    public async Task RunSimulationAsync_StreamEndDate_StopsAfterEnd()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -216,9 +216,9 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(50m, monthly[0].CashBalance);
         Assert.Equal(100m, monthly[1].CashBalance);
         Assert.Equal(100m, monthly[2].CashBalance);
@@ -226,7 +226,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_YearlyStream_AppliedOnlyInJanuary()
+    public async Task RunSimulationAsync_YearlyStream_AppliedOnlyInJanuary()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -246,9 +246,9 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(12, monthly.Count);
         Assert.Equal(1200m, monthly[0].CashBalance);
         for (var i = 1; i < 12; i++)
@@ -259,16 +259,16 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_Age_AdvancesWithMonths()
+    public async Task RunSimulationAsync_Age_AdvancesWithMonths()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
             end: new DateOnly(2020, 12, 1));
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(12, monthly.Count);
         var age0 = monthly[0].Age;
         var age11 = monthly[11].Age;
@@ -278,7 +278,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_TotalAssets_EqualsCashInSlice1()
+    public async Task RunSimulationAsync_TotalAssets_EqualsCashInSlice1()
     {
         var project = MinimalProject(
             start: new DateOnly(2020, 1, 1),
@@ -298,15 +298,15 @@ public sealed class SimulationRunnerTests
             ]);
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         foreach (var m in monthly)
             Assert.Equal(m.CashBalance, m.TotalAssets);
     }
 
     [Fact]
-    public void RunSimulation_WithPortfolioAndEconomicFactor_TotalAssetsIncludesGrownPortfolio()
+    public async Task RunSimulationAsync_WithPortfolioAndEconomicFactor_TotalAssetsIncludesGrownPortfolio()
     {
         const string factorId = "MSCI_World";
         var project = new SimulationProjectDto
@@ -351,9 +351,9 @@ public sealed class SimulationRunnerTests
         };
         var (runner, repo) = CreateRunnerWithRepository();
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(12, monthly.Count);
         var firstMonth = monthly[0];
         Assert.Equal(1000m, firstMonth.CashBalance);
@@ -365,7 +365,7 @@ public sealed class SimulationRunnerTests
     }
 
     [Fact]
-    public void RunSimulation_ClonesPortfolio_DoesNotMutateProjectTranchesOrTransactions()
+    public async Task RunSimulationAsync_ClonesPortfolio_DoesNotMutateProjectTranchesOrTransactions()
     {
         var tranches = new List<AssetTrancheDto> { new() { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 10m, AcquisitionPricePerUnit = 100m } };
         var transactions = new List<TransactionDto> { new() { Date = new DateOnly(2020, 1, 1), Type = TransactionType.Buy, Quantity = 10m, PricePerUnit = 100m, TotalAmount = 1000m } };
@@ -396,14 +396,14 @@ public sealed class SimulationRunnerTests
         };
 
         var (runner, _) = CreateRunnerWithRepository();
-        runner.RunSimulation(project);
+        await runner.RunSimulationAsync(project);
 
         Assert.Same(tranches, project.Portfolio!.Assets[0].Tranches);
         Assert.Same(transactions, project.Portfolio.Assets[0].Transactions);
     }
 
     [Fact]
-    public void RunSimulation_EmptyTranchesAndBuyTransactions_CompletesWithoutError()
+    public async Task RunSimulationAsync_EmptyTranchesAndBuyTransactions_CompletesWithoutError()
     {
         var transactions = new List<TransactionDto>
         {
@@ -433,10 +433,10 @@ public sealed class SimulationRunnerTests
             }
         };
         var (runner, repo) = CreateRunnerWithRepository();
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
         Assert.NotNull(result);
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         Assert.Equal(3, monthly.Count);
         Assert.True(monthly[0].TotalAssets >= 800m);
     }

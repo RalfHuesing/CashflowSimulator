@@ -263,7 +263,7 @@ public sealed class InflationProcessorTests
     }
 
     [Fact]
-    public void SimulationRunner_WithInflationProcessor_SecondYearSnapshotAmountHigher()
+    public async Task SimulationRunner_WithInflationProcessor_SecondYearSnapshotAmountHigher()
     {
         var repo = new InMemorySimulationResultRepository();
         ISimulationRunner runner = new SimulationRunner(
@@ -308,9 +308,9 @@ public sealed class InflationProcessorTests
             ]
         };
 
-        var result = runner.RunSimulation(project);
+        var result = await runner.RunSimulationAsync(project);
 
-        var monthly = repo.GetMonthlyResults(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
         var jan2020 = monthly[0];
         var jan2021 = monthly[12];
         var salarySnapshot2020 = jan2020.CashflowSnapshots.FirstOrDefault(s => s.Name == "Gehalt");

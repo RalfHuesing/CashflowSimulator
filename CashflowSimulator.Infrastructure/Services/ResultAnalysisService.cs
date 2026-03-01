@@ -15,6 +15,6 @@ public sealed class ResultAnalysisService : IResultAnalysisService
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<Contracts.Dtos.MonthlyResultDto> GetMonthlyResults(long runId) =>
-        _repository.GetMonthlyResults(runId);
+    public async Task<IReadOnlyList<Contracts.Dtos.MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default) =>
+        await _repository.GetMonthlyResultsAsync(runId, cancellationToken).ConfigureAwait(false);
 }

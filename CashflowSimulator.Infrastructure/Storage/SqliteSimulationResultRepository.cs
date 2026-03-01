@@ -7,7 +7,8 @@ namespace CashflowSimulator.Infrastructure.Storage;
 
 /// <summary>
 /// SQLite-Repository für Simulationsergebnisse. Eine frische, leere DB pro Run im Temp-Verzeichnis.
-/// Speicherort: %Temp%\CashflowSimulator\ (OS-unabhängig). Vor jedem StartRun werden nur eigene Dateien (run_*.db) gelöscht.
+/// Speicherort: %Temp%\CashflowSimulator\ (OS-unabhängig). Vor jedem StartRunAsync werden nur eigene Dateien (run_*.db) gelöscht.
+/// Nutzt eine Connection/Transaktion pro Batch (WriteMonthlyResultsAsync) zur Vermeidung von N+1.
 /// </summary>
 public sealed class SqliteSimulationResultRepository : ISimulationResultRepository
 {
@@ -16,126 +17,145 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
     private const string FileSuffix = ".db";
 
     /// <inheritdoc />
-    public long StartRun()
+    public async Task<long> StartRunAsync(CancellationToken cancellationToken = default)
     {
         EnsureTempDirectoryExists();
         DeleteOwnDatabaseFiles();
 
-        long runId;
-        using (var memoryConnection = new SqliteConnection("Data Source=:memory:"))
-        {
-            memoryConnection.Open();
-            CreateSchema(memoryConnection);
-            using (var cmd = memoryConnection.CreateCommand())
-            {
-                cmd.CommandText = "INSERT INTO Runs (CreatedAtUtc) VALUES (datetime('now')); SELECT last_insert_rowid();";
-                runId = (long)cmd.ExecuteScalar()!;
-            }
+        await using var memoryConnection = new SqliteConnection("Data Source=:memory:");
+        await memoryConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await CreateSchemaAsync(memoryConnection, cancellationToken).ConfigureAwait(false);
 
-            var finalPath = Path.Combine(TempDirectory, $"{FilePrefix}{runId}{FileSuffix}");
-            using (var fileConnection = new SqliteConnection($"Data Source={finalPath}"))
-            {
-                memoryConnection.BackupDatabase(fileConnection);
-            }
+        long runId;
+        await using (var cmd = memoryConnection.CreateCommand())
+        {
+            cmd.CommandText = "INSERT INTO Runs (CreatedAtUtc) VALUES (datetime('now')); SELECT last_insert_rowid();";
+            var scalar = await cmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            runId = Convert.ToInt64(scalar, CultureInfo.InvariantCulture);
+        }
+
+        var finalPath = Path.Combine(TempDirectory, $"{FilePrefix}{runId}{FileSuffix}");
+        await using (var fileConnection = new SqliteConnection($"Data Source={finalPath}"))
+        {
+            await fileConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            await Task.Run(() => memoryConnection.BackupDatabase(fileConnection), cancellationToken).ConfigureAwait(false);
         }
 
         return runId;
     }
 
     /// <inheritdoc />
-    public void WriteMonthlyResult(long runId, MonthlyResultDto entry)
+    public async Task WriteMonthlyResultsAsync(long runId, IEnumerable<MonthlyResultDto> entries, CancellationToken cancellationToken = default)
     {
         var path = GetDbPath(runId);
         if (!File.Exists(path))
             throw new InvalidOperationException($"Run {runId} nicht gefunden (DB-Datei fehlt).");
 
-        using var connection = new SqliteConnection($"Data Source={path}");
-        connection.Open();
+        var entriesList = entries.ToList();
+        if (entriesList.Count == 0)
+            return;
 
-        using (var tx = connection.BeginTransaction())
+        await using var connection = new SqliteConnection($"Data Source={path}");
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        await using var tx = connection.BeginTransaction();
+        try
         {
-            using (var cmd = connection.CreateCommand())
+            foreach (var entry in entriesList)
             {
-                cmd.Transaction = tx;
-                cmd.CommandText = """
-                    INSERT INTO MonthlyResults (RunId, MonthIndex, Age, CashBalance, TotalAssets)
-                    VALUES (@runId, @monthIndex, @age, @cashBalance, @totalAssets)
-                    """;
-                cmd.Parameters.AddWithValue("@runId", runId);
-                cmd.Parameters.AddWithValue("@monthIndex", entry.MonthIndex);
-                cmd.Parameters.AddWithValue("@age", entry.Age);
-                cmd.Parameters.AddWithValue("@cashBalance", entry.CashBalance.ToString(CultureInfo.InvariantCulture));
-                cmd.Parameters.AddWithValue("@totalAssets", entry.TotalAssets.ToString(CultureInfo.InvariantCulture));
-                cmd.ExecuteNonQuery();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                await using (var cmd = connection.CreateCommand())
+                {
+                    cmd.Transaction = tx;
+                    cmd.CommandText = """
+                        INSERT INTO MonthlyResults (RunId, MonthIndex, Age, CashBalance, TotalAssets)
+                        VALUES (@runId, @monthIndex, @age, @cashBalance, @totalAssets)
+                        """;
+                    cmd.Parameters.AddWithValue("@runId", runId);
+                    cmd.Parameters.AddWithValue("@monthIndex", entry.MonthIndex);
+                    cmd.Parameters.AddWithValue("@age", entry.Age);
+                    cmd.Parameters.AddWithValue("@cashBalance", entry.CashBalance.ToString(CultureInfo.InvariantCulture));
+                    cmd.Parameters.AddWithValue("@totalAssets", entry.TotalAssets.ToString(CultureInfo.InvariantCulture));
+                    await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                var snapshots = entry.CashflowSnapshots ?? [];
+                for (var i = 0; i < snapshots.Count; i++)
+                {
+                    var s = snapshots[i];
+                    await using var cmd = connection.CreateCommand();
+                    cmd.Transaction = tx;
+                    cmd.CommandText = """
+                        INSERT INTO Snapshots (RunId, MonthIndex, Sequence, Name, CashflowType, Amount)
+                        VALUES (@runId, @monthIndex, @seq, @name, @cashflowType, @amount)
+                        """;
+                    cmd.Parameters.AddWithValue("@runId", runId);
+                    cmd.Parameters.AddWithValue("@monthIndex", entry.MonthIndex);
+                    cmd.Parameters.AddWithValue("@seq", i);
+                    cmd.Parameters.AddWithValue("@name", s.Name ?? "");
+                    cmd.Parameters.AddWithValue("@cashflowType", (int)s.CashflowType);
+                    cmd.Parameters.AddWithValue("@amount", s.Amount.ToString(CultureInfo.InvariantCulture));
+                    await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
-            var snapshots = entry.CashflowSnapshots ?? [];
-            for (var i = 0; i < snapshots.Count; i++)
-            {
-                var s = snapshots[i];
-                using var cmd = connection.CreateCommand();
-                cmd.Transaction = tx;
-                cmd.CommandText = """
-                    INSERT INTO Snapshots (RunId, MonthIndex, Sequence, Name, CashflowType, Amount)
-                    VALUES (@runId, @monthIndex, @seq, @name, @cashflowType, @amount)
-                    """;
-                cmd.Parameters.AddWithValue("@runId", runId);
-                cmd.Parameters.AddWithValue("@monthIndex", entry.MonthIndex);
-                cmd.Parameters.AddWithValue("@seq", i);
-                cmd.Parameters.AddWithValue("@name", s.Name ?? "");
-                cmd.Parameters.AddWithValue("@cashflowType", (int)s.CashflowType);
-                cmd.Parameters.AddWithValue("@amount", s.Amount.ToString(CultureInfo.InvariantCulture));
-                cmd.ExecuteNonQuery();
-            }
-
-            tx.Commit();
+            await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken).ConfigureAwait(false);
+            throw;
         }
     }
 
     /// <inheritdoc />
-    public void CompleteRun(long runId)
+    public Task CompleteRunAsync(long runId, CancellationToken cancellationToken = default)
     {
         // Kein offener Connection-Handle; optional später: Transaktion flushen o. Ä.
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<MonthlyResultDto> GetMonthlyResults(long runId)
+    public async Task<IReadOnlyList<MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default)
     {
         var path = GetDbPath(runId);
         if (!File.Exists(path))
             return [];
 
         var results = new List<MonthlyResultDto>();
-        using var connection = new SqliteConnection($"Data Source={path}");
-        connection.Open();
+        await using var connection = new SqliteConnection($"Data Source={path}");
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
-        using var cmd = connection.CreateCommand();
-        cmd.CommandText = """
-            SELECT MonthIndex, Age, CashBalance, TotalAssets
-            FROM MonthlyResults
-            WHERE RunId = @runId
-            ORDER BY MonthIndex
-            """;
-        cmd.Parameters.AddWithValue("@runId", runId);
-        using var reader = cmd.ExecuteReader();
-
-        while (reader.Read())
+        await using (var cmd = connection.CreateCommand())
         {
-            var monthIndex = reader.GetInt32(0);
-            var age = reader.GetDouble(1);
-            var cashStr = reader.GetString(2);
-            var assetsStr = reader.GetString(3);
-            var cash = decimal.Parse(cashStr, CultureInfo.InvariantCulture);
-            var assets = decimal.Parse(assetsStr, CultureInfo.InvariantCulture);
-            var snapshots = GetSnapshots(connection, runId, monthIndex);
-            results.Add(new MonthlyResultDto
+            cmd.CommandText = """
+                SELECT MonthIndex, Age, CashBalance, TotalAssets
+                FROM MonthlyResults
+                WHERE RunId = @runId
+                ORDER BY MonthIndex
+                """;
+            cmd.Parameters.AddWithValue("@runId", runId);
+            await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                MonthIndex = monthIndex,
-                Age = age,
-                CashBalance = cash,
-                TotalAssets = assets,
-                CashflowSnapshots = snapshots
-            });
+                var monthIndex = reader.GetInt32(0);
+                var age = reader.GetDouble(1);
+                var cashStr = reader.GetString(2);
+                var assetsStr = reader.GetString(3);
+                var cash = decimal.Parse(cashStr, CultureInfo.InvariantCulture);
+                var assets = decimal.Parse(assetsStr, CultureInfo.InvariantCulture);
+                var snapshots = await GetSnapshotsAsync(connection, runId, monthIndex, cancellationToken).ConfigureAwait(false);
+                results.Add(new MonthlyResultDto
+                {
+                    MonthIndex = monthIndex,
+                    Age = age,
+                    CashBalance = cash,
+                    TotalAssets = assets,
+                    CashflowSnapshots = snapshots
+                });
+            }
         }
 
         return results;
@@ -169,20 +189,20 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
 
     private static string GetDbPath(long runId) => Path.Combine(TempDirectory, $"{FilePrefix}{runId}{FileSuffix}");
 
-    private static void CreateSchema(SqliteConnection connection)
+    private static async Task CreateSchemaAsync(SqliteConnection connection, CancellationToken cancellationToken)
     {
         foreach (var sql in SchemaStatements)
         {
-            using var cmd = connection.CreateCommand();
+            await using var cmd = connection.CreateCommand();
             cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private static List<CashflowSnapshotEntryDto> GetSnapshots(SqliteConnection connection, long runId, int monthIndex)
+    private static async Task<List<CashflowSnapshotEntryDto>> GetSnapshotsAsync(SqliteConnection connection, long runId, int monthIndex, CancellationToken cancellationToken)
     {
         var list = new List<CashflowSnapshotEntryDto>();
-        using var cmd = connection.CreateCommand();
+        await using var cmd = connection.CreateCommand();
         cmd.CommandText = """
             SELECT Name, CashflowType, Amount
             FROM Snapshots
@@ -191,8 +211,8 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
             """;
         cmd.Parameters.AddWithValue("@runId", runId);
         cmd.Parameters.AddWithValue("@monthIndex", monthIndex);
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
             var name = reader.GetString(0);
             var type = (CashflowType)reader.GetInt32(1);

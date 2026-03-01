@@ -364,18 +364,19 @@ public partial class MainShellViewModel : ObservableObject
     private bool CanSave() => _currentProjectService.Current is not null;
 
     [RelayCommand(CanExecute = nameof(CanSave))]
-    private void StartSimulation()
+    private async Task StartSimulationAsync()
     {
         var project = _currentProjectService.Current;
         if (project is null) return;
 
         try
         {
-            var result = _simulationRunner.RunSimulation(project);
+            var result = await _simulationRunner.RunSimulationAsync(project).ConfigureAwait(true);
             var runId = result.RunId ?? 0L;
             var resultViewModel = _navigationService.Create<SimulationResultViewModel>(runId);
+            await resultViewModel.LoadAsync().ConfigureAwait(true);
             CurrentContentViewModel = resultViewModel;
-            var count = result.RunId is null ? 0 : _resultAnalysisService.GetMonthlyResults(runId).Count;
+            var count = resultViewModel.MonthlyResults.Count;
             _logger.LogInformation("Simulation abgeschlossen: {Count} Monate", count);
         }
         catch (Exception ex)

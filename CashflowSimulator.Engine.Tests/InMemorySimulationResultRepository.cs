@@ -5,29 +5,34 @@ using CashflowSimulator.Contracts.Interfaces;
 namespace CashflowSimulator.Engine.Tests;
 
 /// <summary>
-/// In-Memory-Implementierung für Tests: speichert Monatsergebnisse pro RunId.
+/// In-Memory-Implementierung für Tests: speichert Monatsergebnisse pro RunId (async API).
 /// </summary>
 internal sealed class InMemorySimulationResultRepository : ISimulationResultRepository
 {
     private long _nextRunId;
     private readonly ConcurrentDictionary<long, List<MonthlyResultDto>> _runData = new();
 
-    public long StartRun()
+    public Task<long> StartRunAsync(CancellationToken cancellationToken = default)
     {
         var runId = Interlocked.Increment(ref _nextRunId);
         _runData[runId] = [];
-        return runId;
+        return Task.FromResult(runId);
     }
 
-    public void WriteMonthlyResult(long runId, MonthlyResultDto entry)
+    public Task WriteMonthlyResultsAsync(long runId, IEnumerable<MonthlyResultDto> entries, CancellationToken cancellationToken = default)
     {
         if (!_runData.TryGetValue(runId, out var list))
             throw new InvalidOperationException($"Run {runId} nicht gefunden.");
-        list.Add(entry);
+        foreach (var entry in entries)
+            list.Add(entry);
+        return Task.CompletedTask;
     }
 
-    public void CompleteRun(long runId) { }
+    public Task CompleteRunAsync(long runId, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-    public IReadOnlyList<MonthlyResultDto> GetMonthlyResults(long runId) =>
-        _runData.TryGetValue(runId, out var list) ? list : [];
+    public Task<IReadOnlyList<MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default)
+    {
+        var result = _runData.TryGetValue(runId, out var list) ? (IReadOnlyList<MonthlyResultDto>)list : [];
+        return Task.FromResult(result);
+    }
 }

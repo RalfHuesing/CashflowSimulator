@@ -8,9 +8,10 @@ namespace CashflowSimulator.Contracts.Interfaces;
 public interface ISimulationRunner
 {
     /// <summary>
-    /// Führt die Simulation für das gegebene Projekt aus und liefert die monatlichen Ergebnisse.
+    /// Führt die Simulation für das gegebene Projekt asynchron aus und liefert die Run-Id (Monatsdaten im Repository).
     /// </summary>
     /// <param name="project">Projekt mit Parametern und Cashflow-Streams.</param>
-    /// <returns>Ergebnis mit Liste der monatlichen Ergebnisse (Slice 1: nur Cashflow, kein Depot/Steuern).</returns>
-    SimulationResultDto RunSimulation(SimulationProjectDto project);
+    /// <param name="cancellationToken">Abbruchtoken.</param>
+    /// <returns>Ergebnis mit RunId; monatliche Details per GetMonthlyResultsAsync am Repository/ResultAnalysisService.</returns>
+    Task<SimulationResultDto> RunSimulationAsync(SimulationProjectDto project, CancellationToken cancellationToken = default);
 }

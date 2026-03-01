@@ -8,7 +8,7 @@ namespace CashflowSimulator.Desktop.Tests;
 public sealed class SimulationResultViewModelTests
 {
     [Fact]
-    public void Constructor_LoadsMonthlyResultsFromService()
+    public async Task LoadAsync_LoadsMonthlyResultsFromService()
     {
         const long runId = 42;
         var monthly = new List<MonthlyResultDto>
@@ -19,6 +19,9 @@ public sealed class SimulationResultViewModelTests
         IResultAnalysisService service = new FakeResultAnalysisService(monthly);
 
         var vm = new SimulationResultViewModel(runId, service);
+        Assert.Empty(vm.MonthlyResults);
+
+        await vm.LoadAsync();
 
         Assert.Equal(runId, vm.RunId);
         Assert.Equal(runId, vm.Result.RunId);
@@ -30,9 +33,17 @@ public sealed class SimulationResultViewModelTests
     }
 
     [Fact]
-    public void Constructor_WithNullService_TreatsAsEmptyResults()
+    public void Constructor_WithNullService_DoesNotThrow()
     {
-        var vm = new SimulationResultViewModel(1, null!);
+        var vm = new SimulationResultViewModel(1, null);
+        Assert.Empty(vm.MonthlyResults);
+    }
+
+    [Fact]
+    public async Task LoadAsync_WithNullService_DoesNothing()
+    {
+        var vm = new SimulationResultViewModel(1, null);
+        await vm.LoadAsync();
         Assert.Empty(vm.MonthlyResults);
     }
 
@@ -42,6 +53,7 @@ public sealed class SimulationResultViewModelTests
 
         public FakeResultAnalysisService(IReadOnlyList<MonthlyResultDto> list) => _list = list;
 
-        public IReadOnlyList<MonthlyResultDto> GetMonthlyResults(long runId) => _list;
+        public Task<IReadOnlyList<MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(_list);
     }
 }
