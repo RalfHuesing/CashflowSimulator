@@ -12,11 +12,11 @@ internal sealed class InMemorySimulationResultRepository : ISimulationResultRepo
     private long _nextRunId;
     private readonly ConcurrentDictionary<long, List<MonthlyResultDto>> _runData = new();
 
-    public Task<long> StartRunAsync(CancellationToken cancellationToken = default)
+    public Task<RunStartResult> StartRunAsync(CancellationToken cancellationToken = default)
     {
         var runId = Interlocked.Increment(ref _nextRunId);
         _runData[runId] = [];
-        return Task.FromResult(runId);
+        return Task.FromResult(new RunStartResult(runId, ResultFolderPath: null));
     }
 
     public Task WriteMonthlyResultsAsync(long runId, IEnumerable<MonthlyResultDto> entries, CancellationToken cancellationToken = default)

@@ -9,16 +9,20 @@ public sealed class SqliteSimulationResultRepositoryTests
     private readonly SqliteSimulationResultRepository _repository = new();
 
     [Fact]
-    public async Task StartRunAsync_ReturnsPositiveRunId()
+    public async Task StartRunAsync_ReturnsRunStartResult_WithPositiveRunId_AndResultFolderPath()
     {
-        var runId = await _repository.StartRunAsync();
-        Assert.True(runId > 0);
+        var result = await _repository.StartRunAsync();
+        Assert.True(result.RunId > 0);
+        Assert.NotNull(result.ResultFolderPath);
+        Assert.True(Directory.Exists(result.ResultFolderPath));
+        Assert.True(File.Exists(Path.Combine(result.ResultFolderPath, "simulation.db")));
     }
 
     [Fact]
     public async Task WriteMonthlyResultsAsync_And_GetMonthlyResultsAsync_Roundtrip()
     {
-        var runId = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync();
+        var runId = start.RunId;
         var entry = new MonthlyResultDto
         {
             MonthIndex = 0,
@@ -53,7 +57,8 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task WriteMonthlyResultsAsync_MultipleMonths_StoredInOrder()
     {
-        var runId = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync();
+        var runId = start.RunId;
         var entries = new List<MonthlyResultDto>();
         for (var i = 0; i < 3; i++)
         {
@@ -88,25 +93,39 @@ public sealed class SqliteSimulationResultRepositoryTests
     }
 
     [Fact]
-    public async Task StartRunAsync_ClearsPreviousRunFiles_SecondRunUsesFreshDb()
+    public async Task StartRunAsync_TwoRunsInSequence_SecondRunHasFreshEmptyDb()
     {
-        var runId1 = await _repository.StartRunAsync();
-        await _repository.WriteMonthlyResultsAsync(runId1, [new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m }]);
-        await _repository.CompleteRunAsync(runId1);
+        var tempDir = Path.Combine(Path.GetTempPath(), "CashflowSimulator_RepoTest_" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(tempDir);
+            var repo = new SqliteSimulationResultRepository(tempDir);
+            var start1 = await repo.StartRunAsync();
+            await repo.WriteMonthlyResultsAsync(start1.RunId, [new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m }]);
+            await repo.CompleteRunAsync(start1.RunId);
 
-        var runId2 = await _repository.StartRunAsync();
-        Assert.True(runId2 > 0);
-        var fromRun2 = await _repository.GetMonthlyResultsAsync(runId2);
-        Assert.Empty(fromRun2);
-
-        var fromRun1 = await _repository.GetMonthlyResultsAsync(runId1);
-        Assert.Empty(fromRun1);
+            var start2 = await repo.StartRunAsync();
+            Assert.True(start2.RunId > 0);
+            Assert.NotEqual(start1.RunId, start2.RunId);
+            var fromRun2 = await repo.GetMonthlyResultsAsync(start2.RunId);
+            Assert.Empty(fromRun2);
+        }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, recursive: true);
+            }
+            catch { /* cleanup best-effort */ }
+        }
     }
 
     [Fact]
     public async Task WriteMonthlyResultsAsync_LargeBatch_360Months_Roundtrip()
     {
-        var runId = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync();
+        var runId = start.RunId;
         var entries = new List<MonthlyResultDto>(360);
         for (var i = 0; i < 360; i++)
         {

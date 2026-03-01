@@ -5,21 +5,25 @@ namespace CashflowSimulator.Engine.Services.Simulation;
 
 /// <summary>
 /// Führt die monatliche Simulations-Pipeline aus (Processors: Cashflow, Growth; erweiterbar um Steuern, Inflation).
-/// Schreibt alle Monatsergebnisse per Batch ins <see cref="ISimulationResultRepository"/>; Rückgabe enthält RunId.
+/// Schreibt alle Monatsergebnisse per Batch ins <see cref="ISimulationResultRepository"/>; Rückgabe enthält RunId und ResultFolderPath.
+/// Optional wird ein Szenario-Snapshot (input_scenario.json) via <see cref="IScenarioSnapshotWriter"/> geschrieben.
 /// </summary>
 public sealed class SimulationRunner : ISimulationRunner
 {
     private readonly IEnumerable<ISimulationProcessor> _processors;
     private readonly ISimulationResultRepository _repository;
+    private readonly IScenarioSnapshotWriter? _scenarioSnapshotWriter;
 
     public SimulationRunner(
         IEnumerable<ISimulationProcessor> processors,
-        ISimulationResultRepository repository)
+        ISimulationResultRepository repository,
+        IScenarioSnapshotWriter? scenarioSnapshotWriter = null)
     {
         ArgumentNullException.ThrowIfNull(processors);
         ArgumentNullException.ThrowIfNull(repository);
         _processors = processors;
         _repository = repository;
+        _scenarioSnapshotWriter = scenarioSnapshotWriter;
     }
 
     /// <inheritdoc />
@@ -37,7 +41,8 @@ public sealed class SimulationRunner : ISimulationRunner
         if (monthCount <= 0)
             return new SimulationResultDto { MonthlyResults = [] };
 
-        var runId = await _repository.StartRunAsync(cancellationToken).ConfigureAwait(false);
+        var runResult = await _repository.StartRunAsync(cancellationToken).ConfigureAwait(false);
+        var runId = runResult.RunId;
 
         var portfolio = project.Portfolio ?? new PortfolioDto();
         var state = new SimulationState
@@ -77,7 +82,10 @@ public sealed class SimulationRunner : ISimulationRunner
         await _repository.WriteMonthlyResultsAsync(runId, monthlyEntries, cancellationToken).ConfigureAwait(false);
         await _repository.CompleteRunAsync(runId, cancellationToken).ConfigureAwait(false);
 
-        return new SimulationResultDto { RunId = runId, MonthlyResults = [] };
+        if (_scenarioSnapshotWriter is not null && !string.IsNullOrWhiteSpace(runResult.ResultFolderPath))
+            await _scenarioSnapshotWriter.WriteAsync(runResult.ResultFolderPath, project, cancellationToken).ConfigureAwait(false);
+
+        return new SimulationResultDto { RunId = runId, ResultFolderPath = runResult.ResultFolderPath, MonthlyResults = [] };
     }
 
     private static int GetMonthCount(DateOnly start, DateOnly end)

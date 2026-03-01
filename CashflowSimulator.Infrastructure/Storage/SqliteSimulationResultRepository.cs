@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
@@ -6,49 +7,76 @@ using Microsoft.Data.Sqlite;
 namespace CashflowSimulator.Infrastructure.Storage;
 
 /// <summary>
-/// SQLite-Repository für Simulationsergebnisse. Eine frische, leere DB pro Run im Temp-Verzeichnis.
-/// Speicherort: %Temp%\CashflowSimulator\ (OS-unabhängig). Vor jedem StartRunAsync werden nur eigene Dateien (run_*.db) gelöscht.
-/// Nutzt eine Connection/Transaktion pro Batch (WriteMonthlyResultsAsync) zur Vermeidung von N+1.
+/// SQLite-Repository für Simulationsergebnisse. Ein Run = ein Ordner im Drafts-Verzeichnis mit simulation.db.
+/// Speicherort: AppData/Local/CashflowSimulator/Drafts/{yyyyMMdd-HHmmss_RunId}/. Vor jedem StartRunAsync wird aufgeräumt (nur 5 neueste Ordner).
 /// </summary>
 public sealed class SqliteSimulationResultRepository : ISimulationResultRepository
 {
-    private static readonly string TempDirectory = Path.Combine(Path.GetTempPath(), "CashflowSimulator");
-    private const string FilePrefix = "run_";
-    private const string FileSuffix = ".db";
+    private const string DbFileName = "simulation.db";
+    private const int KeepNewestDraftCount = 5;
+
+    private static string DefaultDraftsBasePath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "CashflowSimulator",
+        "Drafts");
+
+    private readonly string _draftsBasePath;
+    private long _nextRunId;
+    private readonly ConcurrentDictionary<long, string> _runIdToFolder = new();
+
+    /// <summary>
+    /// Erstellt das Repository mit dem Standard-Drafts-Pfad (AppData/Local/CashflowSimulator/Drafts).
+    /// </summary>
+    public SqliteSimulationResultRepository() : this(DefaultDraftsBasePath) { }
+
+    /// <summary>
+    /// Erstellt das Repository mit einem benutzerdefinierten Drafts-Basisordner (z. B. für Tests).
+    /// </summary>
+    public SqliteSimulationResultRepository(string draftsBasePath)
+    {
+        _draftsBasePath = draftsBasePath ?? DefaultDraftsBasePath;
+    }
 
     /// <inheritdoc />
-    public async Task<long> StartRunAsync(CancellationToken cancellationToken = default)
+    public async Task<RunStartResult> StartRunAsync(CancellationToken cancellationToken = default)
     {
-        EnsureTempDirectoryExists();
-        DeleteOwnDatabaseFiles();
+        if (!Directory.Exists(_draftsBasePath))
+            Directory.CreateDirectory(_draftsBasePath);
+        DraftsFolderCleanup.KeepNewest(_draftsBasePath, KeepNewestDraftCount);
+
+        var runId = Interlocked.Increment(ref _nextRunId);
 
         await using var memoryConnection = new SqliteConnection("Data Source=:memory:");
         await memoryConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
         await CreateSchemaAsync(memoryConnection, cancellationToken).ConfigureAwait(false);
 
-        long runId;
         await using (var cmd = memoryConnection.CreateCommand())
         {
-            cmd.CommandText = "INSERT INTO Runs (CreatedAtUtc) VALUES (datetime('now')); SELECT last_insert_rowid();";
-            var scalar = await cmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-            runId = Convert.ToInt64(scalar, CultureInfo.InvariantCulture);
+            cmd.CommandText = "INSERT INTO Runs (Id, CreatedAtUtc) VALUES (@id, datetime('now'));";
+            cmd.Parameters.AddWithValue("@id", runId);
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        var finalPath = Path.Combine(TempDirectory, $"{FilePrefix}{runId}{FileSuffix}");
-        await using (var fileConnection = new SqliteConnection($"Data Source={finalPath}"))
+        var folderName = $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{runId}";
+        var runFolderPath = Path.Combine(_draftsBasePath, folderName);
+        Directory.CreateDirectory(runFolderPath);
+
+        var dbPath = Path.Combine(runFolderPath, DbFileName);
+        await using (var fileConnection = new SqliteConnection($"Data Source={dbPath}"))
         {
             await fileConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
             await Task.Run(() => memoryConnection.BackupDatabase(fileConnection), cancellationToken).ConfigureAwait(false);
         }
 
-        return runId;
+        _runIdToFolder[runId] = runFolderPath;
+        return new RunStartResult(runId, runFolderPath);
     }
 
     /// <inheritdoc />
     public async Task WriteMonthlyResultsAsync(long runId, IEnumerable<MonthlyResultDto> entries, CancellationToken cancellationToken = default)
     {
         var path = GetDbPath(runId);
-        if (!File.Exists(path))
+        if (path is null || !File.Exists(path))
             throw new InvalidOperationException($"Run {runId} nicht gefunden (DB-Datei fehlt).");
 
         var entriesList = entries.ToList();
@@ -112,7 +140,6 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
     /// <inheritdoc />
     public Task CompleteRunAsync(long runId, CancellationToken cancellationToken = default)
     {
-        // Kein offener Connection-Handle; optional später: Transaktion flushen o. Ä.
         return Task.CompletedTask;
     }
 
@@ -120,7 +147,7 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
     public async Task<IReadOnlyList<MonthlyResultDto>> GetMonthlyResultsAsync(long runId, CancellationToken cancellationToken = default)
     {
         var path = GetDbPath(runId);
-        if (!File.Exists(path))
+        if (path is null || !File.Exists(path))
             return [];
 
         var results = new List<MonthlyResultDto>();
@@ -161,33 +188,8 @@ public sealed class SqliteSimulationResultRepository : ISimulationResultReposito
         return results;
     }
 
-    private static void EnsureTempDirectoryExists()
-    {
-        if (!Directory.Exists(TempDirectory))
-            Directory.CreateDirectory(TempDirectory);
-    }
-
-    /// <summary>
-    /// Löscht nur Dateien, die wir anlegen (run_*.db), aus dem Temp-Verzeichnis.
-    /// </summary>
-    private static void DeleteOwnDatabaseFiles()
-    {
-        if (!Directory.Exists(TempDirectory))
-            return;
-        foreach (var file in Directory.EnumerateFiles(TempDirectory, $"{FilePrefix}*{FileSuffix}"))
-        {
-            try
-            {
-                File.Delete(file);
-            }
-            catch
-            {
-                // Ignorieren (z. B. von anderem Prozess geöffnet)
-            }
-        }
-    }
-
-    private static string GetDbPath(long runId) => Path.Combine(TempDirectory, $"{FilePrefix}{runId}{FileSuffix}");
+    private string? GetDbPath(long runId) =>
+        _runIdToFolder.TryGetValue(runId, out var folder) ? Path.Combine(folder, DbFileName) : null;
 
     private static async Task CreateSchemaAsync(SqliteConnection connection, CancellationToken cancellationToken)
     {

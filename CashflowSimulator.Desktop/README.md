@@ -44,7 +44,7 @@ CashflowSimulator.Desktop/
 
 ## Technische Grundlagen
 
-- **Simulation:** Läuft asynchron (`ISimulationRunner.RunSimulationAsync`); UI bleibt reaktionsfähig. Persistenz erfolgt per Batch (`ISimulationResultRepository.WriteMonthlyResultsAsync`) in einer Transaktion pro Run (kein N+1).
+- **Simulation:** Läuft asynchron (`ISimulationRunner.RunSimulationAsync`); UI bleibt reaktionsfähig. Persistenz erfolgt in einen Drafts-Ordner (AppData/Local/…/Drafts/{yyyyMMdd-HHmmss_RunId}/) mit `simulation.db` und `input_scenario.json`; nur die 5 neuesten Ordner werden behalten. Das Ergebnis enthält `ResultFolderPath` für spätere Auswertung.
 - **DI:** Microsoft.Extensions.DependencyInjection. Composition Root in `Program.Main` (vor `BuildAvaloniaApp()`); ServiceProvider über `CompositionRoot.Services`; MainWindow wird aus dem Container aufgelöst (`GetRequiredService<MainWindow>()`).
 - **Logging:** Serilog; Konfiguration in `Program.Main` (Datei: `Logs/cashflow-{Date}.log`, Rolling pro Tag). In Libraries/ViewModels ausschließlich `ILogger<T>` per Constructor Injection. **Strukturiertes Logging:** Platzhalter wie `{Path}`, `{Error}` nutzen, keine String-Interpolation – siehe `.cursor/rules/main.md` (Abschnitt Logging). Dieses Muster bei allen neuen Log-Aufrufen beibehalten.
 - **Constructor Injection:** Durchgängig; kein Service Locator.

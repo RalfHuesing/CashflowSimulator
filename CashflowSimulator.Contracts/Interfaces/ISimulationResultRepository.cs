@@ -9,11 +9,11 @@ namespace CashflowSimulator.Contracts.Interfaces;
 public interface ISimulationResultRepository
 {
     /// <summary>
-    /// Bereitet einen neuen Run vor (leere DB pro Run), räumt zuvor das Temp-Verzeichnis auf (nur eigene Dateien).
+    /// Bereitet einen neuen Run vor (leere DB pro Run). Bei Datei-Persistenz: Drafts-Ordner mit Cleanup (5 neueste), Ordner pro Lauf.
     /// </summary>
     /// <param name="cancellationToken">Abbruchtoken.</param>
-    /// <returns>Run-Id des neuen Laufs.</returns>
-    Task<long> StartRunAsync(CancellationToken cancellationToken = default);
+    /// <returns>Run-Id und optional Pfad zum Ergebnisordner.</returns>
+    Task<RunStartResult> StartRunAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Schreibt alle Monatsergebnisse inkl. Snapshots für den angegebenen Run in einer Transaktion (Batch).

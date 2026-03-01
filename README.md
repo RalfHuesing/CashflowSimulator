@@ -79,7 +79,7 @@ Das Projekt setzt auf moderne .NET-Technologien und eine saubere Architektur (Cl
     * `CashflowSimulator.Validation`: FluentValidation-Validatoren (Single Source of Truth für Regeln).
     * `CashflowSimulator.Engine`: Reine Rechenlogik: `SimulationRunner` (monatliche Pipeline) mit `ISimulationProcessor`-Kette (CashflowProcessor, GrowthProcessor, LiquidityProcessor, InflationProcessor); keine UI, keine I/O.
     * `CashflowSimulator.Infrastructure`: Persistenz (Projekte: JSON; Simulationsergebnisse: SQLite), Kursdaten (`DummyStockPriceProvider`), Implementierungen für Contracts-Interfaces.
-    * **Hybrid-Persistenz:** Projekte werden als JSON gespeichert. Jeder Simulationslauf schreibt in eine **frische, flüchtige** SQLite-DB im Temp-Verzeichnis (`%Temp%\CashflowSimulator\`, OS-unabhängig). Vor jedem neuen Lauf werden nur eigene Dateien (`run_*.db`) in diesem Ordner gelöscht. Ein Run = ein Pfad (spätere Monte-Carlo-Erweiterung möglich).
+    * **Hybrid-Persistenz:** Projekte werden als JSON gespeichert. Jeder Simulationslauf schreibt in einen **persistenten Drafts-Ordner** unter `AppData/Local/CashflowSimulator/Drafts/`. Pro Lauf wird ein Unterordner `{yyyyMMdd-HHmmss}_{RunId}` angelegt mit `simulation.db` (SQLite-Ergebnisdaten) und `input_scenario.json` (Snapshot des Eingabe-Szenarios). Es werden nur die **5 neuesten** Draft-Ordner behalten (Cleanup vor jedem neuen Lauf). Das Ergebnis-DTO liefert `ResultFolderPath` für spätere Auswertung.
     * `CashflowSimulator.Desktop`: Avalonia-UI, Composition Root, MVVM; Feature „Simulation starten“ und Anzeige der monatlichen Ergebnisse (Daten aus `IResultAnalysisService`/Repository).
     * `CashflowSimulator.Shared`: Gemeinsame Hilfen (derzeit Placeholder). Test-Projekte: Engine.Tests, Desktop.Tests, Validation.Tests.
 * **Testing:** xUnit
@@ -100,7 +100,7 @@ Wir arbeiten aktuell an folgenden Meilensteinen:
 - [x] Validierungslogik für Eingaben
 - [x] Grundaufbau der Benutzeroberfläche (Avalonia XAML, Shell, Navigation, Feature-Bereiche)
 - [x] Persistierung (Speichern/Laden von Projekten)
-- [x] SQLite-Ergebnis-Persistenz (ein Run = eine DB im Temp-Verzeichnis, RunId-basierte Anzeige)
+- [x] SQLite-Ergebnis-Persistenz (Drafts-Ordner pro Lauf mit simulation.db + input_scenario.json, Auto-Cleanup 5 neueste, ResultFolderPath im DTO)
 - [ ] Erste lauffähige Beta-Version – **geplant**
 
 ---
