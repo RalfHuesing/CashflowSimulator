@@ -94,7 +94,8 @@ Wir arbeiten aktuell an folgenden Meilensteinen:
 - [x] Monatliche Simulations-Pipeline (Engine: `SimulationRunner` mit Cashflow-, Growth-, Liquidity-, InflationProcessor)
 - [x] Anzeige Simulationsergebnis (Desktop: „Simulation starten“, monatliche Ergebnisse)
 - [x] Kursabfrage-Basis (`IStockPriceService`, `DummyStockPriceProvider`, Button „Kurs aktualisieren“ im Portfolio)
-- [ ] Implementierung der Steuer-Engine (FIFO, Vorabpauschale) – **geplant**
+- [x] FIFO-Tranchen (Kauf-/Verkaufsbestand pro Asset: `AssetTrancheDto`, Engine FIFO bei Verkauf, UI-Anzeige und Validatoren)
+- [ ] Steuer-Engine (Gewinn/Verlust aus FIFO, Vorabpauschale) – **geplant**
 - [x] Validierungslogik für Eingaben
 - [x] Grundaufbau der Benutzeroberfläche (Avalonia XAML, Shell, Navigation, Feature-Bereiche)
 - [x] Persistierung (Speichern/Laden von Projekten)

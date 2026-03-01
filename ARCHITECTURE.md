@@ -63,6 +63,6 @@ Validierung läuft zentral über **FluentValidation** im Projekt **CashflowSimulat
 
 ---
 
-**Technischer Stand (Code = Source of Truth):** Die monatliche Simulations-Pipeline ist implementiert: `SimulationRunner` (Engine) führt pro Monat eine Kette von `ISimulationProcessor` aus (InflationProcessor, CashflowProcessor, LiquidityProcessor, GrowthProcessor). Ergebnis: `SimulationResultDto` mit monatlichen Werten (Cash, TotalAssets, Cashflow-Snapshots). Steuer-Engine (FIFO, Vorabpauschale) und Monte-Carlo sind in Planung.
+**Technischer Stand (Code = Source of Truth):** Die monatliche Simulations-Pipeline ist implementiert: `SimulationRunner` (Engine) führt pro Monat eine Kette von `ISimulationProcessor` aus (InflationProcessor, CashflowProcessor, LiquidityProcessor, GrowthProcessor). Ergebnis: `SimulationResultDto` mit monatlichen Werten (Cash, TotalAssets, Cashflow-Snapshots). Das **FIFO-Datenmodell** (Tranchen pro Asset: `AssetTrancheDto`, Anlage bei Kauf, FIFO-Verbrauch bei Verkauf) ist umgesetzt; die eigentliche Steuer-Engine (Gewinn/Verlust, Vorabpauschale) und Monte-Carlo sind in Planung.
 
 Technische Architektur, Datenmodell (`SimulationProjectDto`, inkl. `UiSettings` für UI-Optionen pro Szenario) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.

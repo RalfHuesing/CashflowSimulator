@@ -64,9 +64,10 @@ Assets tragen Attribute für die **deutsche Besteuerung**:
 
 - **TaxType:** z. B. Aktienfonds (Teilfreistellung 30 %), Mischfonds, Anleihenfonds, None (voll steuerpflichtig). Wird für Veräußerungsgewinne und Ausschüttungen genutzt.
 - **Transaktionshistorie:** Für eine exakte **FIFO-Steuerberechnung** bei Verkäufen müssen Kaufdaten und -mengen vorliegen (`TransactionDto` mit Typ `Buy`/`Sell`). Jede Transaktion hat eine eindeutige **Id**; die Desktop-App nutzt diese für robustes Bearbeiten und Löschen (unabhängig von Listenreihenfolge/Sortierung). Die Engine kann anhand der Id bzw. der Historie realisierte Gewinne/Verluste und Kapitalertragsteuer ableiten.
+- **Tranchen (FIFO-Bestand):** Pro Asset wird ein **Tranchen-Bestand** geführt (`AssetDto.Tranches`): jede Kauf-Tranche speichert Kaufdatum, Menge und Anschaffungspreis. Die Engine legt bei jedem simulierten Kauf eine neue Tranche an und verbraucht bei Verkäufen nach **FIFO** (älteste Tranche zuerst). So ist die spätere Gewinn/Verlust-Berechnung nach deutschem Steuerrecht vorbereitet. In der UI werden die Tranchen im Vermögenswerte-Detail unter „Tranchen (FIFO-Bestand)“ angezeigt; manuelle Käufe (Transaktionen) erzeugen ebenfalls eine Tranche.
 - **Vorabpauschale / Ausschüttung:** Transaktionstypen `TaxPrepayment` und `Dividend` in der Historie unterstützen die Nachbildung von Besteuerung und Cashflows.
 
-Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der Engine; die Contracts liefern die dafür notwendigen Daten.
+Die detaillierte Steuerlogik (Gewinn/Verlust aus FIFO, Teilfreistellung, Verrechnung) liegt in der Engine; die Contracts und der Tranchen-Bestand liefern die dafür notwendigen Daten.
 
 ---
 
@@ -78,10 +79,23 @@ Die detaillierte Steuerlogik (FIFO, Teilfreistellung, Verrechnung) liegt in der 
 | **AssetClassDto** | Anlageklasse (Bucket): Id, Name. Definiert nur die Kategorien; Zielgewichtungen stehen in den Allokationsprofilen pro Lebensphase. Assets referenzieren eine Klasse über `AssetClassId`. |
 | **AllocationProfileDto** | Allokationsprofil (Soll-Struktur): Id, Name, Entries (Liste von AllocationProfileEntryDto). Wird von Lebensphasen referenziert; definiert die Zielgewichtung pro Anlageklasse in dieser Phase. Summe der Eintrags-Gewichte = 100 %. |
 | **AllocationProfileEntryDto** | Ein Eintrag in einem Allokationsprofil: AssetClassId (Referenz auf AssetClassDto), TargetWeight (0–1). |
-| **AssetDto** | Besitz: Id, Name, ISIN, **AssetType**, **AssetClassId**, **CurrentPrice**, EconomicFactorId, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue?, Transactions. |
+| **AssetDto** | Besitz: Id, Name, ISIN, **AssetType**, **AssetClassId**, **CurrentPrice**, EconomicFactorId, IsActiveSavingsInstrument, TaxType, CurrentQuantity, CurrentValue?, Transactions, **Tranches** (FIFO-Bestand, siehe unten). |
+| **AssetTrancheDto** | Eine Kauf-Tranche: **PurchaseDate**, **Quantity**, **AcquisitionPricePerUnit**. Chronologisch (älteste zuerst); bei Verkauf wird FIFO aus den Tranchen verbraucht. |
 | **TransactionDto** | Einzelne Buchung: **Id** (eindeutig, Guid-String), Datum, Typ (Buy/Sell/Dividend/TaxPrepayment), Menge, Preis, Gesamtbetrag, Steueranteil. Die Id ermöglicht robustes Update/Löschen in der UI und eine eindeutige Zuordnung für die Engine (z. B. FIFO). |
 | **PortfolioDto** | Container: Liste aller Assets, optional Strategy (Rebalancing etc., später). |
 
 **LifecyclePhaseDto** enthält optional **AllocationProfileId** (Referenz auf ein AllocationProfileDto) und **GlidepathMonths** (Anzahl Monate vor Phasenstart, in denen gleitend auf die neue Zielallokation umgeschichtet wird; 0 = sofortiger Wechsel).
 
 `SimulationProjectDto` enthält `EconomicFactors`, **AssetClasses**, **AllocationProfiles**, **LifecyclePhases** (mit optional AllocationProfileId und GlidepathMonths), sowie `Portfolio` (mit `Portfolio.Assets`). Referenzierung: Jedes `AssetDto.EconomicFactorId` muss auf eine `EconomicFactorDto.Id` aus `SimulationProjectDto.EconomicFactors` verweisen; jede gesetzte `LifecyclePhaseDto.AllocationProfileId` muss auf ein Profil aus `AllocationProfiles` verweisen; jede in einem Profil-Eintrag referenzierte `AssetClassId` muss in `AssetClasses` existieren (Validierung in CashflowSimulator.Validation).
+
+---
+
+## 5. Tranchen (FIFO-Bestand) – Umsetzung in Engine und UI
+
+Zur Vorbereitung auf die deutsche Steuerlogik (FIFO-Prinzip) wird pro Asset ein **Tranchen-Bestand** geführt:
+
+- **Neues DTO:** `AssetTrancheDto` mit `PurchaseDate`, `Quantity`, `AcquisitionPricePerUnit` (init-only, Record).
+- **AssetDto:** Property `Tranches` (Liste von `AssetTrancheDto`, chronologisch: älteste zuerst). Invariante: `CurrentQuantity` entspricht der Summe der Tranchen-Mengen.
+- **Engine:** Beim **Kauf** (LiquidityProcessor) wird eine neue Tranche angelegt; beim **Verkauf** werden Tranchen nach FIFO verbraucht (ConsumeTranchesFifo). Der SimulationRunner klont beim Start Assets inkl. Tranches; sind Tranches leer, werden sie aus bestehenden Buy-Transaktionen abgeleitet.
+- **UI:** Im Vermögenswerte-Detail (Portfolio) wird die Tabelle „Tranchen (FIFO-Bestand)“ mit Kaufdatum, Menge und Anschaffungspreis angezeigt. Beim manuellen Anlegen einer Kauf-Transaktion (Transaktionen-Feature) wird automatisch eine Tranche am Asset ergänzt.
+- **Validierung:** `AssetTrancheDtoValidator` (Menge > 0, Anschaffungspreis ≥ 0); `AssetDtoValidator` validiert alle Tranchen eines Assets; Projekt-Validierung bindet dies für `Portfolio.Assets` ein.
