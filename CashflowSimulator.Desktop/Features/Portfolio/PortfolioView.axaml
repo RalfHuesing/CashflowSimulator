@@ -206,15 +206,6 @@
                 </StackPanel>
             </controls:MasterDetailView.DetailContent>
         </controls:MasterDetailView>
-        <!-- Status-Anzeige für Kursaktualisierung -->
-        <StackPanel Margin="0,12,0,0" Spacing="4">
-            <TextBlock Text="{Binding UpdateStatus}" 
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       TextWrapping="Wrap"/>
-            <ProgressBar IsIndeterminate="True" 
-                         IsVisible="{Binding IsUpdatingPrices}"
-                         Height="4"/>
-        </StackPanel>
         </StackPanel>
     </controls:FeatureLayoutView>
 </UserControl>

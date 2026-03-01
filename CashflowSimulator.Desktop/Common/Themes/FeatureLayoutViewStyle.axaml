@@ -2,7 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=netstandard"
         xmlns:controls="clr-namespace:CashflowSimulator.Desktop.Common.Controls;assembly=CashflowSimulator.Desktop"
-        xmlns:vm="clr-namespace:CashflowSimulator.Desktop.ViewModels;assembly=CashflowSimulator.Desktop">
+        xmlns:vm="clr-namespace:CashflowSimulator.Desktop.ViewModels;assembly=CashflowSimulator.Desktop"
+        xmlns:converters="clr-namespace:CashflowSimulator.Desktop.Common.Converters;assembly=CashflowSimulator.Desktop">
+
+    <Styles.Resources>
+        <converters:StatusTypeToBrushConverter x:Key="StatusTypeToBrushConverter"/>
+    </Styles.Resources>
 
     <Style Selector="controls|FeatureLayoutView">
         <Setter Property="Template">
@@ -88,6 +93,24 @@
                                               TextWrapping="Wrap"
                                               FontSize="13"
                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <!-- Status-Liste (Info, Warnung, Fehler, Erfolg); scrollbar mit dem gesamten Panel -->
+                                <StackPanel IsVisible="{Binding HasStatusEntries}" Spacing="4">
+                                    <TextBlock Text="STATUS" FontSize="12" FontWeight="SemiBold"
+                                              Foreground="{StaticResource InfoPanelTitleBrush}" Margin="0,0,0,4"/>
+                                    <ItemsControl ItemsSource="{Binding StatusEntries}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="vm:StatusEntry">
+                                                <Border Padding="8,6" Margin="0,0,0,4" CornerRadius="2"
+                                                        Background="{Binding Type, Converter={StaticResource StatusTypeToBrushConverter}}">
+                                                    <TextBlock Text="{Binding Message}"
+                                                              TextWrapping="Wrap"
+                                                              FontSize="13"
+                                                              Foreground="{Binding Type, Converter={StaticResource StatusTypeToBrushConverter}, ConverterParameter=Foreground}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>

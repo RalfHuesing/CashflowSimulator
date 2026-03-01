@@ -35,7 +35,8 @@ Diese Regeln gelten für die **CashflowSimulator.Desktop**-Avalonia-App. Nicht m
 
 ## Feature-Layout und Hilfe
 
-- **FeatureLayoutView** (Common/Controls): Wrapper für Feature-Seiten mit zweigeteiltem Layout – links scrollbarer Content, rechts festes Info-Panel (Hilfetext + Validierungsfehler). Neue Feature-Views wie Eckdaten/Einstellungen nutzen dieses Control als Wurzel.
+- **FeatureLayoutView** (Common/Controls): Wrapper für Feature-Seiten mit zweigeteiltem Layout – links scrollbarer Content, rechts festes Info-Panel (Hilfetext + Validierungsfehler + **Status-Liste**). Neue Feature-Views wie Eckdaten/Einstellungen nutzen dieses Control als Wurzel.
+- **Info-Panel-Reihenfolge:** Block „VALIDIERUNGSFEHLER“, Hilfetext (Titel/Beschreibung), **Status-Liste** (gebunden an `ValidatingViewModelBase.StatusEntries`). Status-Typen: Info, Warning, Error, Success (jeweils mit Farbe). `ShowStatus(message, durationMs, type)` fügt Einträge hinzu; nach Ablauf oder beim View-Wechsel (`ClearStatus`) werden sie entfernt.
 - **FocusHelpBehavior** + **HelpKey:** Attached Property `FocusHelpBehavior.HelpKey` (und optional `ErrorPropertyName`) an Eingabe-Controls setzen (kurzer Property-Name). Bei GotFocus wird das ViewModel (ValidatingViewModelBase) mit dem HelpKey aktualisiert; Lookup im IHelpProvider erfolgt als **HelpKeyPrefix.PropertyName** (jedes Feature implementiert HelpKeyPrefix). Einmalige Initialisierung z. B. in MainWindow: `FocusHelpBehavior.Initialize(this)`.
 
 ## Datumsfelder (CalendarDatePicker)

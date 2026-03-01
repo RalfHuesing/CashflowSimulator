@@ -16,6 +16,7 @@ using CashflowSimulator.Desktop.Features.StrategyProfiles;
 using CashflowSimulator.Desktop.Features.AllocationProfiles;
 using CashflowSimulator.Desktop.Features.LifecyclePhases;
 using CashflowSimulator.Desktop.Services;
+using CashflowSimulator.Desktop.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentIcons.Common;
@@ -94,8 +95,11 @@ public partial class MainShellViewModel : ObservableObject
         get => _currentContentViewModel;
         set
         {
+            var previous = _currentContentViewModel;
             if (SetProperty(ref _currentContentViewModel, value))
             {
+                if (previous is ValidatingViewModelBase validatingVm)
+                    validatingVm.ClearStatus();
                 OnPropertyChanged(nameof(IsContentPlaceholderVisible));
                 if (value is IDiagnosticExport export && !string.IsNullOrWhiteSpace(_currentProjectService.LastRunFolderPath))
                     _ = _diagnosticExportService.ExportAsync(export);

@@ -189,6 +189,7 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
             list.Add(dto);
             UpdateProject(list);
             RefreshItems();
+            ShowStatus("Gespeichert.", 3000, StatusType.Success);
             // Nach dem Hinzufügen Formular leeren für nächstes Item
             ClearForm();
         }
@@ -201,6 +202,7 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
                 list[idx] = dto;
                 UpdateProject(list);
                 RefreshItems();
+                ShowStatus("Gespeichert.", 3000, StatusType.Success);
                 // Nach Update: Item bleibt ausgewählt (SelectedItem wird durch RefreshItems aktualisiert)
                 SelectedItem = Items.FirstOrDefault(x => x.Id == EditingId);
             }

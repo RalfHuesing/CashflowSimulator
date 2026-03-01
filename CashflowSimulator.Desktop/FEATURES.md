@@ -66,6 +66,7 @@ Damit neue Features gleich funktionieren wie Eckdaten/Einstellungen:
 3. **ViewModel:** Erbt von **ValidatingViewModelBase**; **HelpKeyPrefix** implementieren (abstrakt, z. B. `=> "Eckdaten"`); im Konstruktor optional **PageHelpKey** setzen (default ist HelpKeyPrefix); **IHelpProvider** per Constructor Injection.
 4. **Hilfe:** An jedem Eingabe-Control `FocusHelpBehavior.HelpKey="PropertyName"` setzen (kurzer Name; Lookup im HelpProvider erfolgt als `HelpKeyPrefix.PropertyName`). FocusHelpBehavior wird einmalig in MainWindow initialisiert.
 5. **Validierung:** Nur über FluentValidation; Fehler erscheinen **nur im rechten Info-Panel** (nicht unter den Controls). Keine Statusleiste.
+6. **Status-Rückmeldungen:** Für Aktionen (z. B. Speichern, asynchrone Operationen wie Kursaktualisierung) **ShowStatus(Nachricht, DauerMs, StatusType)** nutzen (Info, Warning, Error, Success). Die Meldungen erscheinen als **Liste** im rechten Info-Panel unterhalb der Hilfe (scrollbar mit dem gesamten Panel). Beim Verlassen des Feature-Views werden alle Meldungen verworfen (ClearStatus beim View-Wechsel); keine Toasts, keine Persistenz.
 
 Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.cursor/rules/avalonia.md` („Feature-Layout und Hilfe“).
 

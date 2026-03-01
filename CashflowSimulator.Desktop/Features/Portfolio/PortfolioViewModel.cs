@@ -120,9 +120,6 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
     [NotifyCanExecuteChangedFor(nameof(UpdatePricesCommand))]
     private bool _isUpdatingPrices;
 
-    [ObservableProperty]
-    private string _updateStatus = string.Empty;
-
     public PortfolioViewModel(
         ICurrentProjectService currentProjectService,
         IHelpProvider helpProvider,
@@ -143,14 +140,14 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
             return;
 
         IsUpdatingPrices = true;
-        UpdateStatus = "Kurse werden aktualisiert...";
-        
+        ShowStatus("Kurse werden aktualisiert...", 0, StatusType.Info);
+
         try
         {
             var assets = LoadItems().ToList();
             if (!assets.Any())
             {
-                UpdateStatus = "Keine Assets zum Aktualisieren gefunden.";
+                ShowStatus("Keine Assets zum Aktualisieren gefunden.", 4000, StatusType.Info);
                 return;
             }
 
@@ -185,11 +182,11 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
                 }
             }
 
-            UpdateStatus = $"Aktualisierung abgeschlossen: {updatedCount} Kurse aktualisiert, {errorCount} Fehler.";
+            ShowStatus($"Aktualisierung abgeschlossen: {updatedCount} Kurse aktualisiert, {errorCount} Fehler.", 5000, StatusType.Success);
         }
         catch (Exception ex)
         {
-            UpdateStatus = $"Fehler bei der Kursaktualisierung: {ex.Message}";
+            ShowStatus($"Fehler bei der Kursaktualisierung: {ex.Message}", 8000, StatusType.Error);
         }
         finally
         {

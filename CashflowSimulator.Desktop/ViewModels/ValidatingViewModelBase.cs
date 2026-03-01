@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CashflowSimulator.Contracts.Common;
 using CashflowSimulator.Contracts.Interfaces;
@@ -22,6 +23,7 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     private readonly Dictionary<string, List<string>> _errors = new();
     private readonly Debouncer _debouncer = new();
     private readonly IHelpProvider? _helpProvider;
+    private readonly Dictionary<Guid, CancellationTokenSource> _statusTimers = new();
 
     private string? _activeHelpKey;
     private string? _pageHelpKey;
@@ -112,6 +114,16 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
     /// </summary>
     public bool HasFormLevelErrors => _errors.ContainsKey(FormLevelErrorsKey);
 
+    /// <summary>
+    /// Sammlung der Statusmeldungen für das rechte Info-Panel (scrollbar bei vielen Einträgen).
+    /// </summary>
+    public ObservableCollection<StatusEntry> StatusEntries { get; } = [];
+
+    /// <summary>
+    /// True, wenn mindestens eine Statusmeldung angezeigt wird (für Sichtbarkeit des Status-Blocks).
+    /// </summary>
+    public bool HasStatusEntries => StatusEntries.Count > 0;
+
     /// <inheritdoc />
     public bool HasErrors => _errors.Count > 0;
 
@@ -184,6 +196,59 @@ public abstract class ValidatingViewModelBase : ObservableObject, INotifyDataErr
         if (string.IsNullOrEmpty(propertyName))
             return _errors.Values.SelectMany(list => list).ToList();
         return _errors.TryGetValue(propertyName, out var list) ? list : [];
+    }
+
+    /// <summary>
+    /// Zeigt eine Statusmeldung im rechten Info-Panel an. Bei durationMs &gt; 0 wird der Eintrag nach Ablauf automatisch entfernt.
+    /// Bei durationMs == 0 bleibt der Eintrag bis <see cref="ClearStatus"/> oder View-Wechsel.
+    /// </summary>
+    public void ShowStatus(string message, int durationMs, StatusType type = StatusType.Info)
+    {
+        var entry = StatusEntry.Create(message, type);
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            StatusEntries.Add(entry);
+            OnPropertyChanged(nameof(HasStatusEntries));
+            if (durationMs <= 0)
+                return;
+            var cts = new CancellationTokenSource();
+            _statusTimers[entry.Id] = cts;
+            var token = cts.Token;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(durationMs, token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+                    _statusTimers.Remove(entry.Id);
+                    StatusEntries.Remove(entry);
+                    OnPropertyChanged(nameof(HasStatusEntries));
+                });
+            }, token);
+        });
+    }
+
+    /// <summary>
+    /// Leert alle Statusmeldungen und bricht laufende Timer ab. Wird beim Verlassen des Feature-Views aufgerufen.
+    /// </summary>
+    public void ClearStatus()
+    {
+        foreach (var cts in _statusTimers.Values)
+            cts.Cancel();
+        _statusTimers.Clear();
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            StatusEntries.Clear();
+            OnPropertyChanged(nameof(HasStatusEntries));
+        });
     }
 
     /// <summary>

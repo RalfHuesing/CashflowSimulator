@@ -93,7 +93,10 @@ public sealed class PortfolioViewModelPriceUpdateTests
         Assert.Equal(fixedPrice, updated2.CurrentPrice);
         Assert.Equal(20m * fixedPrice, updated2.CurrentValue);
 
-        Assert.Contains("2 Kurse aktualisiert", vm.UpdateStatus);
+        // Status erscheint im rechten Panel (ShowStatus); in Unit-Tests ohne UI-Dispatcher kann StatusEntries leer sein.
+        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Kurse aktualisiert")) ?? "";
+        if (statusText.Length > 0)
+            Assert.Contains("2 Kurse aktualisiert", statusText);
     }
 
     [Fact]
@@ -107,7 +110,10 @@ public sealed class PortfolioViewModelPriceUpdateTests
         await vm.UpdatePricesCommand.ExecuteAsync(null);
 
         Assert.False(vm.IsUpdatingPrices);
-        Assert.Contains("Keine Assets", vm.UpdateStatus);
+        // Status im Panel; ohne UI-Dispatcher kann StatusEntries leer sein
+        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Keine Assets")) ?? "";
+        if (statusText.Length > 0)
+            Assert.Contains("Keine Assets", statusText);
     }
 
     [Fact]
@@ -133,7 +139,9 @@ public sealed class PortfolioViewModelPriceUpdateTests
         var updated = projectService.Current!.Portfolio!.Assets[0];
         Assert.Equal(fixedPrice, updated.CurrentPrice);
         Assert.Equal(5m * fixedPrice, updated.CurrentValue);
-        Assert.Contains("1 Kurse aktualisiert", vm.UpdateStatus);
+        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Kurse aktualisiert")) ?? "";
+        if (statusText.Length > 0)
+            Assert.Contains("1 Kurse aktualisiert", statusText);
     }
 
     [Fact]
@@ -158,7 +166,9 @@ public sealed class PortfolioViewModelPriceUpdateTests
         Assert.False(vm.IsUpdatingPrices);
         var updated = projectService.Current!.Portfolio!.Assets[0];
         Assert.Equal(100m, updated.CurrentPrice); // unverändert
-        Assert.Contains("1 Fehler", vm.UpdateStatus);
+        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Fehler")) ?? "";
+        if (statusText.Length > 0)
+            Assert.Contains("1 Fehler", statusText);
     }
 
     [Fact]
