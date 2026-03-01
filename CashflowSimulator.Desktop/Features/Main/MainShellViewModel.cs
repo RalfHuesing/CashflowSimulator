@@ -10,6 +10,7 @@ using CashflowSimulator.Desktop.Features.Meta;
 using CashflowSimulator.Desktop.Features.Portfolio;
 using CashflowSimulator.Desktop.Features.Settings;
 using CashflowSimulator.Desktop.Features.SimulationResult;
+using CashflowSimulator.Desktop.Features.Analysis;
 using CashflowSimulator.Desktop.Features.TaxProfiles;
 using CashflowSimulator.Desktop.Features.StrategyProfiles;
 using CashflowSimulator.Desktop.Features.AllocationProfiles;
@@ -76,6 +77,7 @@ public partial class MainShellViewModel : ObservableObject
         OpenStrategieprofileCommand.NotifyCanExecuteChanged();
         OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
         OpenLebensphasenCommand.NotifyCanExecuteChanged();
+        OpenAnalyseCommand.NotifyCanExecuteChanged();
         StartSimulationCommand.NotifyCanExecuteChanged();
     }
 
@@ -256,6 +258,13 @@ public partial class MainShellViewModel : ObservableObject
             Command = OpenSettingsCommand,
             IsActive = false
         };
+        var analyseItem = new NavItemViewModel
+        {
+            DisplayName = "Analyse",
+            Icon = Symbol.ChartMultiple,
+            Command = OpenAnalyseCommand,
+            IsActive = false
+        };
 
         var groupSzenario = new NavGroupViewModel { DisplayName = "Szenario" };
         groupSzenario.Items.Add(szenarioItem);
@@ -284,6 +293,9 @@ public partial class MainShellViewModel : ObservableObject
         var groupLebensplanung = new NavGroupViewModel { DisplayName = "Lebensplanung" };
         groupLebensplanung.Items.Add(lebensphasenItem);
 
+        var groupAnalyse = new NavGroupViewModel { DisplayName = "Analyse & Auswertung" };
+        groupAnalyse.Items.Add(analyseItem);
+
         var groupApp = new NavGroupViewModel { DisplayName = "App" };
         groupApp.Items.Add(einstellungenItem);
 
@@ -293,6 +305,7 @@ public partial class MainShellViewModel : ObservableObject
         Navigation.Groups.Add(groupEinnahmenAusgaben);
         Navigation.Groups.Add(groupProfile);
         Navigation.Groups.Add(groupLebensplanung);
+        Navigation.Groups.Add(groupAnalyse);
         Navigation.Groups.Add(groupApp);
     }
 
@@ -373,6 +386,7 @@ public partial class MainShellViewModel : ObservableObject
         {
             var result = await _simulationRunner.RunSimulationAsync(project).ConfigureAwait(true);
             var runId = result.RunId ?? 0L;
+            _currentProjectService.SetLastRunId(runId);
             var resultViewModel = _navigationService.Create<SimulationResultViewModel>(runId);
             await resultViewModel.LoadAsync().ConfigureAwait(true);
             CurrentContentViewModel = resultViewModel;
@@ -520,11 +534,22 @@ public partial class MainShellViewModel : ObservableObject
     private bool CanOpenLifecycle() => _currentProjectService.Current is not null;
 
     [RelayCommand]
+    private async Task OpenAnalyse()
+    {
+        _logger.LogDebug("Analyse & Auswertung geöffnet.");
+        var runId = _currentProjectService.LastRunId ?? 0L;
+        var analysisVm = _navigationService.Create<AnalysisDashboardViewModel>(runId);
+        await analysisVm.LoadAsync().ConfigureAwait(true);
+        CurrentContentViewModel = analysisVm;
+        SetActiveNavigationItem(15);
+    }
+
+    [RelayCommand]
     private void OpenSettings()
     {
         _logger.LogDebug("Einstellungen geöffnet.");
         CurrentContentViewModel = _navigationService.Create<SettingsViewModel>();
-        SetActiveNavigationItem(15);
+        SetActiveNavigationItem(16);
     }
 
     private void SetActiveNavigationItem(int index)

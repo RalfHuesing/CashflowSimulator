@@ -148,4 +148,17 @@ public sealed class CurrentProjectServiceCashflowTests
         Assert.Single(current.LifecyclePhases);
         Assert.Equal(67, current.LifecyclePhases[0].StartAge);
     }
+
+    [Fact]
+    public void LastRunId_InitiallyNull_AfterSetLastRunId_ReturnsValue()
+    {
+        var service = new CurrentProjectService();
+        Assert.Null(service.LastRunId);
+
+        service.SetLastRunId(7);
+        Assert.Equal(7L, service.LastRunId);
+
+        service.SetLastRunId(99);
+        Assert.Equal(99L, service.LastRunId);
+    }
 }

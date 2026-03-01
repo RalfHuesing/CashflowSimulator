@@ -14,6 +14,7 @@ public sealed class CurrentProjectService : ICurrentProjectService
 
     private SimulationProjectDto? _current;
     private string? _currentFilePath;
+    private long? _lastRunId;
 
     public CurrentProjectService()
     {
@@ -24,6 +25,15 @@ public sealed class CurrentProjectService : ICurrentProjectService
 
     /// <inheritdoc />
     public string? CurrentFilePath => WithLock(() => _currentFilePath);
+
+    /// <inheritdoc />
+    public long? LastRunId => WithLock(() => _lastRunId);
+
+    /// <inheritdoc />
+    public void SetLastRunId(long runId)
+    {
+        WithLock(() => _lastRunId = runId);
+    }
 
     /// <inheritdoc />
     public event EventHandler? ProjectChanged;

@@ -19,6 +19,17 @@ public interface ICurrentProjectService
     string? CurrentFilePath { get; }
 
     /// <summary>
+    /// Run-Id der zuletzt durchgeführten Simulation (null wenn noch keine oder nach Reset).
+    /// Wird nach erfolgreichem <see cref="StartRunAsync"/> bzw. Simulation-Start gesetzt.
+    /// </summary>
+    long? LastRunId { get; }
+
+    /// <summary>
+    /// Setzt die Run-Id der zuletzt durchgeführten Simulation (z. B. nach Simulation-Start).
+    /// </summary>
+    void SetLastRunId(long runId);
+
+    /// <summary>
     /// Setzt das aktuelle Projekt und optional den Dateipfad (z. B. nach Load oder Save).
     /// Löst <see cref="ProjectChanged"/> aus.
     /// </summary>
