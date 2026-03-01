@@ -57,7 +57,7 @@
                               HorizontalAlignment="Stretch">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                            <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding AssetType, Converter={StaticResource EnumDescriptionConverter}}"/>
+                            <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding AssetType, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"/>
                             <DataGridTemplateColumn Width="100" SortMemberPath="CurrentValue">
                                 <DataGridTemplateColumn.Header>
                                     <TextBlock Text="Wert" HorizontalAlignment="Right" VerticalAlignment="Center"/>

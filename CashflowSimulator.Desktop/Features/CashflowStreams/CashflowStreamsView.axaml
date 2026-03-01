@@ -58,7 +58,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Intervall" Width="90" Binding="{Binding Interval, Converter={StaticResource EnumDescriptionConverter}}"/>
+                        <DataGridTextColumn Header="Intervall" Width="90" Binding="{Binding Interval, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"/>
                         <DataGridTextColumn Header="Von" Width="120" Binding="{Binding StartDate}"/>
                         <DataGridTextColumn Header="Bis" Width="120" Binding="{Binding EndDate}"/>
                     </DataGrid.Columns>

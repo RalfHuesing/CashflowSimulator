@@ -59,7 +59,7 @@
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
                                                 <TextBlock Text="{Binding Amount, StringFormat='{}{0:N2}'}"/>
-                                                <TextBlock Text="{Binding CashflowType, Converter={StaticResource EnumDescriptionConverter}}"/>
+                                                <TextBlock Text="{Binding CashflowType, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

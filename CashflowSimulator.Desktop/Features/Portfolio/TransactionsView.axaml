@@ -45,7 +45,7 @@
                           HorizontalAlignment="Stretch">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Datum" Width="110" Binding="{Binding Transaction.Date}"/>
-                        <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding Transaction.Type, Converter={StaticResource EnumDescriptionConverter}}"/>
+                        <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding Transaction.Type, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"/>
                         <DataGridTextColumn Header="Asset" Width="*" Binding="{Binding AssetName}"/>
                         <DataGridTemplateColumn Header="Betrag" Width="120" SortMemberPath="Transaction.TotalAmount">
                             <DataGridTemplateColumn.CellTemplate>
