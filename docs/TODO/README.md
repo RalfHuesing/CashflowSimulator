@@ -15,6 +15,7 @@
 | :--- | :--- | :--- | :--- |
 | 001 | Navigation UI Polish | Offen | [001_navigation_polish.md](./UI/001_navigation_polish.md) |
 | 002 | Analysis Charts | Offen | [002_analysis_charts.md](./UI/002_analysis_charts.md) |
+| 003 | Life Phase Model Rethink | Offen | [003_life_phase_model_rethink.md](./UI/003_life_phase_model_rethink.md) |
 
 ## ⚙️ Infrastructure (Technik & Daten)
 | Prio | Task | Status | Datei |
