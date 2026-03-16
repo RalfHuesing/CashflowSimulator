@@ -18,8 +18,17 @@ public record ProfileOption(string Id, string Name);
 /// ViewModel für Lebensphasen (Master-Detail). Startalter, Steuer- und Strategie-Profil.
 /// Nutzt <see cref="CrudViewModelBase{TDto}"/> für CRUD; ID-basierte Identifikation.
 /// </summary>
-public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhaseDto>
+public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhaseDto>, IMasterDetailSearchable
 {
+    private const int SearchDebounceMs = 200;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche...";
+
+    partial void OnSearchTextChanged(string value) => ScheduleDebounced(SearchDebounceMs, ApplyFilter);
+
     [ObservableProperty]
     private int _startAge;
 
@@ -80,6 +89,20 @@ public partial class LifecyclePhasesViewModel : CrudViewModelBase<LifecyclePhase
         RefreshOptions();
         RefreshItems();
     }
+
+    private void ApplyFilter()
+    {
+        var all = LoadItems();
+        var search = (SearchText ?? string.Empty).Trim().ToUpperInvariant();
+        Items.Clear();
+        foreach (var item in all)
+        {
+            if (string.IsNullOrEmpty(search) || item.StartAge.ToString().Contains(search))
+                Items.Add(item);
+        }
+    }
+
+    protected override void RefreshItems() => ApplyFilter();
 
     partial void OnStartAgeChanged(int value) => ScheduleValidateAndSave();
 

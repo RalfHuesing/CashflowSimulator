@@ -13,8 +13,17 @@ namespace CashflowSimulator.Desktop.Features.CashflowEvents;
 /// Validierung über <see cref="ValidationRunner"/>; Fehler nur im Info-Panel.
 /// Property-Namen 1:1 wie im DTO (Rules-konform).
 /// </summary>
-public partial class CashflowEventsViewModel : CrudViewModelBase<CashflowEventDto>
+public partial class CashflowEventsViewModel : CrudViewModelBase<CashflowEventDto>, IMasterDetailSearchable
 {
+    private const int SearchDebounceMs = 200;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche nach Name...";
+
+    partial void OnSearchTextChanged(string value) => ScheduleDebounced(SearchDebounceMs, ApplyFilter);
+
     private readonly CashflowType _cashflowType;
 
     [ObservableProperty]
@@ -64,6 +73,20 @@ public partial class CashflowEventsViewModel : CrudViewModelBase<CashflowEventDt
         RefreshDynamicFactorOptions();
         RefreshItems();
     }
+
+    private void ApplyFilter()
+    {
+        var all = LoadItems();
+        var search = (SearchText ?? string.Empty).Trim().ToUpperInvariant();
+        Items.Clear();
+        foreach (var item in all)
+        {
+            if (string.IsNullOrEmpty(search) || (item.Name ?? string.Empty).ToUpperInvariant().Contains(search))
+                Items.Add(item);
+        }
+    }
+
+    protected override void RefreshItems() => ApplyFilter();
 
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();
     partial void OnAmountChanged(decimal value) => ScheduleValidateAndSave();

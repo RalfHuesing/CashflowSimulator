@@ -12,8 +12,17 @@ namespace CashflowSimulator.Desktop.Features.Portfolio;
 /// ViewModel für Anlageklassen (Strategy): Master-Liste mit Name, Detail-Formular.
 /// Zielgewichtungen werden in den Allokationsprofilen pro Lebensphase definiert.
 /// </summary>
-public partial class AssetClassesViewModel : CrudViewModelBase<AssetClassDto>
+public partial class AssetClassesViewModel : CrudViewModelBase<AssetClassDto>, IMasterDetailSearchable
 {
+    private const int SearchDebounceMs = 200;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche nach Name...";
+
+    partial void OnSearchTextChanged(string value) => ScheduleDebounced(SearchDebounceMs, ApplyFilter);
+
     [ObservableProperty]
     private string _name = string.Empty;
 
@@ -25,6 +34,22 @@ public partial class AssetClassesViewModel : CrudViewModelBase<AssetClassDto>
         PageHelpKey = "AssetClasses";
         RefreshItems();
     }
+
+    private void ApplyFilter()
+    {
+        var all = LoadItems();
+        var search = (SearchText ?? string.Empty).Trim().ToUpperInvariant();
+        Items.Clear();
+        foreach (var item in all)
+        {
+            if (string.IsNullOrEmpty(search) || 
+                (item.Name ?? string.Empty).ToUpperInvariant().Contains(search) ||
+                (item.Id ?? string.Empty).ToUpperInvariant().Contains(search))
+                Items.Add(item);
+        }
+    }
+
+    protected override void RefreshItems() => ApplyFilter();
 
     protected override IEnumerable<AssetClassDto> LoadItems()
     {

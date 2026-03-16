@@ -14,8 +14,17 @@ namespace CashflowSimulator.Desktop.Features.Marktdaten;
 /// Master-Detail: Liste der Faktoren, Formular für Eigenschaften.
 /// Beim Löschen werden Referenzen in Streams/Events auf null gesetzt.
 /// </summary>
-public partial class MarktdatenViewModel : CrudViewModelBase<EconomicFactorDto>
+public partial class MarktdatenViewModel : CrudViewModelBase<EconomicFactorDto>, IMasterDetailSearchable
 {
+    private const int SearchDebounceMs = 200;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche nach Name oder Id...";
+
+    partial void OnSearchTextChanged(string value) => ScheduleDebounced(SearchDebounceMs, ApplyFilter);
+
     [ObservableProperty]
     private string _id = string.Empty;
 
@@ -63,6 +72,22 @@ public partial class MarktdatenViewModel : CrudViewModelBase<EconomicFactorDto>
         PageHelpKey = "Marktdaten";
         RefreshItems();
     }
+
+    private void ApplyFilter()
+    {
+        var all = LoadItems();
+        var search = (SearchText ?? string.Empty).Trim().ToUpperInvariant();
+        Items.Clear();
+        foreach (var item in all)
+        {
+            if (string.IsNullOrEmpty(search) || 
+                (item.Name ?? string.Empty).ToUpperInvariant().Contains(search) ||
+                (item.Id ?? string.Empty).ToUpperInvariant().Contains(search))
+                Items.Add(item);
+        }
+    }
+
+    protected override void RefreshItems() => ApplyFilter();
 
     partial void OnIdChanged(string value) => ScheduleValidateAndSave();
     partial void OnNameChanged(string value) => ScheduleValidateAndSave();

@@ -116,7 +116,7 @@ public abstract partial class CrudViewModelBase<TDto> : ValidatingViewModelBase
     /// <summary>
     /// Lädt die Items neu aus dem Projekt und aktualisiert die Liste.
     /// </summary>
-    protected void RefreshItems()
+    protected virtual void RefreshItems()
     {
         var items = LoadItems();
         Items.Clear();
