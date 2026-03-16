@@ -1,221 +1,130 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
 using CashflowSimulator.Contracts.Dtos;
 
 namespace CashflowSimulator.Engine.Services.Defaults;
 
 /// <summary>
-/// Standard-Cashflows für einen durchschnittlichen deutschen Single-Haushalt:
-/// Einnahmen (Gehalt, Rente), Lebenshaltung, Mobilität, Abos, jährliche Posten, Lebensereignisse.
+/// Lädt die Standard-Cashflows für einen durchschnittlichen deutschen Single-Haushalt 
+/// aus einer eingebetteten JSON-Ressource.
 /// </summary>
 public sealed class CashflowDefaultService : ICashflowDefaultService
 {
+    private readonly CashflowDefaultsTemplate _template;
+
+    public CashflowDefaultService()
+    {
+        _template = LoadTemplate() ?? new CashflowDefaultsTemplate();
+    }
+
+    private CashflowDefaultsTemplate? LoadTemplate()
+    {
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CashflowSimulator.Engine.Resources.default_cashflows.json");
+        if (stream == null) return null;
+        
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        
+        return JsonSerializer.Deserialize<CashflowDefaultsTemplate>(stream, options);
+    }
+
     /// <inheritdoc />
     public List<CashflowStreamDto> GetStreams(DateOnly simulationStart, DateOnly simulationEnd, DateOnly dateOfBirth)
     {
-        List<CashflowStreamDto> streams =
-        [
-            .. GetIncomeStreams(simulationStart, simulationEnd, dateOfBirth),
-            .. GetLivingExpenses(simulationStart),
-            .. GetMobilityAndSubscriptions(simulationStart),
-            .. GetYearlyExpenses(simulationStart, simulationEnd)
-        ];
+        var pensionStart = new DateOnly(dateOfBirth.Year + 67, dateOfBirth.Month, 1);
+        var streams = new List<CashflowStreamDto>();
+
+        foreach (var t in _template.Streams)
+        {
+            streams.Add(new CashflowStreamDto
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = t.Name,
+                Type = t.Type,
+                Amount = t.Amount,
+                Interval = t.Interval,
+                StartDate = ParseDateRef(t.StartDateRef, simulationStart, simulationEnd, pensionStart) ?? simulationStart,
+                EndDate = ParseDateRef(t.EndDateRef, simulationStart, simulationEnd, pensionStart),
+                StartAge = t.StartAge
+            });
+        }
+
         return streams;
     }
 
     /// <inheritdoc />
     public List<CashflowEventDto> GetEvents(DateOnly simulationStart, DateOnly simulationEnd)
     {
-        return
-        [
-            new()
+        // Für Events ignorieren wir pensionStart, wir können aber simStart übergeben
+        var pensionStart = simulationStart; 
+        var events = new List<CashflowEventDto>();
+
+        foreach (var e in _template.Events)
+        {
+            events.Add(new CashflowEventDto
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = "Kauf Gebrauchtwagen",
-                Type = CashflowType.Expense,
-                Amount = 18000m,
-                TargetDate = simulationStart.AddYears(4),
-                EarliestMonthOffset = -6,
-                LatestMonthOffset = 12
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Sabbatical / Weltreise",
-                Type = CashflowType.Expense,
-                Amount = 12000m,
-                TargetDate = simulationStart.AddYears(8),
-                EarliestMonthOffset = 0,
-                LatestMonthOffset = 24
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Hochzeit / Große Feier",
-                Type = CashflowType.Expense,
-                Amount = 8000m,
-                TargetDate = simulationStart.AddYears(5),
-                EarliestMonthOffset = -12,
-                LatestMonthOffset = 36
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Möbel-Upgrade (Küche)",
-                Type = CashflowType.Expense,
-                Amount = 10000m,
-                TargetDate = simulationStart.AddYears(12),
-                EarliestMonthOffset = -6,
-                LatestMonthOffset = 6
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Zahnersatz / Gesundheit im Alter",
-                Type = CashflowType.Expense,
-                Amount = 5000m,
-                TargetDate = simulationEnd.AddMonths(-60),
-                EarliestMonthOffset = 0,
-                LatestMonthOffset = 60
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Erbe / Schenkung (Erwartet)",
-                Type = CashflowType.Income,
-                Amount = 25000m,
-                TargetDate = simulationStart.AddYears(20),
-                EarliestMonthOffset = -24,
-                LatestMonthOffset = 24
-            }
-        ];
+                Name = e.Name,
+                Type = e.Type,
+                Amount = e.Amount,
+                TargetDate = ParseDateRef(e.TargetDateRef, simulationStart, simulationEnd, pensionStart) ?? simulationStart,
+                EarliestMonthOffset = e.EarliestMonthOffset,
+                LatestMonthOffset = e.LatestMonthOffset
+            });
+        }
+
+        return events;
     }
 
-    private IEnumerable<CashflowStreamDto> GetIncomeStreams(DateOnly start, DateOnly simulationEnd, DateOnly dateOfBirth)
+    private DateOnly? ParseDateRef(string? reference, DateOnly simStart, DateOnly simEnd, DateOnly pensionStart)
     {
-        var pensionStartDate = new DateOnly(dateOfBirth.Year + 67, dateOfBirth.Month, 1);
-        return
-        [
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Gehalt (Netto)",
-                Type = CashflowType.Income,
-                Amount = 2850m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = pensionStartDate.AddDays(-1)
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Gesetzliche Rente (Prognose Netto)",
-                Type = CashflowType.Income,
-                Amount = 1950m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = pensionStartDate,
-                EndDate = null,
-                StartAge = 67
-            }
-        ];
+        if (string.IsNullOrEmpty(reference)) return null;
+        return reference switch
+        {
+            "SimulationStart" => simStart,
+            "SimulationEnd" => simEnd,
+            "PensionStart" => pensionStart,
+            "PensionStartMinusOneDay" => pensionStart.AddDays(-1),
+            "SimulationStartJuneFirst" => new DateOnly(simStart.Year, 6, 1),
+            "SimulationStartDecemberFirst" => new DateOnly(simStart.Year, 12, 1),
+            "SimulationStartPlus4Years" => simStart.AddYears(4),
+            "SimulationStartPlus5Years" => simStart.AddYears(5),
+            "SimulationStartPlus8Years" => simStart.AddYears(8),
+            "SimulationStartPlus12Years" => simStart.AddYears(12),
+            "SimulationStartPlus20Years" => simStart.AddYears(20),
+            "SimulationEndMinus60Months" => simEnd.AddMonths(-60),
+            _ => simStart
+        };
     }
 
-    private IEnumerable<CashflowStreamDto> GetLivingExpenses(DateOnly start)
+    // --- JSON Klassen ---
+    private class CashflowDefaultsTemplate
     {
-        return
-        [
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Wohnen (Warmmiete + Strom)",
-                Type = CashflowType.Expense,
-                Amount = 1050m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Lebenshaltung (Supermarkt, Drogerie)",
-                Type = CashflowType.Expense,
-                Amount = 450m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Freizeit & Hobby",
-                Type = CashflowType.Expense,
-                Amount = 200m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
-            }
-        ];
+        public List<StreamTemplate> Streams { get; set; } = [];
+        public List<EventTemplate> Events { get; set; } = [];
     }
 
-    private IEnumerable<CashflowStreamDto> GetMobilityAndSubscriptions(DateOnly start)
+    private class StreamTemplate
     {
-        return
-        [
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Mobilität (ÖPNV + Carsharing)",
-                Type = CashflowType.Expense,
-                Amount = 120m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Digitale Abos & Internet",
-                Type = CashflowType.Expense,
-                Amount = 65m,
-                Interval = CashflowInterval.Monthly,
-                StartDate = start,
-                EndDate = null
-            }
-        ];
+        public string Name { get; set; } = "";
+        public CashflowType Type { get; set; }
+        public decimal Amount { get; set; }
+        public CashflowInterval Interval { get; set; }
+        public string? StartDateRef { get; set; }
+        public string? EndDateRef { get; set; }
+        public int? StartAge { get; set; }
     }
 
-    private IEnumerable<CashflowStreamDto> GetYearlyExpenses(DateOnly start, DateOnly simulationEnd)
+    private class EventTemplate
     {
-        return
-        [
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Versicherungen (Haftpflicht, Hausrat, BU)",
-                Type = CashflowType.Expense,
-                Amount = 350m,
-                Interval = CashflowInterval.Yearly,
-                StartDate = start,
-                EndDate = null
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Urlaubsbudget (Sommer)",
-                Type = CashflowType.Expense,
-                Amount = 2000m,
-                Interval = CashflowInterval.Yearly,
-                StartDate = new DateOnly(start.Year, 6, 1),
-                EndDate = simulationEnd
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Weihnachten & Geschenke",
-                Type = CashflowType.Expense,
-                Amount = 600m,
-                Interval = CashflowInterval.Yearly,
-                StartDate = new DateOnly(start.Year, 12, 1),
-                EndDate = null
-            }
-        ];
+        public string Name { get; set; } = "";
+        public CashflowType Type { get; set; }
+        public decimal Amount { get; set; }
+        public string? TargetDateRef { get; set; }
+        public int EarliestMonthOffset { get; set; }
+        public int LatestMonthOffset { get; set; }
     }
 }

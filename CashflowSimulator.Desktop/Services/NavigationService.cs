@@ -28,4 +28,16 @@ public class NavigationService : INavigationService
         // ActivatorUtilities.CreateInstance kombiniert DI-Services mit manuellen Parametern
         return ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider, parameters);
     }
+
+    /// <inheritdoc />
+    public ObservableObject Create(Type viewModelType)
+    {
+        return (ObservableObject)_serviceProvider.GetRequiredService(viewModelType);
+    }
+
+    /// <inheritdoc />
+    public ObservableObject Create(Type viewModelType, params object[] parameters)
+    {
+        return (ObservableObject)ActivatorUtilities.CreateInstance(_serviceProvider, viewModelType, parameters);
+    }
 }

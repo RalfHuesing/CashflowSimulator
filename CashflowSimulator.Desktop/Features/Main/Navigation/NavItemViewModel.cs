@@ -24,7 +24,7 @@ public partial class NavItemViewModel : ObservableObject
     /// <summary>
     /// Der Command, der ausgeführt wird (Navigation oder Aktion).
     /// </summary>
-    public required ICommand Command { get; init; }
+    public ICommand? Command { get; set; }
 
     /// <summary>
     /// Steuert den visuellen "Active State" (z.B. farbiger Balken links).

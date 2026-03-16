@@ -116,7 +116,7 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>, IMasterDe
 
     protected override string HelpKeyPrefix => "Portfolio";
 
-    private readonly IStockPriceService _stockPriceService;
+    private readonly IPortfolioService _portfolioService;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UpdatePricesCommand))]
@@ -125,10 +125,10 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>, IMasterDe
     public PortfolioViewModel(
         ICurrentProjectService currentProjectService,
         IHelpProvider helpProvider,
-        IStockPriceService stockPriceService)
+        IPortfolioService portfolioService)
         : base(currentProjectService, helpProvider)
     {
-        _stockPriceService = stockPriceService;
+        _portfolioService = portfolioService;
         PageHelpKey = "Portfolio";
         RefreshFactorOptions();
         RefreshAssetClassOptions();
@@ -146,41 +146,31 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>, IMasterDe
 
         try
         {
-            var assets = LoadItems().ToList();
-            if (!assets.Any())
+            var current = CurrentProjectService.Current;
+            if (current?.Portfolio is null)
+            {
+                ShowStatus("Kein Portfolio gefunden.", 4000, StatusType.Info);
+                return;
+            }
+
+            var assets = current.Portfolio.Assets ?? [];
+            if (assets.Count == 0)
             {
                 ShowStatus("Keine Assets zum Aktualisieren gefunden.", 4000, StatusType.Info);
                 return;
             }
 
-            var updatedCount = 0;
-            var errorCount = 0;
+            var (updatedAssets, updatedCount, errorCount) = await _portfolioService.UpdatePricesAsync(assets).ConfigureAwait(true);
+            
+            CurrentProjectService.UpdatePortfolio(current.Portfolio with { Assets = updatedAssets });
 
-            foreach (var asset in assets)
+            // Form aktualisieren, falls zutreffend
+            if (SelectedItem != null)
             {
-                // Verwende ISIN als Symbol für die Kursabfrage
-                var symbol = asset.Isin;
-                if (string.IsNullOrWhiteSpace(symbol))
+                var updatedSelected = updatedAssets.FirstOrDefault(a => a.Id == SelectedItem.Id);
+                if (updatedSelected != null)
                 {
-                    // Fallback: Name als Symbol verwenden
-                    symbol = asset.Name;
-                }
-
-                if (string.IsNullOrWhiteSpace(symbol))
-                {
-                    continue;
-                }
-
-                var result = await _stockPriceService.GetStockPriceAsync(symbol);
-                if (result.Success)
-                {
-                    // Aktualisiere das Asset mit neuem Kurs
-                    await UpdateAssetPriceAsync(asset, result.Price);
-                    updatedCount++;
-                }
-                else
-                {
-                    errorCount++;
+                    CurrentPrice = updatedSelected.CurrentPrice;
                 }
             }
 
@@ -197,29 +187,6 @@ public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>, IMasterDe
     }
 
     private bool CanUpdatePrices() => !IsUpdatingPrices;
-
-    private async Task UpdateAssetPriceAsync(AssetDto asset, decimal newPrice)
-    {
-        // Erstelle eine aktualisierte Version des Assets (CurrentValue = Stückzahl × neuer Kurs)
-        var newTotalValue = asset.CurrentQuantity * newPrice;
-        var updatedAsset = asset with { CurrentPrice = newPrice, CurrentValue = newTotalValue };
-        
-        // Aktualisiere das Asset im Projekt
-        var current = CurrentProjectService.Current;
-        if (current?.Portfolio is null)
-            return;
-
-        var assets = current.Portfolio.Assets.Select(a => 
-            a.Id == asset.Id ? updatedAsset : a).ToList();
-        
-        CurrentProjectService.UpdatePortfolio(current.Portfolio with { Assets = assets });
-        
-        // Wenn das aktuell ausgewählte Asset aktualisiert wurde, aktualisiere die Form
-        if (SelectedItem?.Id == asset.Id)
-        {
-            CurrentPrice = newPrice;
-        }
-    }
 
     partial void OnSearchTextChanged(string value)
     {

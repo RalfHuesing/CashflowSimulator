@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\default_cashflows.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CashflowSimulator.Contracts\CashflowSimulator.Contracts.csproj" />
     <ProjectReference Include="..\CashflowSimulator.Validation\CashflowSimulator.Validation.csproj" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />

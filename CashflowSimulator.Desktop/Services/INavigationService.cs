@@ -24,4 +24,14 @@ public interface INavigationService
     /// <param name="parameters">Zusätzliche Parameter für den Konstruktor.</param>
     /// <returns>Eine neue Instanz des ViewModels.</returns>
     TViewModel Create<TViewModel>(params object[] parameters) where TViewModel : ObservableObject;
+
+    /// <summary>
+    /// Erstellt ein ViewModel zur Laufzeit anhand des Typs.
+    /// </summary>
+    ObservableObject Create(Type viewModelType);
+
+    /// <summary>
+    /// Erstellt ein ViewModel zur Laufzeit anhand des Typs und zusätzlicher Parameter.
+    /// </summary>
+    ObservableObject Create(Type viewModelType, params object[] parameters);
 }

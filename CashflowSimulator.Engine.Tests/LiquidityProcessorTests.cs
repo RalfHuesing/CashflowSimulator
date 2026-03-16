@@ -80,11 +80,17 @@ public sealed class LiquidityProcessorTests
         Assert.Empty(state.Portfolio.Assets[0].Transactions);
     }
 
-    [Fact]
-    public void ProcessMonth_CashPositive_NoLifecyclePhases_LeavesCashUnchanged()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void ProcessMonth_CashPositive_NoValidAllocationProfile_LeavesCashUnchanged(string? allocationProfileId)
     {
         var processor = new LiquidityProcessor();
-        var project = Project(phases: []);
+        var phases = allocationProfileId == null 
+            ? new List<LifecyclePhaseDto>() 
+            : [new LifecyclePhaseDto { StartAge = 0, AllocationProfileId = allocationProfileId }];
+            
+        var project = Project(phases: phases);
         var state = new SimulationState
         {
             Cash = 1000m,
@@ -102,22 +108,6 @@ public sealed class LiquidityProcessorTests
                     }
                 ]
             }
-        };
-
-        processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
-
-        Assert.Equal(1000m, state.Cash);
-    }
-
-    [Fact]
-    public void ProcessMonth_CashPositive_PhaseWithoutAllocationProfileId_LeavesCashUnchanged()
-    {
-        var processor = new LiquidityProcessor();
-        var project = Project(phases: [new LifecyclePhaseDto { StartAge = 0, AllocationProfileId = "" }]);
-        var state = new SimulationState
-        {
-            Cash = 1000m,
-            Portfolio = new PortfolioDto { Assets = [] }
         };
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
@@ -360,14 +350,31 @@ public sealed class LiquidityProcessorTests
         Assert.Equal(state.Portfolio.Assets[0].Tranches.Sum(t => t.Quantity), state.Portfolio.Assets[0].CurrentQuantity);
     }
 
-    [Fact]
-    public void ProcessMonth_CashNegative_FifoConsumesOldestTranchesFirst()
+    [Theory]
+    [InlineData(-600, 10, 0, 4, 110)]
+    [InlineData(-250, 5, -50, 3, 110)]
+    public void ProcessMonth_CashNegative_FifoConsumesTranchesCorrectly(
+        decimal initialCash, decimal initialQuantity, decimal expectedCash, decimal expectedTrancheQuantity, decimal expectedAcquisitionPrice)
     {
         var processor = new LiquidityProcessor();
         var project = Project();
+        
+        // Setup original tranches
+        var tranches = new List<AssetTrancheDto>();
+        if (initialQuantity == 10m)
+        {
+            tranches.Add(new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 5m, AcquisitionPricePerUnit = 90m });
+            tranches.Add(new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 2, 1), Quantity = 5m, AcquisitionPricePerUnit = 110m });
+        }
+        else if (initialQuantity == 5m)
+        {
+            tranches.Add(new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 2m, AcquisitionPricePerUnit = 90m });
+            tranches.Add(new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 2, 1), Quantity = 3m, AcquisitionPricePerUnit = 110m });
+        }
+
         var state = new SimulationState
         {
-            Cash = -600m,
+            Cash = initialCash,
             Portfolio = new PortfolioDto
             {
                 Assets =
@@ -377,13 +384,9 @@ public sealed class LiquidityProcessorTests
                         Id = "a1",
                         AssetClassId = ClassA,
                         CurrentPrice = 100m,
-                        CurrentQuantity = 10m,
-                        CurrentValue = 1000m,
-                        Tranches =
-                        [
-                            new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 5m, AcquisitionPricePerUnit = 90m },
-                            new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 2, 1), Quantity = 5m, AcquisitionPricePerUnit = 110m }
-                        ]
+                        CurrentQuantity = initialQuantity,
+                        CurrentValue = initialQuantity * 100m,
+                        Tranches = tranches
                     }
                 ]
             }
@@ -391,52 +394,17 @@ public sealed class LiquidityProcessorTests
 
         processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
 
-        Assert.Equal(0m, state.Cash);
-        Assert.Equal(4m, state.Portfolio.Assets[0].CurrentQuantity);
-        var tranches = state.Portfolio.Assets[0].Tranches;
-        Assert.Single(tranches);
-        Assert.Equal(new DateOnly(2020, 2, 1), tranches[0].PurchaseDate);
-        Assert.Equal(4m, tranches[0].Quantity);
-        Assert.Equal(110m, tranches[0].AcquisitionPricePerUnit);
-    }
-
-    [Fact]
-    public void ProcessMonth_CashNegative_FifoPartialConsumeSecondTranche()
-    {
-        var processor = new LiquidityProcessor();
-        var project = Project();
-        var state = new SimulationState
+        Assert.Equal(expectedCash, state.Cash);
+        Assert.Equal(expectedTrancheQuantity, state.Portfolio.Assets[0].CurrentQuantity);
+        
+        var resultingTranches = state.Portfolio.Assets[0].Tranches;
+        Assert.Single(resultingTranches);
+        Assert.Equal(new DateOnly(2020, 2, 1), resultingTranches[0].PurchaseDate);
+        Assert.Equal(expectedTrancheQuantity, resultingTranches[0].Quantity);
+        if (initialQuantity == 10m)
         {
-            Cash = -250m,
-            Portfolio = new PortfolioDto
-            {
-                Assets =
-                [
-                    new AssetDto
-                    {
-                        Id = "a1",
-                        AssetClassId = ClassA,
-                        CurrentPrice = 100m,
-                        CurrentQuantity = 5m,
-                        CurrentValue = 500m,
-                        Tranches =
-                        [
-                            new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 1, 1), Quantity = 2m, AcquisitionPricePerUnit = 90m },
-                            new AssetTrancheDto { PurchaseDate = new DateOnly(2020, 2, 1), Quantity = 3m, AcquisitionPricePerUnit = 110m }
-                        ]
-                    }
-                ]
-            }
-        };
-
-        processor.ProcessMonth(project, state, new DateOnly(2020, 6, 1));
-
-        Assert.Equal(-50m, state.Cash);
-        Assert.Equal(3m, state.Portfolio.Assets[0].CurrentQuantity);
-        var tranches = state.Portfolio.Assets[0].Tranches;
-        Assert.Single(tranches);
-        Assert.Equal(new DateOnly(2020, 2, 1), tranches[0].PurchaseDate);
-        Assert.Equal(3m, tranches[0].Quantity);
+            Assert.Equal(expectedAcquisitionPrice, resultingTranches[0].AcquisitionPricePerUnit);
+        }
     }
 
     [Fact]

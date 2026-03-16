@@ -1,0 +1,144 @@
+{
+  "Streams": [
+    {
+      "Name": "Gehalt (Netto)",
+      "Type": "Income",
+      "Amount": 2850.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": "PensionStartMinusOneDay",
+      "StartAge": null
+    },
+    {
+      "Name": "Gesetzliche Rente (Prognose Netto)",
+      "Type": "Income",
+      "Amount": 1950.0,
+      "Interval": "Monthly",
+      "StartDateRef": "PensionStart",
+      "EndDateRef": null,
+      "StartAge": 67
+    },
+    {
+      "Name": "Wohnen (Warmmiete + Strom)",
+      "Type": "Expense",
+      "Amount": 1050.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Lebenshaltung (Supermarkt, Drogerie)",
+      "Type": "Expense",
+      "Amount": 450.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Freizeit & Hobby",
+      "Type": "Expense",
+      "Amount": 200.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Mobilität (ÖPNV + Carsharing)",
+      "Type": "Expense",
+      "Amount": 120.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Digitale Abos & Internet",
+      "Type": "Expense",
+      "Amount": 65.0,
+      "Interval": "Monthly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Versicherungen (Haftpflicht, Hausrat, BU)",
+      "Type": "Expense",
+      "Amount": 350.0,
+      "Interval": "Yearly",
+      "StartDateRef": "SimulationStart",
+      "EndDateRef": null,
+      "StartAge": null
+    },
+    {
+      "Name": "Urlaubsbudget (Sommer)",
+      "Type": "Expense",
+      "Amount": 2000.0,
+      "Interval": "Yearly",
+      "StartDateRef": "SimulationStartJuneFirst",
+      "EndDateRef": "SimulationEnd",
+      "StartAge": null
+    },
+    {
+      "Name": "Weihnachten & Geschenke",
+      "Type": "Expense",
+      "Amount": 600.0,
+      "Interval": "Yearly",
+      "StartDateRef": "SimulationStartDecemberFirst",
+      "EndDateRef": null,
+      "StartAge": null
+    }
+  ],
+  "Events": [
+    {
+      "Name": "Kauf Gebrauchtwagen",
+      "Type": "Expense",
+      "Amount": 18000.0,
+      "TargetDateRef": "SimulationStartPlus4Years",
+      "EarliestMonthOffset": -6,
+      "LatestMonthOffset": 12
+    },
+    {
+      "Name": "Sabbatical / Weltreise",
+      "Type": "Expense",
+      "Amount": 12000.0,
+      "TargetDateRef": "SimulationStartPlus8Years",
+      "EarliestMonthOffset": 0,
+      "LatestMonthOffset": 24
+    },
+    {
+      "Name": "Hochzeit / Große Feier",
+      "Type": "Expense",
+      "Amount": 8000.0,
+      "TargetDateRef": "SimulationStartPlus5Years",
+      "EarliestMonthOffset": -12,
+      "LatestMonthOffset": 36
+    },
+    {
+      "Name": "Möbel-Upgrade (Küche)",
+      "Type": "Expense",
+      "Amount": 10000.0,
+      "TargetDateRef": "SimulationStartPlus12Years",
+      "EarliestMonthOffset": -6,
+      "LatestMonthOffset": 6
+    },
+    {
+      "Name": "Zahnersatz / Gesundheit im Alter",
+      "Type": "Expense",
+      "Amount": 5000.0,
+      "TargetDateRef": "SimulationEndMinus60Months",
+      "EarliestMonthOffset": 0,
+      "LatestMonthOffset": 60
+    },
+    {
+      "Name": "Erbe / Schenkung (Erwartet)",
+      "Type": "Income",
+      "Amount": 25000.0,
+      "TargetDateRef": "SimulationStartPlus20Years",
+      "EarliestMonthOffset": -24,
+      "LatestMonthOffset": 24
+    }
+  ]
+}

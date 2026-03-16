@@ -23,6 +23,7 @@ using CashflowSimulator.Desktop.Features.Analysis;
 using CashflowSimulator.Desktop.Services;
 using CashflowSimulator.Engine.Services.Simulation;
 using CashflowSimulator.Engine.Services.Defaults;
+using CashflowSimulator.Engine.Services.Portfolio;
 using CashflowSimulator.Infrastructure.Services;
 using CashflowSimulator.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,8 +80,10 @@ namespace CashflowSimulator.Desktop
                 services.AddSingleton<IResultAnalysisService, ResultAnalysisService>();
                 services.AddSingleton<IDiagnosticExportService, DiagnosticExportService>();
                 services.AddSingleton<ISimulationRunner, SimulationRunner>();
+                services.AddSingleton<IPortfolioService, PortfolioService>();
 
                 // Navigation Service
+                services.AddSingleton<INavigationConfiguration, NavigationConfiguration>();
                 services.AddSingleton<INavigationService, NavigationService>();
 
                 // ViewModels (als Transient registriert, werden über NavigationService aufgelöst)

@@ -35,6 +35,7 @@ public partial class MainShellViewModel : ObservableObject
     private readonly IFileDialogService _fileDialogService;
     private readonly IStorageService<SimulationProjectDto> _storageService;
     private readonly ICurrentProjectService _currentProjectService;
+    private readonly INavigationConfiguration _navigationConfiguration;
     private readonly INavigationService _navigationService;
     private readonly ISimulationRunner _simulationRunner;
     private readonly IResultAnalysisService _resultAnalysisService;
@@ -50,6 +51,7 @@ public partial class MainShellViewModel : ObservableObject
         IResultAnalysisService resultAnalysisService,
         IDiagnosticExportService diagnosticExportService,
         NavigationViewModel navigationViewModel,
+        INavigationConfiguration navigationConfiguration,
         ILogger<MainShellViewModel> logger)
     {
         _fileDialogService = fileDialogService;
@@ -60,28 +62,23 @@ public partial class MainShellViewModel : ObservableObject
         _resultAnalysisService = resultAnalysisService;
         _diagnosticExportService = diagnosticExportService;
         _logger = logger;
+        _navigationConfiguration = navigationConfiguration;
         Navigation = navigationViewModel;
 
         _currentProjectService.ProjectChanged += OnProjectChanged;
-        InitializeNavigation();
-        // Initialen Command-Status setzen (Projekt ist bereits vom Program gesetzt)
+        
+        _navigationConfiguration.Configure(Navigation, NavigateAsync, () => _currentProjectService.Current is not null);
+        RefreshNavigationCommands();
+    }
+    
+    private void RefreshNavigationCommands()
+    {
+        foreach (var item in Navigation.GetAllItems())
+        {
+            if (item.Command is IRelayCommand rc)
+                rc.NotifyCanExecuteChanged();
+        }
         SaveCommand.NotifyCanExecuteChanged();
-        OpenSzenarioCommand.NotifyCanExecuteChanged();
-        OpenEckdatenCommand.NotifyCanExecuteChanged();
-        OpenLaufendeEinnahmenCommand.NotifyCanExecuteChanged();
-        OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
-        OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
-        OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
-        OpenMarktdatenCommand.NotifyCanExecuteChanged();
-        OpenKorrelationenCommand.NotifyCanExecuteChanged();
-        OpenAnlageklassenCommand.NotifyCanExecuteChanged();
-        OpenVermoegenswerteCommand.NotifyCanExecuteChanged();
-        OpenTransaktionenCommand.NotifyCanExecuteChanged();
-        OpenSteuerprofileCommand.NotifyCanExecuteChanged();
-        OpenStrategieprofileCommand.NotifyCanExecuteChanged();
-        OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
-        OpenLebensphasenCommand.NotifyCanExecuteChanged();
-        OpenAnalyseCommand.NotifyCanExecuteChanged();
         StartSimulationCommand.NotifyCanExecuteChanged();
     }
 
@@ -126,23 +123,7 @@ public partial class MainShellViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(CurrentProjectTitle));
         OnPropertyChanged(nameof(CurrentFilePath));
-        SaveCommand.NotifyCanExecuteChanged();
-        OpenSzenarioCommand.NotifyCanExecuteChanged();
-        OpenEckdatenCommand.NotifyCanExecuteChanged();
-        OpenLaufendeEinnahmenCommand.NotifyCanExecuteChanged();
-        OpenLaufendeAusgabenCommand.NotifyCanExecuteChanged();
-        OpenGeplanteEinnahmenCommand.NotifyCanExecuteChanged();
-        OpenGeplanteAusgabenCommand.NotifyCanExecuteChanged();
-        OpenMarktdatenCommand.NotifyCanExecuteChanged();
-        OpenKorrelationenCommand.NotifyCanExecuteChanged();
-        OpenAnlageklassenCommand.NotifyCanExecuteChanged();
-        OpenVermoegenswerteCommand.NotifyCanExecuteChanged();
-        OpenTransaktionenCommand.NotifyCanExecuteChanged();
-        OpenSteuerprofileCommand.NotifyCanExecuteChanged();
-        OpenStrategieprofileCommand.NotifyCanExecuteChanged();
-        OpenAllocationProfilesCommand.NotifyCanExecuteChanged();
-        OpenLebensphasenCommand.NotifyCanExecuteChanged();
-        StartSimulationCommand.NotifyCanExecuteChanged();
+        RefreshNavigationCommands();
     }
 
     private string GetCurrentProjectTitle()
@@ -155,170 +136,7 @@ public partial class MainShellViewModel : ObservableObject
             : current.Meta.ScenarioName;
     }
 
-    private void InitializeNavigation()
-    {
-        var szenarioItem = new NavItemViewModel
-        {
-            DisplayName = "Szenario",
-            Icon = Symbol.Database,
-            Command = OpenSzenarioCommand,
-            IsActive = false
-        };
-        var eckdatenItem = new NavItemViewModel
-        {
-            DisplayName = "Eckdaten",
-            Icon = Symbol.Calendar,
-            Command = OpenEckdatenCommand,
-            IsActive = false
-        };
-        var marktdatenItem = new NavItemViewModel
-        {
-            DisplayName = "Marktdaten",
-            Icon = Symbol.ChartMultiple,
-            Command = OpenMarktdatenCommand,
-            IsActive = false
-        };
-        var korrelationenItem = new NavItemViewModel
-        {
-            DisplayName = "Korrelationen",
-            Icon = Symbol.Link,
-            Command = OpenKorrelationenCommand,
-            IsActive = false
-        };
-        var anlageklassenItem = new NavItemViewModel
-        {
-            DisplayName = "Anlageklassen",
-            Icon = Symbol.Grid,
-            Command = OpenAnlageklassenCommand,
-            IsActive = false
-        };
-        var vermoegenswerteItem = new NavItemViewModel
-        {
-            DisplayName = "Vermögenswerte",
-            Icon = Symbol.Stack,
-            Command = OpenVermoegenswerteCommand,
-            IsActive = false
-        };
-        var transaktionenItem = new NavItemViewModel
-        {
-            DisplayName = "Transaktionen",
-            Icon = Symbol.Document,
-            Command = OpenTransaktionenCommand,
-            IsActive = false
-        };
-        var laufendeEinnahmenItem = new NavItemViewModel
-        {
-            DisplayName = "Laufende Einnahmen",
-            Icon = Symbol.ArrowUp,
-            Command = OpenLaufendeEinnahmenCommand,
-            IsActive = false
-        };
-        var laufendeAusgabenItem = new NavItemViewModel
-        {
-            DisplayName = "Laufende Ausgaben",
-            Icon = Symbol.ArrowDown,
-            Command = OpenLaufendeAusgabenCommand,
-            IsActive = false
-        };
-        var geplanteEinnahmenItem = new NavItemViewModel
-        {
-            DisplayName = "Geplante Einnahmen",
-            Icon = Symbol.CalendarAdd,
-            Command = OpenGeplanteEinnahmenCommand,
-            IsActive = false
-        };
-        var geplanteAusgabenItem = new NavItemViewModel
-        {
-            DisplayName = "Geplante Ausgaben",
-            Icon = Symbol.CalendarCancel,
-            Command = OpenGeplanteAusgabenCommand,
-            IsActive = false
-        };
-        var steuerprofileItem = new NavItemViewModel
-        {
-            DisplayName = "Steuerprofile",
-            Icon = Symbol.Receipt,
-            Command = OpenSteuerprofileCommand,
-            IsActive = false
-        };
-        var strategieprofileItem = new NavItemViewModel
-        {
-            DisplayName = "Strategieprofile",
-            Icon = Symbol.Target,
-            Command = OpenStrategieprofileCommand,
-            IsActive = false
-        };
-        var allocationProfilesItem = new NavItemViewModel
-        {
-            DisplayName = "Allokationsprofile",
-            Icon = Symbol.Grid,
-            Command = OpenAllocationProfilesCommand,
-            IsActive = false
-        };
-        var lebensphasenItem = new NavItemViewModel
-        {
-            DisplayName = "Lebensphasen",
-            Icon = Symbol.Person,
-            Command = OpenLebensphasenCommand,
-            IsActive = false
-        };
-        var einstellungenItem = new NavItemViewModel
-        {
-            DisplayName = "Einstellungen",
-            Icon = Symbol.Settings,
-            Command = OpenSettingsCommand,
-            IsActive = false
-        };
-        var analyseItem = new NavItemViewModel
-        {
-            DisplayName = "Analyse",
-            Icon = Symbol.ChartMultiple,
-            Command = OpenAnalyseCommand,
-            IsActive = false
-        };
 
-        var groupSzenario = new NavGroupViewModel { DisplayName = "Szenario" };
-        groupSzenario.Items.Add(szenarioItem);
-
-        var groupStammdaten = new NavGroupViewModel { DisplayName = "Stammdaten" };
-        groupStammdaten.Items.Add(eckdatenItem);
-        groupStammdaten.Items.Add(marktdatenItem);
-        groupStammdaten.Items.Add(korrelationenItem);
-        groupStammdaten.Items.Add(anlageklassenItem);
-
-        var groupVermoegen = new NavGroupViewModel { DisplayName = "Vermögen & Cashflow" };
-        groupVermoegen.Items.Add(vermoegenswerteItem);
-        groupVermoegen.Items.Add(transaktionenItem);
-
-        var groupEinnahmenAusgaben = new NavGroupViewModel { DisplayName = "Einnahmen & Ausgaben" };
-        groupEinnahmenAusgaben.Items.Add(laufendeEinnahmenItem);
-        groupEinnahmenAusgaben.Items.Add(laufendeAusgabenItem);
-        groupEinnahmenAusgaben.Items.Add(geplanteEinnahmenItem);
-        groupEinnahmenAusgaben.Items.Add(geplanteAusgabenItem);
-
-        var groupProfile = new NavGroupViewModel { DisplayName = "Profile" };
-        groupProfile.Items.Add(steuerprofileItem);
-        groupProfile.Items.Add(strategieprofileItem);
-        groupProfile.Items.Add(allocationProfilesItem);
-
-        var groupLebensplanung = new NavGroupViewModel { DisplayName = "Lebensplanung" };
-        groupLebensplanung.Items.Add(lebensphasenItem);
-
-        var groupAnalyse = new NavGroupViewModel { DisplayName = "Analyse & Auswertung" };
-        groupAnalyse.Items.Add(analyseItem);
-
-        var groupApp = new NavGroupViewModel { DisplayName = "App" };
-        groupApp.Items.Add(einstellungenItem);
-
-        Navigation.Groups.Add(groupSzenario);
-        Navigation.Groups.Add(groupStammdaten);
-        Navigation.Groups.Add(groupVermoegen);
-        Navigation.Groups.Add(groupEinnahmenAusgaben);
-        Navigation.Groups.Add(groupProfile);
-        Navigation.Groups.Add(groupLebensplanung);
-        Navigation.Groups.Add(groupAnalyse);
-        Navigation.Groups.Add(groupApp);
-    }
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -410,164 +228,29 @@ public partial class MainShellViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanOpenSzenario))]
-    private void OpenSzenario()
+    private async Task NavigateAsync(Type targetType, object[]? parameters)
     {
-        _logger.LogDebug("Szenario-Bereich geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<MetaEditViewModel>();
-        SetActiveNavigationItem(0);
-    }
-
-    private bool CanOpenSzenario() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenEckdaten))]
-    private void OpenEckdaten()
-    {
-        _logger.LogDebug("Eckdaten geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<EckdatenViewModel>();
-        SetActiveNavigationItem(1);
-    }
-
-    private bool CanOpenEckdaten() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenMarktdaten))]
-    private void OpenMarktdaten()
-    {
-        _logger.LogDebug("Marktdaten geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<MarktdatenViewModel>();
-        SetActiveNavigationItem(2);
-    }
-
-    private bool CanOpenMarktdaten() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenKorrelationen))]
-    private void OpenKorrelationen()
-    {
-        _logger.LogDebug("Korrelationen geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<KorrelationenViewModel>();
-        SetActiveNavigationItem(3);
-    }
-
-    private bool CanOpenKorrelationen() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenAnlageklassen))]
-    private void OpenAnlageklassen()
-    {
-        _logger.LogDebug("Anlageklassen geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<AssetClassesViewModel>();
-        SetActiveNavigationItem(4);
-    }
-
-    private bool CanOpenAnlageklassen() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenVermoegenswerte))]
-    private void OpenVermoegenswerte()
-    {
-        _logger.LogDebug("Vermögenswerte geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<PortfolioViewModel>();
-        SetActiveNavigationItem(5);
-    }
-
-    private bool CanOpenVermoegenswerte() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenTransaktionen))]
-    private void OpenTransaktionen()
-    {
-        _logger.LogDebug("Transaktionen geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<TransactionsViewModel>();
-        SetActiveNavigationItem(6);
-    }
-
-    private bool CanOpenTransaktionen() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
-    private void OpenLaufendeEinnahmen()
-    {
-        CurrentContentViewModel = _navigationService.Create<CashflowStreamsViewModel>(CashflowType.Income);
-        SetActiveNavigationItem(7);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
-    private void OpenLaufendeAusgaben()
-    {
-        CurrentContentViewModel = _navigationService.Create<CashflowStreamsViewModel>(CashflowType.Expense);
-        SetActiveNavigationItem(8);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
-    private void OpenGeplanteEinnahmen()
-    {
-        CurrentContentViewModel = _navigationService.Create<CashflowEventsViewModel>(CashflowType.Income);
-        SetActiveNavigationItem(9);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenCashflow))]
-    private void OpenGeplanteAusgaben()
-    {
-        CurrentContentViewModel = _navigationService.Create<CashflowEventsViewModel>(CashflowType.Expense);
-        SetActiveNavigationItem(10);
-    }
-
-    private bool CanOpenCashflow() => _currentProjectService.Current is not null;
-
-    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
-    private void OpenSteuerprofile()
-    {
-        _logger.LogDebug("Steuerprofile geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<TaxProfilesViewModel>();
-        SetActiveNavigationItem(11);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
-    private void OpenStrategieprofile()
-    {
-        _logger.LogDebug("Strategieprofile geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<StrategyProfilesViewModel>();
-        SetActiveNavigationItem(12);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
-    private void OpenAllocationProfiles()
-    {
-        _logger.LogDebug("Allokationsprofile geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<AllocationProfilesViewModel>();
-        SetActiveNavigationItem(13);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanOpenLifecycle))]
-    private void OpenLebensphasen()
-    {
-        _logger.LogDebug("Lebensphasen geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<LifecyclePhasesViewModel>();
-        SetActiveNavigationItem(14);
-    }
-
-    private bool CanOpenLifecycle() => _currentProjectService.Current is not null;
-
-    [RelayCommand]
-    private async Task OpenAnalyse()
-    {
-        _logger.LogDebug("Analyse & Auswertung geöffnet.");
-        var runId = _currentProjectService.LastRunId ?? 0L;
-        var analysisVm = _navigationService.Create<AnalysisDashboardViewModel>(runId);
-        await analysisVm.LoadAsync().ConfigureAwait(true);
-        CurrentContentViewModel = analysisVm;
-        SetActiveNavigationItem(15);
-    }
-
-    [RelayCommand]
-    private void OpenSettings()
-    {
-        _logger.LogDebug("Einstellungen geöffnet.");
-        CurrentContentViewModel = _navigationService.Create<SettingsViewModel>();
-        SetActiveNavigationItem(16);
-    }
-
-    private void SetActiveNavigationItem(int index)
-    {
-        var all = Navigation.GetAllItems();
-        for (var i = 0; i < all.Count; i++)
-            all[i].IsActive = i == index;
+        try
+        {
+            _logger.LogDebug("Navigation zu {Type} gestartet.", targetType.Name);
+            if (targetType == typeof(AnalysisDashboardViewModel))
+            {
+                var runId = _currentProjectService.LastRunId ?? 0L;
+                var analysisVm = (AnalysisDashboardViewModel)_navigationService.Create(typeof(AnalysisDashboardViewModel), runId);
+                await analysisVm.LoadAsync().ConfigureAwait(true);
+                CurrentContentViewModel = analysisVm;
+            }
+            else
+            {
+                CurrentContentViewModel = parameters is { Length: > 0 } 
+                    ? _navigationService.Create(targetType, parameters) 
+                    : _navigationService.Create(targetType);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Fehler bei der Navigation zu {Type}", targetType.Name);
+        }
     }
 
 }

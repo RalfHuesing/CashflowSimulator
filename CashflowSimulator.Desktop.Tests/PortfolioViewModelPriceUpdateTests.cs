@@ -1,4 +1,6 @@
-using CashflowSimulator.Contracts.Common;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CashflowSimulator.Contracts.Dtos;
 using CashflowSimulator.Contracts.Interfaces;
 using CashflowSimulator.Desktop.Features.Portfolio;
@@ -12,23 +14,25 @@ namespace CashflowSimulator.Desktop.Tests;
 /// </summary>
 public sealed class PortfolioViewModelPriceUpdateTests
 {
-    /// <summary>Stub: liefert einen festen Kurs für jede Abfrage (deterministisch für Tests).</summary>
-    private sealed class FixedPriceStockPriceService : IStockPriceService
+    private sealed class MockPortfolioService : IPortfolioService
     {
-        private readonly decimal _price;
-        private readonly bool _success;
+        private readonly decimal _newPrice;
 
-        public FixedPriceStockPriceService(decimal price, bool success = true)
+        public MockPortfolioService(decimal newPrice)
         {
-            _price = price;
-            _success = success;
+            _newPrice = newPrice;
         }
 
-        public Task<StockPriceResultDto> GetStockPriceAsync(string symbol)
+        public Task<(List<AssetDto> UpdatedAssets, int UpdatedCount, int ErrorCount)> UpdatePricesAsync(
+            IEnumerable<AssetDto> currentAssets, 
+            CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(_success
-                ? StockPriceResultDto.SuccessResult(symbol, _price, DateTime.UtcNow)
-                : StockPriceResultDto.FailureResult(symbol, "Simulierter Fehler"));
+            var assets = new List<AssetDto>();
+            foreach(var a in currentAssets)
+            {
+                assets.Add(a with { CurrentPrice = _newPrice, CurrentValue = a.CurrentQuantity * _newPrice });
+            }
+            return Task.FromResult((assets, assets.Count, 0));
         }
     }
 
@@ -36,147 +40,34 @@ public sealed class PortfolioViewModelPriceUpdateTests
     {
         return new SimulationProjectDto
         {
-            Meta = new MetaDto { ScenarioName = "Test", CreatedAt = DateTimeOffset.UtcNow },
-            Parameters = new SimulationParametersDto
-            {
-                SimulationStart = DateOnly.FromDateTime(DateTime.Today),
-                SimulationEnd = DateOnly.FromDateTime(DateTime.Today.AddYears(30)),
-                DateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-40)),
-                InitialLiquidCash = 0,
-                CurrencyCode = "EUR"
-            },
-            UiSettings = new UiSettingsDto(),
-            Portfolio = new PortfolioDto { Assets = assets.ToList() }
+            Portfolio = new PortfolioDto { Assets = new List<AssetDto>(assets) }
         };
     }
 
     [Fact]
-    public async Task UpdatePricesAsync_WithTwoAssets_UpdatesCurrentPriceAndCurrentValue()
+    public async Task UpdatePricesAsync_CallsServiceAndUpdatesProject()
     {
-        const decimal fixedPrice = 123.45m;
-        var asset1 = new AssetDto
-        {
-            Id = "a1",
-            Name = "ETF A",
-            Isin = "DE000123",
-            CurrentPrice = 100m,
-            CurrentQuantity = 10m,
-            CurrentValue = 1000m
-        };
-        var asset2 = new AssetDto
-        {
-            Id = "a2",
-            Name = "ETF B",
-            Isin = "DE000456",
-            CurrentPrice = 50m,
-            CurrentQuantity = 20m,
-            CurrentValue = 1000m
-        };
-
-        var projectService = new CurrentProjectService();
-        projectService.SetCurrent(CreateProjectWithAssets(asset1, asset2));
-        var stockService = new FixedPriceStockPriceService(fixedPrice);
-        var vm = new PortfolioViewModel(projectService, null!, stockService);
-
-        await vm.UpdatePricesCommand.ExecuteAsync(null);
-
-        Assert.False(vm.IsUpdatingPrices);
-        var project = projectService.Current;
-        Assert.NotNull(project?.Portfolio);
-        Assert.Equal(2, project.Portfolio.Assets.Count);
-
-        var updated1 = project.Portfolio.Assets.First(a => a.Id == "a1");
-        Assert.Equal(fixedPrice, updated1.CurrentPrice);
-        Assert.Equal(10m * fixedPrice, updated1.CurrentValue);
-
-        var updated2 = project.Portfolio.Assets.First(a => a.Id == "a2");
-        Assert.Equal(fixedPrice, updated2.CurrentPrice);
-        Assert.Equal(20m * fixedPrice, updated2.CurrentValue);
-
-        // Status erscheint im rechten Panel (ShowStatus); in Unit-Tests ohne UI-Dispatcher kann StatusEntries leer sein.
-        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Kurse aktualisiert")) ?? "";
-        if (statusText.Length > 0)
-            Assert.Contains("2 Kurse aktualisiert", statusText);
-    }
-
-    [Fact]
-    public async Task UpdatePricesAsync_WithNoAssets_SetsStatusMessage()
-    {
-        var projectService = new CurrentProjectService();
-        projectService.SetCurrent(CreateProjectWithAssets());
-        var stockService = new FixedPriceStockPriceService(100m);
-        var vm = new PortfolioViewModel(projectService, null!, stockService);
-
-        await vm.UpdatePricesCommand.ExecuteAsync(null);
-
-        Assert.False(vm.IsUpdatingPrices);
-        // Status im Panel; ohne UI-Dispatcher kann StatusEntries leer sein
-        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Keine Assets")) ?? "";
-        if (statusText.Length > 0)
-            Assert.Contains("Keine Assets", statusText);
-    }
-
-    [Fact]
-    public async Task UpdatePricesAsync_AssetWithoutIsin_UsesNameAsSymbol()
-    {
-        const decimal fixedPrice = 99.99m;
-        var asset = new AssetDto
-        {
-            Id = "a1",
-            Name = "MyETF",
-            Isin = "",  // leer → Fallback auf Name
-            CurrentPrice = 80m,
-            CurrentQuantity = 5m
-        };
-
+        var asset = new AssetDto { Id = "a1", CurrentQuantity = 10m, CurrentPrice = 100m };
         var projectService = new CurrentProjectService();
         projectService.SetCurrent(CreateProjectWithAssets(asset));
-        var stockService = new FixedPriceStockPriceService(fixedPrice);
-        var vm = new PortfolioViewModel(projectService, null!, stockService);
-
-        await vm.UpdatePricesCommand.ExecuteAsync(null);
-
-        var updated = projectService.Current!.Portfolio!.Assets[0];
-        Assert.Equal(fixedPrice, updated.CurrentPrice);
-        Assert.Equal(5m * fixedPrice, updated.CurrentValue);
-        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Kurse aktualisiert")) ?? "";
-        if (statusText.Length > 0)
-            Assert.Contains("1 Kurse aktualisiert", statusText);
-    }
-
-    [Fact]
-    public async Task UpdatePricesAsync_WhenServiceFails_IncrementsErrorCountAndKeepsPrice()
-    {
-        var asset = new AssetDto
-        {
-            Id = "a1",
-            Name = "ETF",
-            Isin = "DE000X",
-            CurrentPrice = 100m,
-            CurrentQuantity = 1m
-        };
-
-        var projectService = new CurrentProjectService();
-        projectService.SetCurrent(CreateProjectWithAssets(asset));
-        var stockService = new FixedPriceStockPriceService(0, success: false);
-        var vm = new PortfolioViewModel(projectService, null!, stockService);
+        
+        var service = new MockPortfolioService(123.45m);
+        var vm = new PortfolioViewModel(projectService, null!, service);
 
         await vm.UpdatePricesCommand.ExecuteAsync(null);
 
         Assert.False(vm.IsUpdatingPrices);
         var updated = projectService.Current!.Portfolio!.Assets[0];
-        Assert.Equal(100m, updated.CurrentPrice); // unverändert
-        var statusText = vm.StatusEntries.Select(e => e.Message).FirstOrDefault(s => s.Contains("Fehler")) ?? "";
-        if (statusText.Length > 0)
-            Assert.Contains("1 Fehler", statusText);
+        Assert.Equal(123.45m, updated.CurrentPrice);
+        Assert.Equal(1234.50m, updated.CurrentValue);
     }
 
     [Fact]
     public void UpdatePricesCommand_CanExecute_WhenNotUpdating()
     {
         var projectService = new CurrentProjectService();
-        projectService.SetCurrent(CreateProjectWithAssets(new AssetDto { Id = "a1", Name = "X", Isin = "DE" }));
-        var vm = new PortfolioViewModel(projectService, null!, new FixedPriceStockPriceService(100m));
+        projectService.SetCurrent(CreateProjectWithAssets(new AssetDto { Id = "a1" }));
+        var vm = new PortfolioViewModel(projectService, null!, new MockPortfolioService(100m));
 
         Assert.True(vm.UpdatePricesCommand.CanExecute(null));
     }
