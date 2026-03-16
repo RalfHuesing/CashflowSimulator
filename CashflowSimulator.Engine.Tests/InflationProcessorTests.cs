@@ -346,9 +346,9 @@ public sealed class InflationProcessorTests
             ]
         };
 
-        var result = await runner.RunSimulationAsync(project);
+        var result = await runner.RunSimulationAsync(project, TestContext.Current.CancellationToken);
 
-        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value, TestContext.Current.CancellationToken);
         var jan2020 = monthly[0];
         var jan2021 = monthly[12];
         var salarySnapshot2020 = jan2020.CashflowSnapshots.FirstOrDefault(s => s.Name == "Gehalt");

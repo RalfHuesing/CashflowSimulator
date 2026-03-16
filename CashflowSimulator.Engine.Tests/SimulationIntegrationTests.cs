@@ -75,10 +75,10 @@ public sealed class SimulationIntegrationTests
             ]
         };
 
-        var result = await runner.RunSimulationAsync(project);
+        var result = await runner.RunSimulationAsync(project, TestContext.Current.CancellationToken);
         Assert.NotNull(result.RunId);
 
-        var monthly = await repo.GetMonthlyResultsAsync(result.RunId.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value, TestContext.Current.CancellationToken);
         var monthCount = (simulationEnd.Year - simulationStart.Year) * 12 + (simulationEnd.Month - simulationStart.Month) + 1;
         Assert.Equal(monthCount, monthly.Count);
 
@@ -164,10 +164,10 @@ public sealed class SimulationIntegrationTests
             }
         };
 
-        var result = await runner.RunSimulationAsync(project);
+        var result = await runner.RunSimulationAsync(project, TestContext.Current.CancellationToken);
         Assert.NotNull(result.RunId);
 
-        var monthly = await repo.GetMonthlyResultsAsync(result.RunId.Value);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value, TestContext.Current.CancellationToken);
         var firstMonth = monthly[0];
         Assert.True(firstMonth.TotalAssets >= 60_000m);
         Assert.True(firstMonth.TotalAssets > firstMonth.CashBalance, "TotalAssets = Cash + Depot.");
@@ -218,8 +218,8 @@ public sealed class SimulationIntegrationTests
             ]
         };
 
-        var result = await runner.RunSimulationAsync(project);
-        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value);
+        var result = await runner.RunSimulationAsync(project, TestContext.Current.CancellationToken);
+        var monthly = await repo.GetMonthlyResultsAsync(result.RunId!.Value, TestContext.Current.CancellationToken);
 
         Assert.Equal(121, monthly.Count);
 

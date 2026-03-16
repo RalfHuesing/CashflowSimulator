@@ -13,7 +13,7 @@ public sealed class AnalysisDashboardViewModelTests
     {
         var logger = NullLogger<AnalysisDashboardViewModel>.Instance;
         var vm = new AnalysisDashboardViewModel(0, null, logger);
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
         Assert.True(vm.IsEmpty);
         Assert.Empty(vm.YearlySummaries);
         Assert.Empty(vm.TotalAssetsSeries);
@@ -24,7 +24,7 @@ public sealed class AnalysisDashboardViewModelTests
     {
         var logger = NullLogger<AnalysisDashboardViewModel>.Instance;
         var vm = new AnalysisDashboardViewModel(1, null, logger);
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
         Assert.True(vm.IsEmpty);
     }
 
@@ -45,7 +45,7 @@ public sealed class AnalysisDashboardViewModelTests
         var logger = NullLogger<AnalysisDashboardViewModel>.Instance;
 
         var vm = new AnalysisDashboardViewModel(42, service, logger);
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
 
         Assert.False(vm.IsEmpty);
         Assert.Equal(42, vm.RunId);
@@ -67,7 +67,7 @@ public sealed class AnalysisDashboardViewModelTests
         var logger = NullLogger<AnalysisDashboardViewModel>.Instance;
 
         var vm = new AnalysisDashboardViewModel(1, service, logger);
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
 
         vm.SelectedYearlySummary = vm.YearlySummaries[0];
         Assert.Equal(12, vm.MonthsInSelectedYear.Count);

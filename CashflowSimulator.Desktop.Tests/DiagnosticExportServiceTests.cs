@@ -16,7 +16,7 @@ public sealed class DiagnosticExportServiceTests
         var service = new DiagnosticExportService(projectService, NullLogger<DiagnosticExportService>.Instance);
         var source = new TestDiagnosticExport("test.json", new { A = 1 });
 
-        await service.ExportAsync(source);
+        await service.ExportAsync(source, TestContext.Current.CancellationToken);
 
         Assert.False(File.Exists(Path.Combine(Path.GetTempPath(), "Diagnostics", "test.json")));
     }
@@ -32,11 +32,11 @@ public sealed class DiagnosticExportServiceTests
             var service = new DiagnosticExportService(projectService, NullLogger<DiagnosticExportService>.Instance);
             var source = new TestDiagnosticExport("snapshot.json", new { RunId = 42, Label = "Test" });
 
-            await service.ExportAsync(source);
+            await service.ExportAsync(source, TestContext.Current.CancellationToken);
 
             var expectedPath = Path.Combine(tempDir, "Diagnostics", "snapshot.json");
             Assert.True(File.Exists(expectedPath));
-            var json = await File.ReadAllTextAsync(expectedPath);
+            var json = await File.ReadAllTextAsync(expectedPath, TestContext.Current.CancellationToken);
             Assert.Contains("runId", json);
             Assert.Contains("42", json);
             Assert.Contains("label", json);
@@ -60,7 +60,7 @@ public sealed class DiagnosticExportServiceTests
             var service = new DiagnosticExportService(projectService, NullLogger<DiagnosticExportService>.Instance);
             var source = new TestDiagnosticExport("analysis-dashboard", new { X = 1 });
 
-            await service.ExportAsync(source);
+            await service.ExportAsync(source, TestContext.Current.CancellationToken);
 
             var expectedPath = Path.Combine(tempDir, "Diagnostics", "analysis-dashboard.json");
             Assert.True(File.Exists(expectedPath));
@@ -85,8 +85,8 @@ public sealed class DiagnosticExportServiceTests
             var source1 = new TestDiagnosticExport("a.json", new { Id = 1 });
             var source2 = new TestDiagnosticExport("b.json", new { Id = 2 });
 
-            var t1 = service.ExportAsync(source1);
-            var t2 = service.ExportAsync(source2);
+            var t1 = service.ExportAsync(source1, TestContext.Current.CancellationToken);
+            var t2 = service.ExportAsync(source2, TestContext.Current.CancellationToken);
             await Task.WhenAll(t1, t2);
 
             Assert.True(File.Exists(Path.Combine(tempDir, "Diagnostics", "a.json")));

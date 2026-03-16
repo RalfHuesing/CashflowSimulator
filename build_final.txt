@@ -1,0 +1,18 @@
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\InflationProcessorTests.cs(351,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(96,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationIntegrationTests.cs(222,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(125,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(162,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(191,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(221,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(251,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(271,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(303,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(356,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\SimulationRunnerTests.cs(439,57): warning CS8629: Ein Werttyp, der NULL zul├ñsst, kann NULL sein. [c:\Daten\Entwicklung\CashflowSimulator\CashflowSimulator.Engine.Tests\CashflowSimulator.Engine.Tests.csproj]
+
+Der Buildvorgang wurde erfolgreich ausgef├╝hrt.
+    12 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:04.67

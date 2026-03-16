@@ -11,7 +11,7 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task StartRunAsync_ReturnsRunStartResult_WithPositiveRunId_AndResultFolderPath()
     {
-        var result = await _repository.StartRunAsync();
+        var result = await _repository.StartRunAsync(TestContext.Current.CancellationToken);
         Assert.True(result.RunId > 0);
         Assert.NotNull(result.ResultFolderPath);
         Assert.True(Directory.Exists(result.ResultFolderPath));
@@ -21,7 +21,7 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task WriteMonthlyResultsAsync_And_GetMonthlyResultsAsync_Roundtrip()
     {
-        var start = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync(TestContext.Current.CancellationToken);
         var runId = start.RunId;
         var entry = new MonthlyResultDto
         {
@@ -35,10 +35,10 @@ public sealed class SqliteSimulationResultRepositoryTests
                 new CashflowSnapshotEntryDto { Name = "Miete", CashflowType = CashflowType.Expense, Amount = 800m }
             ]
         };
-        await _repository.WriteMonthlyResultsAsync(runId, [entry]);
-        await _repository.CompleteRunAsync(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, [entry], TestContext.Current.CancellationToken);
+        await _repository.CompleteRunAsync(runId, TestContext.Current.CancellationToken);
 
-        var results = await _repository.GetMonthlyResultsAsync(runId);
+        var results = await _repository.GetMonthlyResultsAsync(runId, TestContext.Current.CancellationToken);
         Assert.Single(results);
         var m = results[0];
         Assert.Equal(0, m.MonthIndex);
@@ -57,7 +57,7 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task WriteMonthlyResultsAsync_MultipleMonths_StoredInOrder()
     {
-        var start = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync(TestContext.Current.CancellationToken);
         var runId = start.RunId;
         var entries = new List<MonthlyResultDto>();
         for (var i = 0; i < 3; i++)
@@ -71,10 +71,10 @@ public sealed class SqliteSimulationResultRepositoryTests
                 CashflowSnapshots = []
             });
         }
-        await _repository.WriteMonthlyResultsAsync(runId, entries);
-        await _repository.CompleteRunAsync(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, entries, TestContext.Current.CancellationToken);
+        await _repository.CompleteRunAsync(runId, TestContext.Current.CancellationToken);
 
-        var results = await _repository.GetMonthlyResultsAsync(runId);
+        var results = await _repository.GetMonthlyResultsAsync(runId, TestContext.Current.CancellationToken);
         Assert.Equal(3, results.Count);
         Assert.Equal(0, results[0].MonthIndex);
         Assert.Equal(1000m, results[0].CashBalance);
@@ -87,7 +87,7 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task GetMonthlyResultsAsync_UnknownRunId_ReturnsEmpty()
     {
-        var results = await _repository.GetMonthlyResultsAsync(999_999);
+        var results = await _repository.GetMonthlyResultsAsync(999_999, TestContext.Current.CancellationToken);
         Assert.NotNull(results);
         Assert.Empty(results);
     }
@@ -100,14 +100,14 @@ public sealed class SqliteSimulationResultRepositoryTests
         {
             Directory.CreateDirectory(tempDir);
             var repo = new SqliteSimulationResultRepository(tempDir);
-            var start1 = await repo.StartRunAsync();
-            await repo.WriteMonthlyResultsAsync(start1.RunId, [new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m }]);
-            await repo.CompleteRunAsync(start1.RunId);
+            var start1 = await repo.StartRunAsync(TestContext.Current.CancellationToken);
+            await repo.WriteMonthlyResultsAsync(start1.RunId, [new MonthlyResultDto { MonthIndex = 0, Age = 1, CashBalance = 100m, TotalAssets = 100m }], TestContext.Current.CancellationToken);
+            await repo.CompleteRunAsync(start1.RunId, TestContext.Current.CancellationToken);
 
-            var start2 = await repo.StartRunAsync();
+            var start2 = await repo.StartRunAsync(TestContext.Current.CancellationToken);
             Assert.True(start2.RunId > 0);
             Assert.NotEqual(start1.RunId, start2.RunId);
-            var fromRun2 = await repo.GetMonthlyResultsAsync(start2.RunId);
+            var fromRun2 = await repo.GetMonthlyResultsAsync(start2.RunId, TestContext.Current.CancellationToken);
             Assert.Empty(fromRun2);
         }
         finally
@@ -124,7 +124,7 @@ public sealed class SqliteSimulationResultRepositoryTests
     [Fact]
     public async Task WriteMonthlyResultsAsync_LargeBatch_360Months_Roundtrip()
     {
-        var start = await _repository.StartRunAsync();
+        var start = await _repository.StartRunAsync(TestContext.Current.CancellationToken);
         var runId = start.RunId;
         var entries = new List<MonthlyResultDto>(360);
         for (var i = 0; i < 360; i++)
@@ -138,10 +138,10 @@ public sealed class SqliteSimulationResultRepositoryTests
                 CashflowSnapshots = i % 12 == 0 ? [new CashflowSnapshotEntryDto { Name = "Bonus", CashflowType = CashflowType.Income, Amount = 5000m }] : []
             });
         }
-        await _repository.WriteMonthlyResultsAsync(runId, entries);
-        await _repository.CompleteRunAsync(runId);
+        await _repository.WriteMonthlyResultsAsync(runId, entries, TestContext.Current.CancellationToken);
+        await _repository.CompleteRunAsync(runId, TestContext.Current.CancellationToken);
 
-        var results = await _repository.GetMonthlyResultsAsync(runId);
+        var results = await _repository.GetMonthlyResultsAsync(runId, TestContext.Current.CancellationToken);
         Assert.Equal(360, results.Count);
         Assert.Equal(0, results[0].MonthIndex);
         Assert.Equal(359, results[359].MonthIndex);

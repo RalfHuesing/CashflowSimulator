@@ -21,7 +21,7 @@ public sealed class SimulationResultViewModelTests
         var vm = new SimulationResultViewModel(runId, service);
         Assert.Empty(vm.MonthlyResults);
 
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(runId, vm.RunId);
         Assert.Equal(runId, vm.Result.RunId);
@@ -43,7 +43,7 @@ public sealed class SimulationResultViewModelTests
     public async Task LoadAsync_WithNullService_DoesNothing()
     {
         var vm = new SimulationResultViewModel(1, null);
-        await vm.LoadAsync();
+        await vm.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Empty(vm.MonthlyResults);
     }
 

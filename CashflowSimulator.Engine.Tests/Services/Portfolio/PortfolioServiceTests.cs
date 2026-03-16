@@ -58,7 +58,7 @@ public class PortfolioServiceTests
         var service = new PortfolioService(stockService, NullLogger<PortfolioService>.Instance);
 
         var assets = new[] { asset1, asset2 };
-        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(assets);
+        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(assets, TestContext.Current.CancellationToken);
 
         Assert.Equal(2, updatedAssets.Count);
         Assert.Equal(2, updatedCount);
@@ -89,7 +89,7 @@ public class PortfolioServiceTests
         var stockService = new FixedPriceStockPriceService(fixedPrice);
         var service = new PortfolioService(stockService, NullLogger<PortfolioService>.Instance);
 
-        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(new[] { asset });
+        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(new[] { asset }, TestContext.Current.CancellationToken);
 
         Assert.Single(updatedAssets);
         Assert.Equal(1, updatedCount);
@@ -115,7 +115,7 @@ public class PortfolioServiceTests
         var stockService = new FixedPriceStockPriceService(0, success: false);
         var service = new PortfolioService(stockService, NullLogger<PortfolioService>.Instance);
 
-        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(new[] { asset });
+        var (updatedAssets, updatedCount, errorCount) = await service.UpdatePricesAsync(new[] { asset }, TestContext.Current.CancellationToken);
 
         Assert.Single(updatedAssets);
         Assert.Equal(0, updatedCount);
