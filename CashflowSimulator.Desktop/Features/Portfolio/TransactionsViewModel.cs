@@ -18,8 +18,14 @@ public record TransactionEntry(string AssetId, string AssetName, TransactionDto 
 /// ViewModel für das Transaktions-Journal: flache Liste aller Transaktionen aus allen Assets,
 /// Detail-Formular mit Asset-Auswahl. Sortierung: neueste zuerst.
 /// </summary>
-public partial class TransactionsViewModel : ValidatingViewModelBase
+public partial class TransactionsViewModel : ValidatingViewModelBase, IMasterDetailSearchable
 {
+    private const int SearchDebounceMs = 200;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche nach Asset oder Datum (TT.MM.JJJJ)...";
     private readonly ICurrentProjectService _currentProjectService;
 
     [ObservableProperty]
@@ -60,7 +66,10 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         _editingAssetId = value?.Id;
     }
 
-    /// <summary>Alle Transaktionen aller Assets, neueste zuerst.</summary>
+    /// <summary>Alle Transaktionen aller Assets (vollständige Liste).</summary>
+    private readonly List<TransactionEntry> _allTransactionsOriginal = [];
+
+    /// <summary>Gefilterte Anzeige der Transaktionen (reaktiv auf SearchText).</summary>
     public ObservableCollection<TransactionEntry> AllTransactions { get; } = [];
 
     public ObservableCollection<AssetOption> AssetOptions { get; } = [];
@@ -88,6 +97,11 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
         _currentProjectService.ProjectChanged += OnProjectChanged;
         RefreshAssetOptions();
         RefreshTransactions();
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        ScheduleDebounced(SearchDebounceMs, ApplyFilter);
     }
 
     partial void OnSelectedItemChanged(TransactionEntry? value)
@@ -126,7 +140,7 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
 
     private void RefreshTransactions()
     {
-        AllTransactions.Clear();
+        _allTransactionsOriginal.Clear();
         var assets = _currentProjectService.Current?.Portfolio?.Assets ?? [];
         var list = new List<TransactionEntry>();
         foreach (var asset in assets)
@@ -134,8 +148,33 @@ public partial class TransactionsViewModel : ValidatingViewModelBase
             foreach (var transaction in asset.Transactions)
                 list.Add(new TransactionEntry(asset.Id, asset.Name, transaction));
         }
-        foreach (var entry in list.OrderByDescending(e => e.Transaction.Date))
-            AllTransactions.Add(entry);
+        _allTransactionsOriginal.AddRange(list.OrderByDescending(e => e.Transaction.Date));
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var search = (SearchText ?? string.Empty).Trim().ToUpperInvariant();
+        AllTransactions.Clear();
+        
+        if (string.IsNullOrEmpty(search))
+        {
+            foreach (var entry in _allTransactionsOriginal)
+                AllTransactions.Add(entry);
+        }
+        else
+        {
+            foreach (var entry in _allTransactionsOriginal)
+            {
+                // Suche in Asset-Name oder Datum (formatiert)
+                var dateStr = entry.Transaction.Date.ToString("dd.MM.yyyy");
+                if (entry.AssetName.ToUpperInvariant().Contains(search) ||
+                    dateStr.Contains(search))
+                {
+                    AllTransactions.Add(entry);
+                }
+            }
+        }
     }
 
     private void ClearForm()
