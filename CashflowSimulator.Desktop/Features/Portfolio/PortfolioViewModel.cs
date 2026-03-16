@@ -14,12 +14,14 @@ namespace CashflowSimulator.Desktop.Features.Portfolio;
 /// ViewModel für Vermögenswerte (Assets): Master-Liste mit Suche, Detail-Formular.
 /// Transaktionen werden hier nicht angezeigt (siehe Transaktionen-View). Enthält aktueller Kurs und Anlageklasse.
 /// </summary>
-public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>
+public partial class PortfolioViewModel : CrudViewModelBase<AssetDto>, IMasterDetailSearchable
 {
     private const int SearchDebounceMs = 200;
 
     [ObservableProperty]
     private string _searchText = string.Empty;
+
+    public string? SearchWatermark => "Suche nach Name oder ISIN...";
 
     [ObservableProperty]
     private string _name = string.Empty;

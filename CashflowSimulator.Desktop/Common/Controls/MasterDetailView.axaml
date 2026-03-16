@@ -3,22 +3,30 @@
              xmlns:controls="using:CashflowSimulator.Desktop.Common.Controls"
              x:Class="CashflowSimulator.Desktop.Common.Controls.MasterDetailView">
     
-    <Grid RowDefinitions="*, 4, *"
+    <Grid RowDefinitions="Auto, *, 4, *"
           ColumnDefinitions="*"
           VerticalAlignment="Stretch"
           HorizontalAlignment="Stretch">
         
-        <ContentPresenter Grid.Row="0"
+        <TextBox Grid.Row="0"
+                 x:CompileBindings="False"
+                 Text="{Binding SearchText}"
+                 Watermark="{Binding SearchWatermark}"
+                 IsVisible="{Binding ShowSearch, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"
+                 Margin="0,0,0,8"
+                 Padding="8,6" />
+                 
+        <ContentPresenter Grid.Row="1"
                           Content="{Binding MasterContent, RelativeSource={RelativeSource AncestorType=controls:MasterDetailView}}"
                           VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"/>
         
-        <GridSplitter Grid.Row="1"
+        <GridSplitter Grid.Row="2"
                       Background="{StaticResource GridSplitterBackgroundBrush}"
                       ResizeDirection="Rows"
                       ResizeBehavior="PreviousAndNext"/>
         
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 Background="{StaticResource ContentBackgroundBrush}"
                 MinHeight="{StaticResource MasterDetailDetailMinHeight}"
                 Margin="{StaticResource MasterDetailDetailMargin}">

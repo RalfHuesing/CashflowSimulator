@@ -15,6 +15,9 @@ public partial class MasterDetailView : UserControl
     public static readonly StyledProperty<object?> DetailContentProperty =
         AvaloniaProperty.Register<MasterDetailView, object?>(nameof(DetailContent));
 
+    public static readonly StyledProperty<bool> ShowSearchProperty =
+        AvaloniaProperty.Register<MasterDetailView, bool>(nameof(ShowSearch));
+
     public object? MasterContent
     {
         get => GetValue(MasterContentProperty);
@@ -25,6 +28,21 @@ public partial class MasterDetailView : UserControl
     {
         get => GetValue(DetailContentProperty);
         set => SetValue(DetailContentProperty, value);
+    }
+
+    public bool ShowSearch
+    {
+        get => GetValue(ShowSearchProperty);
+        set => SetValue(ShowSearchProperty, value);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == DataContextProperty)
+        {
+            ShowSearch = DataContext is ViewModels.IMasterDetailSearchable;
+        }
     }
 
     public MasterDetailView()
