@@ -1,41 +1,41 @@
 # Cashflow Simulator
 
-## Überblick
+## Ãœberblick
 
-Der Cashflow Simulator ist mehr als ein einfacher Renditerechner. Er bildet die finanzielle Lebenssituation eines Nutzers über Dekaden und verschiedene Lebensphasen hinweg ab. **Zielgruppe:** Deutsche mit langfristiger Finanzplanung (Anspar- und Rentenphase).
+Der Cashflow Simulator ist mehr als ein einfacher Renditerechner. Er bildet die finanzielle Lebenssituation eines Nutzers Ã¼ber Dekaden und verschiedene Lebensphasen hinweg ab. **Zielgruppe:** Deutsche mit langfristiger Finanzplanung (Anspar- und Rentenphase).
 
-## Wozu? ? Kernfragen
+## Wozu? â€“ Kernfragen
 
 Die Anwendung soll unter anderem beantworten:
 
 - Kann ich mir das 3. Auto in 25 Jahren leisten?
-- Wieviel Cash brauche ich in einem gegebenen Lebensabschnitt (Anspar- oder Entsparphase), um die nächsten N Jahre auch bei Börsencrashs abgesichert zu sein?
-- Wieviel kann ich heute langfristig investieren, ohne mein definiertes Cash-Bucket zu gefährden?
-- In welche Assets soll investiert werden ? inkl. Rebalancing-Strategie?
-- Verschiedene Korrelationen und Strategien über die Lebensphasen simulieren; Verkäufe und Steuereffekte sind dabei zu berücksichtigen.
+- Wieviel Cash brauche ich in einem gegebenen Lebensabschnitt (Anspar- oder Entsparphase), um die nÃ¤chsten N Jahre auch bei BÃ¶rsencrashs abgesichert zu sein?
+- Wieviel kann ich heute langfristig investieren, ohne mein definiertes Cash-Bucket zu gefÃ¤hrden?
+- In welche Assets soll investiert werden â€“ inkl. Rebalancing-Strategie?
+- Verschiedene Korrelationen und Strategien Ã¼ber die Lebensphasen simulieren; VerkÃ¤ufe und Steuereffekte sind dabei zu berÃ¼cksichtigen.
 
 ## Konzepte
 
 ### Lebensabschnitte
 
-Es können Lebensabschnitte definiert werden (z.B. Ansparphase und Rentenphase). Pro Abschnitt: Beginn- und Endalter sowie ein **Lookahead-Zeitraum**. In diesem Zeitraum soll versucht werden, alle geplanten Ausgaben als Cash vorzuhalten. Typisch sind zwei Abschnitte: Ansparphase und Rentenphase.
+Es kÃ¶nnen Lebensabschnitte definiert werden (z.B. Ansparphase und Rentenphase). Pro Abschnitt: Beginn- und Endalter sowie ein **Lookahead-Zeitraum**. In diesem Zeitraum soll versucht werden, alle geplanten Ausgaben als Cash vorzuhalten. Typisch sind zwei Abschnitte: Ansparphase und Rentenphase.
 
 ### Cashflows
 
 - **Laufend:** Einnahmen und Ausgaben.
 - **Einmalig:** Geplante Einnahmen und Ausgaben (z.B. Auto in X Jahren).
 
-Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter innerhalb dieses Abschnitts. In der Entsparphase können sich Werte und Verhalten ändern (z.B. andere Miete/Kosten) ? dafür können entsprechende Flows gepflegt werden.
+Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Vonâ€“Bis-Alter innerhalb dieses Abschnitts. In der Entsparphase kÃ¶nnen sich Werte und Verhalten Ã¤ndern (z.B. andere Miete/Kosten) â€“ dafÃ¼r kÃ¶nnen entsprechende Flows gepflegt werden.
 
-**Unsicherheit:** Einige Events haben eine Toleranz (z.B. ?Auto in 10?12 Jahren?); das darauf folgende Event verschiebt sich entsprechend (z.B. +10 Jahre Abstand).
+**Unsicherheit:** Einige Events haben eine Toleranz (z.B. â€žAuto in 10â€“12 Jahrenâ€œ); das darauf folgende Event verschiebt sich entsprechend (z.B. +10 Jahre Abstand).
 
 ### Portfolio
 
 - Ein Portfolio besteht aus **Assetallokationen** (z.B. MSCI World 60 %, Anleihen 40 %).
-- Jede Allokation hat erwartete Rendite und Volatilität (für die Monte-Carlo-Simulation).
-- Pro Asset können mehrere Wertpapiere existieren (z.B. verschiedene MSCI-World-ETFs über die Jahre). Nur ein Wertpapier pro Asset ist ?aktiv? und wird beim **Kauf** (Sparplan) verwendet.
-- Beim **Verkauf** wird steueroptimiert entschieden (FIFO, Transaktionshistorie mit Kauf, Verkauf, Dividenden, Vorabpauschale). Getätigte Verkäufe fließen in die Akkumulation ein.
-- Die **Zielallokation** kann pro Lebensphase über ein **Allokationsprofil** definiert werden. Bei Phasenwechsel nutzt die Engine das zugehörige Profil. Optional kann ein **Glidepath** (Anzahl Monate vor Phasenstart) konfiguriert werden, sodass gleitend auf die neue Zielallokation umgeschichtet wird.
+- Jede Allokation hat erwartete Rendite und VolatilitÃ¤t (fÃ¼r die Monte-Carlo-Simulation).
+- Pro Asset kÃ¶nnen mehrere Wertpapiere existieren (z.B. verschiedene MSCI-World-ETFs Ã¼ber die Jahre). Nur ein Wertpapier pro Asset ist â€žaktivâ€œ und wird beim **Kauf** (Sparplan) verwendet.
+- Beim **Verkauf** wird steueroptimiert entschieden (FIFO, Transaktionshistorie mit Kauf, Verkauf, Dividenden, Vorabpauschale). GetÃ¤tigte VerkÃ¤ufe flieÃŸen in die Akkumulation ein.
+- Die **Zielallokation** kann pro Lebensphase Ã¼ber ein **Allokationsprofil** definiert werden. Bei Phasenwechsel nutzt die Engine das zugehÃ¶rige Profil. Optional kann ein **Glidepath** (Anzahl Monate vor Phasenstart) konfiguriert werden, sodass gleitend auf die neue Zielallokation umgeschichtet wird.
 
 **Rebalancing:**
 
@@ -44,25 +44,25 @@ Jedem Cashflow wird ein Lebensabschnitt zugeordnet; optional ein Von?Bis-Alter i
 
 ### Unsicherheit und Simulation
 
-- Zukünftige Wertschwankungen werden per **Monte-Carlo-Simulation** und Perzentil-Auswertung abgeschätzt.
-- **Inflation** wird ebenfalls als Monte-Carlo modelliert (z.B. erwartete negative reale Rendite, Volatilität konfigurierbar, ggf. 0).
-- Gleiches gilt für Gehalt und andere Cashflows sowie Wertpapiere. Die Schwankungsbereiche werden zentral definiert und den jeweiligen Assets bzw. Cashflows zugeordnet.
+- ZukÃ¼nftige Wertschwankungen werden per **Monte-Carlo-Simulation** und Perzentil-Auswertung abgeschÃ¤tzt.
+- **Inflation** wird ebenfalls als Monte-Carlo modelliert (z.B. erwartete negative reale Rendite, VolatilitÃ¤t konfigurierbar, ggf. 0).
+- Gleiches gilt fÃ¼r Gehalt und andere Cashflows sowie Wertpapiere. Die Schwankungsbereiche werden zentral definiert und den jeweiligen Assets bzw. Cashflows zugeordnet.
 
 ### Stammdaten und Steuern
 
 - **Stammdaten:** u.a. Geburtsdatum (und Rentenalter).
-- **Steuern:** Verkäufe über Dekaden (FIFO, Vorabpauschale etc.) werden in der Simulation berücksichtigt.
+- **Steuern:** VerkÃ¤ufe Ã¼ber Dekaden (FIFO, Vorabpauschale etc.) werden in der Simulation berÃ¼cksichtigt.
 
 ## Szenarien
 
-Ein **Szenario** ist die vollständige Sammlung aller Eingaben für eine Planungsvariante (Person, Cashflows, Portfolio, Strategie, Optionen). Es können beliebig viele Szenarien angelegt werden; jedes wird typischerweise als eine Projektdatei (z.B. `Szenario.json`) gespeichert.
+Ein **Szenario** ist die vollstÃ¤ndige Sammlung aller Eingaben fÃ¼r eine Planungsvariante (Person, Cashflows, Portfolio, Strategie, Optionen). Es kÃ¶nnen beliebig viele Szenarien angelegt werden; jedes wird typischerweise als eine Projektdatei (z.B. `Szenario.json`) gespeichert.
 
 ## Validierung
 
-Validierung läuft zentral über **FluentValidation** im Projekt **CashflowSimulator.Validation**. Desktop und Engine nutzen dieselben Regeln; Fehler werden in der Desktop-App im zentralen Meldungsbereich der Shell angezeigt. Keine Validierung im XAML. Details in **`.cursor/rules/main.md`**.
+Validierung lÃ¤uft zentral Ã¼ber **FluentValidation** im Projekt **CashflowSimulator.Validation**. Desktop und Engine nutzen dieselben Regeln; Fehler werden in der Desktop-App im zentralen Meldungsbereich der Shell angezeigt. Keine Validierung im XAML. Details in **`.antigravity/rules/main.md`**.
 
 ---
 
-**Technischer Stand (Code = Source of Truth):** Die monatliche Simulations-Pipeline ist implementiert: `SimulationRunner` (Engine) führt pro Monat eine Kette von `ISimulationProcessor` aus (InflationProcessor, CashflowProcessor, LiquidityProcessor, GrowthProcessor). Ergebnis: `SimulationResultDto` mit monatlichen Werten (Cash, TotalAssets, Cashflow-Snapshots). Das **FIFO-Datenmodell** (Tranchen pro Asset: `AssetTrancheDto`, Anlage bei Kauf, FIFO-Verbrauch bei Verkauf) ist umgesetzt; die eigentliche Steuer-Engine (Gewinn/Verlust, Vorabpauschale) und Monte-Carlo sind in Planung.
+**Technischer Stand (Code = Source of Truth):** Die monatliche Simulations-Pipeline ist implementiert: `SimulationRunner` (Engine) fÃ¼hrt pro Monat eine Kette von `ISimulationProcessor` aus (InflationProcessor, CashflowProcessor, LiquidityProcessor, GrowthProcessor). Ergebnis: `SimulationResultDto` mit monatlichen Werten (Cash, TotalAssets, Cashflow-Snapshots). Das **FIFO-Datenmodell** (Tranchen pro Asset: `AssetTrancheDto`, Anlage bei Kauf, FIFO-Verbrauch bei Verkauf) ist umgesetzt; die eigentliche Steuer-Engine (Gewinn/Verlust, Vorabpauschale) und Monte-Carlo sind in Planung.
 
-Technische Architektur, Datenmodell (`SimulationProjectDto`, inkl. `UiSettings` für UI-Optionen pro Szenario) und Datenfluss sind in **`.cursor/rules/main.md`** beschrieben.
+Technische Architektur, Datenmodell (`SimulationProjectDto`, inkl. `UiSettings` fÃ¼r UI-Optionen pro Szenario) und Datenfluss sind in **`.antigravity/rules/main.md`** beschrieben.

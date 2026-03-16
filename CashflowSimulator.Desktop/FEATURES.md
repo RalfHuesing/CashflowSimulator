@@ -68,12 +68,12 @@ Damit neue Features gleich funktionieren wie Eckdaten/Einstellungen:
 5. **Validierung:** Nur über FluentValidation; Fehler erscheinen **nur im rechten Info-Panel** (nicht unter den Controls). Keine Statusleiste.
 6. **Status-Rückmeldungen:** Für Aktionen (z. B. Speichern, asynchrone Operationen wie Kursaktualisierung) **ShowStatus(Nachricht, DauerMs, StatusType)** nutzen (Info, Warning, Error, Success). Die Meldungen erscheinen als **Liste** im rechten Info-Panel unterhalb der Hilfe (scrollbar mit dem gesamten Panel). Beim Verlassen des Feature-Views werden alle Meldungen verworfen (ClearStatus beim View-Wechsel); keine Toasts, keine Persistenz.
 
-Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.cursor/rules/avalonia.md` („Feature-Layout und Hilfe“).
+Details siehe `.antigravity/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.antigravity/rules/ui-avalonia.md` („Feature-Layout und Hilfe“).
 
 ## Coding Guidelines (ViewModel/DTO)
 
 - VM-Properties, die 1:1 DTO-Daten repräsentieren, müssen denselben Namen wie im DTO tragen (Ausnahme: andere Semantik, z. B. Alter vs. Datum).
-- Validierungs-Mapping DTO → VM nur mit `nameof(DtoType.Property)` und `nameof(VmProperty)` – keine String-Literale. Siehe `.cursor/rules/main.md` (Validierung).
+- Validierungs-Mapping DTO → VM nur mit `nameof(DtoType.Property)` und `nameof(VmProperty)` – keine String-Literale. Siehe `.antigravity/rules/main.md` (Validierung).
 
 ## Marktdaten und Korrelationen
 
@@ -100,5 +100,5 @@ Details siehe `.cursor/rules/main.md` (Abschnitt „Feature-Bereiche“) und `.c
 
 ## Erweiterung
 
-- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen, Portfolio/Anlageklassen/Assets) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.cursor/rules/avalonia.md` (Master-Detail und Listen-Ansichten).
+- Neues Feature = neuer Ordner unter `Features/<Name>/` mit Views, ViewModels, ggf. Dialogen; bei Bedarf gleiches Pattern wie Eckdaten (FeatureLayoutView, ValidatingViewModelBase, HelpKey). **Listen-Ansichten mit Bearbeitungsmaske** (z. B. CashflowStreams, CashflowEvents, Marktdaten, Korrelationen, Portfolio/Anlageklassen/Assets) nutzen **MasterDetailView** innerhalb von FeatureLayoutView und zentrale **DataGridStyles** – siehe `.antigravity/rules/ui-avalonia.md` (Master-Detail und Listen-Ansichten).
 - Gemeinsam genutzte Dialoge/Services bleiben in `Services/` oder werden bei Bedarf in ein gemeinsames Feature (z. B. `Features/Shared/`) ausgelagert.
